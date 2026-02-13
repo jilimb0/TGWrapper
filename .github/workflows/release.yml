@@ -29,10 +29,9 @@ jobs:
       - run: |
           TOKEN="$(printf '%s' "${NPM_PUBLISH_TOKEN}" | tr -d '\r\n')"
           if [ -z "$TOKEN" ]; then
-            echo "NPM_TOKEN is empty in workflow context"
+            echo "NPM_PUBLISH_TOKEN is empty in workflow context"
             exit 1
           fi
-          echo "NPM publish token length: ${#TOKEN}"
           echo "//registry.npmjs.org/:_authToken=${TOKEN}" > .npmrc
           npm whoami
         env:

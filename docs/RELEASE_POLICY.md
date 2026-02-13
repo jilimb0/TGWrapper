@@ -4,6 +4,7 @@
 
 - Versioning is managed by Changesets in `.changeset/`.
 - Publishing is CI-only through `.github/workflows/release.yml`.
+- Publishing uses `NPM_PUBLISH_TOKEN` secret from GitHub Actions.
 - Manual local `pnpm publish` is blocked by `prepublishOnly` checks.
 
 ## SemVer Rules

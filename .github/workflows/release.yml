@@ -33,10 +33,16 @@ jobs:
             exit 1
           fi
           echo "NPM publish token length: ${#TOKEN}"
+          python - <<'PY'
+import os, hashlib
+t = os.environ["TOKEN"]
+print("NPM publish token sha16:", hashlib.sha256(t.encode()).hexdigest()[:16])
+PY
           echo "//registry.npmjs.org/:_authToken=${TOKEN}" > ~/.npmrc
           npm whoami
         env:
           NPM_PUBLISH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+          TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
       - uses: changesets/action@v1
         with:
           publish: pnpm -r publish --access public

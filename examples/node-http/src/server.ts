@@ -8,8 +8,8 @@ import {
   SessionManager,
   TreeRouter,
   WebhookHandler
-} from '@framework/core';
-import type { SessionEnvelope } from '@framework/core';
+} from 'tgwrapper';
+import type { SessionEnvelope } from 'tgwrapper';
 
 type State = 'idle';
 interface Data {

@@ -7,7 +7,7 @@
     "dev": "wrangler dev"
   },
   "dependencies": {
-    "@framework/core": "workspace:*"
+    "tgwrapper": "^0.3.0"
   },
   "devDependencies": {
     "wrangler": "^4.2.0"

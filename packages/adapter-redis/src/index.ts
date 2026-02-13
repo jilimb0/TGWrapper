@@ -1,5 +1,22 @@
 import { Redis } from 'ioredis';
-import type { CasResult, SessionStorage, VersionedValue } from '@framework/core';
+
+export interface VersionedValue<T> {
+  value: T;
+  version: number;
+}
+
+export interface CasResult<T> {
+  ok: boolean;
+  current?: VersionedValue<T>;
+}
+
+export interface SessionStorage<TSession> {
+  get(key: string): Promise<TSession | null>;
+  set(key: string, value: TSession): Promise<void>;
+  delete(key: string): Promise<void>;
+  getWithVersion(key: string): Promise<VersionedValue<TSession> | null>;
+  compareAndSet(key: string, expectedVersion: number, nextValue: TSession): Promise<CasResult<TSession>>;
+}
 
 export interface RedisAdapterOptions {
   redisUrl: string;

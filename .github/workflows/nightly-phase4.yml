@@ -1,0 +1,42 @@
+name: Nightly Phase4
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  nightly-chaos-load:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r typecheck
+      - run: pnpm test:load
+      - run: pnpm test:chaos
+      - run: pnpm test:integration
+        env:
+          REDIS_URL: redis://127.0.0.1:6379
+      - run: pnpm benchmark
+      - uses: actions/upload-artifact@v4
+        with:
+          name: phase4-benchmark-report
+          path: benchmark/reports/latest.json
+          if-no-files-found: error

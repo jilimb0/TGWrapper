@@ -1,7 +1,7 @@
 ---
-"@framework/core": minor
-"@framework/adapter-redis": minor
-"@framework/observability": minor
+"tgwrapper": minor
+"tgwrapper-adapter-redis": minor
+"tgwrapper-observability": minor
 ---
 
 Phase 3 release foundation.

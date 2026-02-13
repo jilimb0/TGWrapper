@@ -14,9 +14,9 @@
 
 ## Package Scope
 
-- `@framework/core`: runtime/kernel/router/FSM contracts.
-- `@framework/adapter-redis`: Redis session adapter and storage guarantees.
-- `@framework/observability`: logging/metrics utilities.
+- `tgwrapper`: runtime/kernel/router/FSM contracts.
+- `tgwrapper-adapter-redis`: Redis session adapter and storage guarantees.
+- `tgwrapper-observability`: logging/metrics utilities.
 
 ## Release Flow
 

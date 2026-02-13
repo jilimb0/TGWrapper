@@ -1,5 +1,5 @@
 {
-  "name": "@framework/observability",
+  "name": "tgwrapper-observability",
   "version": "0.1.0",
   "type": "module",
   "main": "dist/index.js",
@@ -15,10 +15,13 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "prepublishOnly": "node ../../scripts/enforce-ci-publish.mjs"
   },
-  "dependencies": {
-    "@framework/core": "workspace:*"
-  },
   "devDependencies": {
     "typescript": "5.8.2"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

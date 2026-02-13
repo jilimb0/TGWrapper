@@ -27,7 +27,7 @@ importers:
 
   packages/adapter-redis:
     dependencies:
-      '@framework/core':
+      'tgwrapper':
         specifier: workspace:*
         version: link:../..
       ioredis:
@@ -43,7 +43,7 @@ importers:
 
   packages/observability:
     dependencies:
-      '@framework/core':
+      'tgwrapper':
         specifier: workspace:*
         version: link:../..
     devDependencies:

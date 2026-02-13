@@ -1,4 +1,24 @@
-import type { JsonObject, LogEvent, Logger, MetricsCollector } from '@framework/core';
+export type JsonValue = string | number | boolean | null | JsonObject | JsonValue[];
+export type JsonObject = { [key: string]: JsonValue | undefined };
+
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+export interface LogEvent {
+  level: LogLevel;
+  event: string;
+  timestamp: string;
+  requestId?: string;
+  data?: JsonObject;
+}
+
+export interface Logger {
+  log(event: LogEvent): void;
+}
+
+export interface MetricsCollector {
+  increment(metric: string, value?: number, tags?: Record<string, string>): void;
+  observe(metric: string, value: number, tags?: Record<string, string>): void;
+}
 
 export interface EcsContext {
   serviceName: string;

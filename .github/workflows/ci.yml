@@ -43,6 +43,6 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @framework/adapter-redis test:integration
+      - run: pnpm --filter tgwrapper-adapter-redis test:integration
         env:
           REDIS_URL: redis://127.0.0.1:6379

@@ -1,0 +1,17 @@
+service: tg-framework-aws-example
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  environment:
+    BOT_TOKEN: ${env:BOT_TOKEN}
+    WEBHOOK_SECRET: ${env:WEBHOOK_SECRET}
+functions:
+  webhook:
+    handler: src/handler.webhook
+    events:
+      - httpApi:
+          path: /webhook
+          method: post
+plugins:
+  - serverless-esbuild

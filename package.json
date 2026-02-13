@@ -1,0 +1,47 @@
+{
+  "name": "@framework/core",
+  "version": "0.3.0",
+  "description": "Serverless-first Telegram bot framework without external bot libraries",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "pnpm --filter @framework/adapter-redis test:integration",
+    "benchmark": "pnpm build && node benchmark/throughput.mjs",
+    "docs": "typedoc src/index.ts --out docs/api",
+    "prepublishOnly": "node scripts/enforce-ci-publish.mjs",
+    "release:status": "changeset status",
+    "release:version": "changeset version",
+    "release:publish": "changeset publish"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "framework",
+    "fsm",
+    "serverless"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@grammyjs/types": "^3.8.0"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.6",
+    "typedoc": "^0.27.9",
+    "typescript": "5.8.2",
+    "vitest": "^4.0.18"
+  },
+  "packageManager": "pnpm@10.4.1"
+}

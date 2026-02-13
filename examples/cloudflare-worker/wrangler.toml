@@ -1,0 +1,7 @@
+name = "tg-framework-worker-example"
+main = "src/worker.ts"
+compatibility_date = "2025-02-01"
+
+[vars]
+BOT_TOKEN = ""
+WEBHOOK_SECRET = ""

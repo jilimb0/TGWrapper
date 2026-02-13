@@ -1,0 +1,27 @@
+{
+  "name": "@framework/adapter-redis",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:integration": "vitest run test/redis.integration.test.ts",
+    "prepublishOnly": "node ../../scripts/enforce-ci-publish.mjs"
+  },
+  "dependencies": {
+    "@framework/core": "workspace:*",
+    "ioredis": "^5.6.1"
+  },
+  "devDependencies": {
+    "typescript": "5.8.2",
+    "vitest": "^4.0.18"
+  }
+}

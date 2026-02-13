@@ -1,5 +1,5 @@
 {
-  "name": "tgwrapper-adapter-redis",
+  "name": "@jilimb0/tgwrapper-adapter-redis",
   "version": "0.2.0",
   "type": "module",
   "main": "dist/index.js",

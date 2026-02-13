@@ -1,5 +1,5 @@
 {
-  "name": "tgwrapper-observability",
+  "name": "@jilimb0/tgwrapper-observability",
   "version": "0.2.0",
   "type": "module",
   "main": "dist/index.js",

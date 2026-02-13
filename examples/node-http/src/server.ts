@@ -8,8 +8,8 @@ import {
   SessionManager,
   TreeRouter,
   WebhookHandler
-} from 'tgwrapper';
-import type { SessionEnvelope } from 'tgwrapper';
+} from '@jilimb0/tgwrapper';
+import type { SessionEnvelope } from '@jilimb0/tgwrapper';
 
 type State = 'idle';
 interface Data {

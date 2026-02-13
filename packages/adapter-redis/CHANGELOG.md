@@ -1,4 +1,4 @@
-# tgwrapper-adapter-redis
+# @jilimb0/tgwrapper-adapter-redis
 
 ## 0.2.0
 

@@ -7,8 +7,8 @@ import {
   SessionManager,
   TreeRouter,
   WebhookHandler
-} from 'tgwrapper';
-import type { ApiGatewayV2Event, ApiGatewayV2Response, SessionEnvelope } from 'tgwrapper';
+} from '@jilimb0/tgwrapper';
+import type { ApiGatewayV2Event, ApiGatewayV2Response, SessionEnvelope } from '@jilimb0/tgwrapper';
 
 type State = 'idle';
 interface Data {

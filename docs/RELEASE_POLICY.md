@@ -15,9 +15,9 @@
 
 ## Package Scope
 
-- `tgwrapper`: runtime/kernel/router/FSM contracts.
-- `tgwrapper-adapter-redis`: Redis session adapter and storage guarantees.
-- `tgwrapper-observability`: logging/metrics utilities.
+- `@jilimb0/tgwrapper`: runtime/kernel/router/FSM contracts.
+- `@jilimb0/tgwrapper-adapter-redis`: Redis session adapter and storage guarantees.
+- `@jilimb0/tgwrapper-observability`: logging/metrics utilities.
 
 ## Release Flow
 

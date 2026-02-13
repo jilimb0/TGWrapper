@@ -1,4 +1,4 @@
-# tgwrapper
+# @jilimb0/tgwrapper
 
 ## 0.4.0
 

@@ -1,4 +1,4 @@
-# tgwrapper-observability
+# @jilimb0/tgwrapper-observability
 
 ## 0.2.0
 

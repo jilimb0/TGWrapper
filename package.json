@@ -1,5 +1,5 @@
 {
-  "name": "tgwrapper",
+  "name": "@jilimb0/tgwrapper",
   "version": "0.4.0",
   "description": "Serverless-first Telegram bot framework without external bot libraries",
   "type": "module",
@@ -16,7 +16,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:integration": "pnpm --filter tgwrapper-adapter-redis test:integration",
+    "test:integration": "pnpm --filter @jilimb0/tgwrapper-adapter-redis test:integration",
     "test:load": "vitest run test/load/throughput.load.test.ts",
     "test:chaos": "vitest run test/chaos/multi-tenant.chaos.test.ts",
     "test:phase4": "pnpm test:load && pnpm test:chaos && pnpm test:integration",

@@ -4,9 +4,9 @@ Production-grade Telegram Bot Framework with serverless-first architecture, nati
 
 ## Packages
 
-- `tgwrapper` - framework kernel, transport, router, FSM, adapters
-- `tgwrapper-adapter-redis` - ioredis-backed atomic session storage
-- `tgwrapper-observability` - ECS JSON logger and metrics helpers
+- `@jilimb0/tgwrapper` - framework kernel, transport, router, FSM, adapters
+- `@jilimb0/tgwrapper-adapter-redis` - ioredis-backed atomic session storage
+- `@jilimb0/tgwrapper-observability` - ECS JSON logger and metrics helpers
 
 ## Quick start
 

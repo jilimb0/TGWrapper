@@ -1,6 +1,7 @@
 name: Release
 
 on:
+  workflow_dispatch:
   workflow_run:
     workflows: ["CI"]
     types: [completed]
@@ -30,6 +31,19 @@ jobs:
           test -n "${ACTIONS_ID_TOKEN_REQUEST_URL}"
           test -n "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
           echo "OIDC context is available"
+      - name: OIDC debug claims
+        run: |
+          set -euo pipefail
+          RAW="$(curl -sS -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=npm:registry.npmjs.org")"
+          JWT="$(echo "${RAW}" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(JSON.parse(s).value))")"
+          PAYLOAD="$(echo "${JWT}" | cut -d '.' -f2 | tr '_-' '/+' | awk '{l=length($0)%4; if(l==2) printf \"%s==\",$0; else if(l==3) printf \"%s=\",$0; else printf \"%s\",$0}' | base64 -d 2>/dev/null || true)"
+          echo "GitHub context"
+          echo "  repository=${GITHUB_REPOSITORY}"
+          echo "  ref=${GITHUB_REF}"
+          echo "  workflow=${GITHUB_WORKFLOW}"
+          echo "  workflow_ref=${GITHUB_WORKFLOW_REF}"
+          echo "OIDC payload"
+          echo "${PAYLOAD}" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const p=JSON.parse(s);const out={iss:p.iss,aud:p.aud,sub:p.sub,repository:p.repository,repository_owner:p.repository_owner,ref:p.ref,job_workflow_ref:p.job_workflow_ref,workflow_ref:p.workflow_ref,actor:p.actor};console.log(JSON.stringify(out,null,2));})"
       - uses: changesets/action@v1
         with:
           publish: pnpm -r publish --access public --provenance --no-git-checks

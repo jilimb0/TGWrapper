@@ -1,5 +1,16 @@
 # @jilimb0/tgwrapper
 
+## 0.5.1
+
+### Patch Changes
+
+- 1ff28e6: Harden next release cycle quality gates by adding:
+
+  - adapter contract tests for cross-platform webhook behavior consistency
+  - package size budget checks in CI and release verification
+  - benchmark trend regression check against repository baseline
+  - reliability-aware release-readiness and go/no-go workflow gates
+
 ## 0.5.1 (Unreleased)
 
 ### Patch Changes

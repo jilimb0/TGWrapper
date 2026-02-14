@@ -32,6 +32,8 @@ function makeUpdate(updateId: number, userId: number, text: string) {
 
 describe('Chaos: multi-tenant contention', () => {
   it('keeps session integrity under concurrent tenant pressure', async () => {
+    const maxQueueOverflowRatio = Number(process.env.CHAOS_MAX_QUEUE_OVERFLOW_RATIO ?? '0.01');
+    const maxConflictsPerUpdate = Number(process.env.CHAOS_MAX_CONFLICTS_PER_UPDATE ?? '30');
     const metrics = new InMemoryMetrics();
     const api = new ApiClient({
       token: 'TEST',
@@ -82,9 +84,17 @@ describe('Chaos: multi-tenant contention', () => {
 
     const userA = await storage.get('1001');
     const userB = await storage.get('2001');
+    const processed = Number(userA?.data.count ?? 0) + Number(userB?.data.count ?? 0);
+    const attempted = all.length;
+    const queueOverflows = metrics.getCounter('runtime_dropped_queue_overflow');
+    const conflicts = metrics.getCounter('session_conflict_count');
+    const overflowRatio = queueOverflows / attempted;
+    const conflictsPerUpdate = conflicts / attempted;
 
     expect(userA?.data.count).toBe(200);
     expect(userB?.data.count).toBe(200);
-    expect(metrics.getCounter('session_conflict_count')).toBeGreaterThanOrEqual(0);
+    expect(processed).toBe(attempted);
+    expect(overflowRatio).toBeLessThanOrEqual(maxQueueOverflowRatio);
+    expect(conflictsPerUpdate).toBeLessThanOrEqual(maxConflictsPerUpdate);
   });
 });

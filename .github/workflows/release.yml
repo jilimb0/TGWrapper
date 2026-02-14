@@ -17,6 +17,9 @@ jobs:
     concurrency:
       group: release-${{ github.ref }}
       cancel-in-progress: false
+    env:
+      # Repository is private; npm provenance is currently unsupported for this source visibility.
+      NPM_PUBLISH_PROVENANCE: "false"
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -38,9 +41,7 @@ jobs:
           echo "registry=$(npm config get registry)"
           echo "always-auth=$(npm config get always-auth || true)"
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -r typecheck
-      - run: pnpm build
-      - run: pnpm -r build
+      - run: pnpm verify:release
       - name: Release status
         run: pnpm release:status
       - name: Package metadata snapshot
@@ -77,6 +78,16 @@ jobs:
           echo "  workflow_ref=${GITHUB_WORKFLOW_REF}"
           echo "OIDC payload"
           echo "${JWT}" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const token=s.trim();const parts=token.split('.');if(parts.length<2){throw new Error('Invalid JWT');}const payload=JSON.parse(Buffer.from(parts[1],'base64url').toString('utf8'));const out={iss:payload.iss,aud:payload.aud,sub:payload.sub,repository:payload.repository,repository_owner:payload.repository_owner,ref:payload.ref,job_workflow_ref:payload.job_workflow_ref,workflow_ref:payload.workflow_ref,actor:payload.actor};console.log(JSON.stringify(out,null,2));})"
+      - name: Assert supported npm publish mode
+        run: |
+          set -euo pipefail
+          if [ "${NPM_PUBLISH_PROVENANCE}" = "true" ]; then
+            echo "Unsupported publish configuration for current repository visibility:"
+            echo "NPM_PUBLISH_PROVENANCE=true with private GitHub repository."
+            echo "Set NPM_PUBLISH_PROVENANCE=false (current supported mode) or migrate repository/package settings to supported public provenance flow."
+            exit 1
+          fi
+          echo "Publish mode OK: private repository without provenance."
       - name: OIDC publish preflight (dry-run)
         id: oidc_preflight
         continue-on-error: true

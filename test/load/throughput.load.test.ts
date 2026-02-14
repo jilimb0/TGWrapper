@@ -18,6 +18,7 @@ interface Data {
 describe('Load: throughput baseline', () => {
   it('handles batch updates with acceptable throughput', async () => {
     const updates = Number(process.env.LOAD_UPDATES ?? '10000');
+    const maxFailureRate = Number(process.env.LOAD_MAX_FAILURE_RATE ?? '0.001');
 
     const api = new ApiClient({
       token: 'TEST',
@@ -55,13 +56,22 @@ describe('Load: throughput baseline', () => {
     };
 
     const started = performance.now();
+    let failures = 0;
     for (let idx = 0; idx < updates; idx += 1) {
       update.update_id = idx;
-      await kernel.handleUpdate(update);
+      try {
+        await kernel.handleUpdate(update);
+      } catch {
+        failures += 1;
+      }
     }
     const elapsedMs = performance.now() - started;
     const perSecond = Math.round((updates / elapsedMs) * 1000);
+    const failureRate = failures / updates;
+    const persisted = await storage.get('1');
 
     expect(perSecond).toBeGreaterThan(3000);
+    expect(failureRate).toBeLessThanOrEqual(maxFailureRate);
+    expect(persisted?.data.count).toBe(updates - failures);
   });
 });

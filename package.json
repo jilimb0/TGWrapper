@@ -22,11 +22,14 @@
     "test:phase4": "pnpm test:load && pnpm test:chaos && pnpm test:integration",
     "benchmark": "pnpm build && node benchmark/run-benchmark.mjs",
     "docs": "typedoc src/index.ts --out docs/api",
+    "api:snapshot:check": "node scripts/check-api-snapshot.mjs",
+    "api:snapshot:update": "node scripts/update-api-snapshot.mjs",
     "prepublishOnly": "node scripts/enforce-ci-publish.mjs",
     "release:status": "changeset status",
     "release:version": "changeset version",
     "release:publish": "changeset publish",
-    "test:published-smoke": "node scripts/published-smoke.mjs"
+    "test:published-smoke": "node scripts/published-smoke.mjs",
+    "verify:release": "pnpm test && pnpm -r typecheck && pnpm build && pnpm -r build && pnpm api:snapshot:check"
   },
   "keywords": [
     "telegram",

@@ -14,6 +14,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck:compat": "tsc -p tsconfig.type-tests.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "pnpm --filter @jilimb0/tgwrapper-adapter-redis test:integration",
@@ -28,10 +29,11 @@
     "api:snapshot:update": "node scripts/update-api-snapshot.mjs",
     "prepublishOnly": "node scripts/enforce-ci-publish.mjs",
     "release:status": "changeset status",
+    "changeset:lint": "node scripts/lint-changesets.mjs",
     "release:version": "changeset version",
     "release:publish": "changeset publish",
     "test:published-smoke": "node scripts/published-smoke.mjs",
-    "verify:release": "pnpm test && pnpm -r typecheck && pnpm build && pnpm -r build && pnpm api:snapshot:check && pnpm pack:size"
+    "verify:release": "pnpm changeset:lint && pnpm test && pnpm typecheck:compat && pnpm -r typecheck && pnpm build && pnpm -r build && pnpm api:snapshot:check && pnpm pack:size"
   },
   "keywords": [
     "telegram",

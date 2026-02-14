@@ -30,11 +30,15 @@ export class Context<TState extends string, TData extends JsonObject> {
   }
 
   public get message(): Message.TextMessage | undefined {
-    const maybeMessage = this.update.message;
+    const maybeMessage = this.primaryMessage;
     if (maybeMessage && 'text' in maybeMessage) {
       return maybeMessage as Message.TextMessage;
     }
     return undefined;
+  }
+
+  public get anyMessage(): Message | undefined {
+    return this.primaryMessage ?? this.update.callback_query?.message;
   }
 
   public get callbackQuery(): CallbackQuery | undefined {
@@ -42,19 +46,37 @@ export class Context<TState extends string, TData extends JsonObject> {
   }
 
   public get fromId(): number | undefined {
-    if (this.update.message?.from) {
-      return this.update.message.from.id;
+    const directFrom =
+      this.primaryMessage?.from ??
+      this.update.callback_query?.from ??
+      this.update.inline_query?.from ??
+      this.update.chosen_inline_result?.from ??
+      this.update.shipping_query?.from ??
+      this.update.pre_checkout_query?.from ??
+      this.update.chat_join_request?.from ??
+      this.update.chat_member?.from ??
+      this.update.my_chat_member?.from;
+
+    if (directFrom) {
+      return directFrom.id;
     }
-    if (this.update.callback_query?.from) {
-      return this.update.callback_query.from.id;
+
+    const reactionActor = this.update.message_reaction?.user;
+    if (reactionActor) {
+      return reactionActor.id;
     }
+
     return undefined;
   }
 
+  public get chatId(): number | undefined {
+    return this.resolveChatId();
+  }
+
   public async reply(text: string, extra: JsonObject = {}): Promise<unknown> {
-    const chatId = this.update.message?.chat.id ?? this.update.callback_query?.message?.chat.id;
+    const chatId = this.resolveChatId();
     if (!chatId) {
-      throw new Error('Cannot reply without chat id in update.');
+      throw new Error('Cannot reply: update has no resolvable chat id.');
     }
 
     return this.apiClient.callApi('sendMessage', {
@@ -65,14 +87,14 @@ export class Context<TState extends string, TData extends JsonObject> {
   }
 
   public async editMessage(text: string, extra: JsonObject = {}): Promise<unknown> {
-    const callbackMessage = this.update.callback_query?.message;
-    if (!callbackMessage) {
-      throw new Error('Cannot edit message without callback_query.message.');
+    const targetMessage = this.update.callback_query?.message ?? this.primaryMessage;
+    if (!targetMessage) {
+      throw new Error('Cannot edit message: update has no resolvable message.');
     }
 
     return this.apiClient.callApi('editMessageText', {
-      chat_id: callbackMessage.chat.id,
-      message_id: callbackMessage.message_id,
+      chat_id: targetMessage.chat.id,
+      message_id: targetMessage.message_id,
       text,
       ...extra
     });
@@ -88,5 +110,52 @@ export class Context<TState extends string, TData extends JsonObject> {
       callback_query_id: callbackQueryId,
       text
     });
+  }
+
+  private get primaryMessage(): Message | undefined {
+    return (
+      this.update.message ??
+      this.update.edited_message ??
+      this.update.channel_post ??
+      this.update.edited_channel_post ??
+      this.update.business_message ??
+      this.update.edited_business_message
+    );
+  }
+
+  private resolveChatId(): number | undefined {
+    if (this.primaryMessage?.chat?.id) {
+      return this.primaryMessage.chat.id;
+    }
+
+    if (this.update.callback_query?.message?.chat?.id) {
+      return this.update.callback_query.message.chat.id;
+    }
+
+    if (this.update.chat_join_request?.chat?.id) {
+      return this.update.chat_join_request.chat.id;
+    }
+
+    if (this.update.chat_member?.chat?.id) {
+      return this.update.chat_member.chat.id;
+    }
+
+    if (this.update.my_chat_member?.chat?.id) {
+      return this.update.my_chat_member.chat.id;
+    }
+
+    if (this.update.message_reaction?.chat?.id) {
+      return this.update.message_reaction.chat.id;
+    }
+
+    if (this.update.message_reaction_count?.chat?.id) {
+      return this.update.message_reaction_count.chat.id;
+    }
+
+    if (this.update.removed_chat_boost?.chat?.id) {
+      return this.update.removed_chat_boost.chat.id;
+    }
+
+    return undefined;
   }
 }

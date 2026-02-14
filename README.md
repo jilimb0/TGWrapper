@@ -40,6 +40,7 @@ See `/Users/jilimbo/Documents/Personal/TGWrapper/docs/RELEASE_POLICY.md` for sem
 ## Release Readiness Docs
 
 - API stability contract: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/API_STABILITY_0.5.md`
+- Telegram Bot API compatibility target: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/TELEGRAM_API_COMPATIBILITY.md`
 - Observability contract: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/OBSERVABILITY_CONTRACT.md`
 - Production checklist: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/PRODUCTION_CHECKLIST.md`
 - Migration notes (`0.4.0 -> 0.5.0`): `/Users/jilimbo/Documents/Personal/TGWrapper/docs/MIGRATION_0.4_TO_0.5.md`

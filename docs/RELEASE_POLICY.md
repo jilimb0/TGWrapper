@@ -39,6 +39,17 @@
 3. Merge to `main`.
 4. Release workflow runs `changesets/action` to version + publish.
 
+## Tag Guardrails
+
+- Release tags are allowed only for changes that include **real changesets** (package bump entries in frontmatter).
+- Empty changesets (`---` + `---`) are not allowed for release tagging.
+- Guard is enforced by `pnpm changeset:lint` in `verify:release`.
+
+## Published Smoke Modes
+
+- Auto run after `Release` workflow: **informational mode** (`PUBLISHED_SMOKE_STRICT=false`), skips when target versions are not yet available in npm.
+- Manual run (`workflow_dispatch`): **strict mode** (`PUBLISHED_SMOKE_STRICT=true`), fails if target versions are not available in npm.
+
 ## Safety Gates
 
 - CI must be green before release.

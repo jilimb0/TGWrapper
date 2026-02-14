@@ -74,6 +74,8 @@ jobs:
       - name: OIDC publish preflight (dry-run)
         id: oidc_preflight
         continue-on-error: true
+        env:
+          CHANGESETS_RELEASE: "1"
         run: |
           set -euo pipefail
           for d in "." "packages/adapter-redis" "packages/observability"; do

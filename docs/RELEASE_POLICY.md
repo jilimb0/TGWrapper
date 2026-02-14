@@ -4,7 +4,7 @@
 
 - Versioning is managed by Changesets in `.changeset/`.
 - Publishing is CI-only through `.github/workflows/release.yml`.
-- Publishing uses `NPM_PUBLISH_TOKEN` secret from GitHub Actions.
+- Publishing uses npm Trusted Publishing (OIDC) from GitHub Actions.
 - Manual local `pnpm publish` is blocked by `prepublishOnly` checks.
 
 ## SemVer Rules
@@ -30,4 +30,17 @@
 
 - CI must be green before release.
 - `publish dry-run` workflow must pass.
-- `NPM_TOKEN` is required in repository secrets.
+- npm package must have Trusted Publisher configured for this repository/workflow.
+
+## npm OIDC Setup
+
+1. Open each package page in npm:
+   - `@jilimb0/tgwrapper`
+   - `@jilimb0/tgwrapper-adapter-redis`
+   - `@jilimb0/tgwrapper-observability`
+2. In package settings, add a Trusted Publisher:
+   - Provider: GitHub Actions
+   - Repository: `jilimb0/TGWrapper`
+   - Workflow: `Release`
+   - Environment (if used): match the workflow configuration
+3. Save and run the `Release` workflow again.

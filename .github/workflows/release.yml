@@ -26,15 +26,15 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm -r typecheck
       - run: pnpm build
-      - run: npm whoami
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: |
+          test -n "${ACTIONS_ID_TOKEN_REQUEST_URL}"
+          test -n "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
+          echo "OIDC context is available"
       - uses: changesets/action@v1
         with:
-          publish: pnpm -r publish --access public --no-git-checks
+          publish: pnpm -r publish --access public --provenance --no-git-checks
           version: pnpm changeset version
         env:
           CHANGESETS_RELEASE: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_CONFIG_PROVENANCE: "true"

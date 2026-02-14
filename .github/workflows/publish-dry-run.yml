@@ -17,11 +17,11 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck
-      - run: pnpm -r typecheck
-      - run: pnpm build
-      - run: pnpm api:snapshot:check
-      - run: pnpm -r build
+      - run: pnpm verify:release
       - run: pnpm -r publish --dry-run --no-git-checks
         env:
           CHANGESETS_RELEASE: "1"
+      - run: pnpm benchmark
+      - run: pnpm benchmark:trend
+        env:
+          BENCHMARK_MIN_RATIO: "0.80"

@@ -45,3 +45,4 @@ See `/Users/jilimbo/Documents/Personal/TGWrapper/docs/RELEASE_POLICY.md` for sem
 - Migration notes (`0.4.0 -> 0.5.0`): `/Users/jilimbo/Documents/Personal/TGWrapper/docs/MIGRATION_0.4_TO_0.5.md`
 - Release runbook checklist: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/RELEASE_CHECKLIST_0.5.0.md`
 - Next patch release checklist: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/RELEASE_CHECKLIST_0.5.1.md`
+- Current patch release checklist: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/RELEASE_CHECKLIST_0.5.2.md`

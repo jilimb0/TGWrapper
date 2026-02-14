@@ -1,5 +1,13 @@
 # @jilimb0/tgwrapper-observability
 
+## 0.2.1
+
+### Patch Changes
+
+- c037bd5: Republish adapter and observability packages with compiled dist artifacts.
+
+  Also enforce workspace-wide build in CI and release pipelines to prevent publishing packages without runtime/type entrypoints.
+
 ## 0.2.0
 
 ### Minor Changes

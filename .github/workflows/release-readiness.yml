@@ -1,0 +1,114 @@
+name: Release Readiness
+
+on:
+  workflow_dispatch:
+    inputs:
+      include_reliability:
+        description: "Run repeated load/chaos + redis integration gates"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Full release verification
+        run: pnpm verify:release
+
+      - name: npm publish dry-run (no git checks)
+        run: pnpm -r publish --dry-run --no-git-checks
+        env:
+          CHANGESETS_RELEASE: "1"
+
+  reliability:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_reliability == 'true' }}
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Repeat load and chaos checks
+        run: |
+          set -euo pipefail
+          for run in 1 2 3; do
+            echo "Release-readiness reliability repetition #${run}: load"
+            pnpm test:load
+            echo "Release-readiness reliability repetition #${run}: chaos"
+            pnpm test:chaos
+          done
+      - run: pnpm test:integration
+        env:
+          REDIS_URL: redis://127.0.0.1:6379
+
+  summary:
+    runs-on: ubuntu-latest
+    needs:
+      - verify
+      - reliability
+    if: always()
+    steps:
+      - name: Readiness summary
+        run: |
+          VERIFY_RESULT="${{ needs.verify.result }}"
+          RELIABILITY_RESULT="${{ needs.reliability.result }}"
+          if [ "${RELIABILITY_RESULT}" = "skipped" ] || [ -z "${RELIABILITY_RESULT}" ]; then
+            RELIABILITY_RESULT="not_requested"
+          fi
+
+          if [ "${VERIFY_RESULT}" = "success" ] && { [ "${RELIABILITY_RESULT}" = "success" ] || [ "${RELIABILITY_RESULT}" = "not_requested" ]; }; then
+            DECISION="GO"
+          else
+            DECISION="NO-GO"
+          fi
+
+          {
+            echo "## Release Readiness Summary"
+            echo ""
+            echo "| Gate | Result |"
+            echo "|---|---|"
+            echo "| verify + dry-run publish | ${VERIFY_RESULT} |"
+            echo "| optional reliability gates | ${RELIABILITY_RESULT} |"
+            echo ""
+            echo "**Decision: ${DECISION}**"
+            echo ""
+            echo "If decision is GO, baseline release gates are satisfied."
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          if [ "${DECISION}" = "NO-GO" ]; then
+            exit 1
+          fi

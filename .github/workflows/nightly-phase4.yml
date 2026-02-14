@@ -32,8 +32,15 @@ jobs:
       - run: pnpm -r typecheck
       - run: pnpm build
       - run: pnpm -r build
-      - run: pnpm test:load
-      - run: pnpm test:chaos
+      - name: Repeat load/chaos tests to catch flakes
+        run: |
+          set -euo pipefail
+          for run in 1 2 3; do
+            echo "Nightly repetition #${run}: load"
+            pnpm test:load
+            echo "Nightly repetition #${run}: chaos"
+            pnpm test:chaos
+          done
       - run: pnpm test:integration
         env:
           REDIS_URL: redis://127.0.0.1:6379

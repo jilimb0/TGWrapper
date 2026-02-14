@@ -1,0 +1,114 @@
+name: Go No-Go
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v0.5.0-rc.*"
+
+jobs:
+  release-gates:
+    runs-on: ubuntu-latest
+    env:
+      NPM_PUBLISH_PROVENANCE: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - name: Upgrade npm for trusted publishing parity
+        run: |
+          npm i -g npm@11.8.0
+          npm -v
+      - run: pnpm install --frozen-lockfile
+      - name: Assert supported npm publish mode
+        run: |
+          set -euo pipefail
+          if [ "${NPM_PUBLISH_PROVENANCE}" = "true" ]; then
+            echo "Unsupported publish mode for private repository: provenance=true."
+            echo "Use NPM_PUBLISH_PROVENANCE=false or migrate to supported public provenance flow."
+            exit 1
+          fi
+      - run: pnpm verify:release
+      - run: pnpm -r publish --dry-run --no-git-checks
+        env:
+          CHANGESETS_RELEASE: "1"
+
+  reliability-gates:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.4.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Repeat load and chaos
+        run: |
+          set -euo pipefail
+          for run in 1 2 3; do
+            echo "Go/No-Go reliability repetition #${run}: load"
+            pnpm test:load
+            echo "Go/No-Go reliability repetition #${run}: chaos"
+            pnpm test:chaos
+          done
+      - run: pnpm test:integration
+        env:
+          REDIS_URL: redis://127.0.0.1:6379
+
+  go-no-go-summary:
+    runs-on: ubuntu-latest
+    needs:
+      - release-gates
+      - reliability-gates
+    if: always()
+    steps:
+      - name: Publish decision
+        run: |
+          set -euo pipefail
+          RELEASE_GATES_RESULT="${{ needs.release-gates.result }}"
+          RELIABILITY_GATES_RESULT="${{ needs.reliability-gates.result }}"
+
+          if [ "${RELEASE_GATES_RESULT}" = "success" ] && [ "${RELIABILITY_GATES_RESULT}" = "success" ]; then
+            DECISION="GO"
+            MESSAGE="All 0.5.0 release gates passed."
+          else
+            DECISION="NO-GO"
+            MESSAGE="One or more 0.5.0 release gates failed. Do not tag/publish final 0.5.0."
+          fi
+
+          {
+            echo "## 0.5.0 Go/No-Go Decision"
+            echo ""
+            echo "| Gate | Result |"
+            echo "|---|---|"
+            echo "| release-gates | ${RELEASE_GATES_RESULT} |"
+            echo "| reliability-gates | ${RELIABILITY_GATES_RESULT} |"
+            echo ""
+            echo "Target ref: \`${GITHUB_REF}\`"
+            echo ""
+            echo "**Decision: ${DECISION}**"
+            echo ""
+            echo "${MESSAGE}"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          if [ "${DECISION}" = "NO-GO" ]; then
+            exit 1
+          fi

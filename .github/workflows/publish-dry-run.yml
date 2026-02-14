@@ -20,6 +20,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm -r typecheck
       - run: pnpm build
+      - run: pnpm api:snapshot:check
       - run: pnpm -r build
       - run: pnpm -r publish --dry-run --no-git-checks
         env:

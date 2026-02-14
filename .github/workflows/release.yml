@@ -94,7 +94,7 @@ jobs:
             fi
 
             echo "OIDC dry-run publish in ${d} for ${NAME}@${VERSION}"
-            (cd "${d}" && npm publish --access public --provenance --dry-run)
+            (cd "${d}" && npm publish --access public --dry-run)
           done
       - name: Fail if OIDC preflight failed
         if: steps.oidc_preflight.outcome == 'failure'
@@ -108,10 +108,9 @@ jobs:
           rm -f "$HOME/.npmrc" || true
       - uses: changesets/action@v1
         with:
-          publish: pnpm -r publish --access public --provenance --no-git-checks
+          publish: pnpm -r publish --access public --no-git-checks
           version: pnpm changeset version
         env:
           CHANGESETS_RELEASE: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_CONFIG_PROVENANCE: "true"
           NODE_AUTH_TOKEN: ""

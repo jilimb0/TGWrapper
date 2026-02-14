@@ -1,6 +1,6 @@
 {
   "name": "@jilimb0/tgwrapper",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Serverless-first Telegram bot framework without external bot libraries",
   "type": "module",
   "main": "dist/index.js",

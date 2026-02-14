@@ -37,10 +37,11 @@ Releases are CI-gated only via Changesets workflow.
 Manual local publishing is not part of supported flow.
 See `/Users/jilimbo/Documents/Personal/TGWrapper/docs/RELEASE_POLICY.md` for semver and process details.
 
-## 0.5.0 Readiness Docs
+## Release Readiness Docs
 
 - API stability contract: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/API_STABILITY_0.5.md`
 - Observability contract: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/OBSERVABILITY_CONTRACT.md`
 - Production checklist: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/PRODUCTION_CHECKLIST.md`
 - Migration notes (`0.4.0 -> 0.5.0`): `/Users/jilimbo/Documents/Personal/TGWrapper/docs/MIGRATION_0.4_TO_0.5.md`
 - Release runbook checklist: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/RELEASE_CHECKLIST_0.5.0.md`
+- Next patch release checklist: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/RELEASE_CHECKLIST_0.5.1.md`

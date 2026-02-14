@@ -7,8 +7,13 @@ const rootDir = process.cwd();
 
 async function main() {
   const versions = await loadPublishedVersions();
+  await assertPublishedVersionsExist(versions);
   const tempDir = await mkdtemp(join(tmpdir(), 'tgwrapper-published-smoke-'));
   console.log(`Temp project: ${tempDir}`);
+  console.log(`Target versions: ${JSON.stringify(versions)}`);
+  if (process.env.GITHUB_SHA) {
+    console.log(`GitHub SHA: ${process.env.GITHUB_SHA}`);
+  }
 
   try {
     await run('npm', ['init', '-y'], tempDir);
@@ -147,19 +152,56 @@ async function loadPublishedVersions() {
   };
 }
 
+async function assertPublishedVersionsExist(versions) {
+  const checks = [
+    ['@jilimb0/tgwrapper', versions.core],
+    ['@jilimb0/tgwrapper-adapter-redis', versions.adapterRedis],
+    ['@jilimb0/tgwrapper-observability', versions.observability]
+  ];
+
+  for (const [name, version] of checks) {
+    const target = `${name}@${version}`;
+    try {
+      await run('npm', ['view', target, 'version'], rootDir, {
+        stdio: 'pipe',
+        timeoutMs: 20_000
+      });
+    } catch {
+      throw new Error(
+        [
+          `Published smoke target is not available in npm: ${target}`,
+          'This usually means the workflow is checking out a commit whose package version is newer than what was published.',
+          `Current commit: ${process.env.GITHUB_SHA ?? 'unknown'}`
+        ].join('\n')
+      );
+    }
+  }
+}
+
 async function readJson(filePath) {
   return JSON.parse(await readFile(filePath, 'utf8'));
 }
 
-async function run(cmd, args, cwd) {
+async function run(cmd, args, cwd, options = {}) {
   await new Promise((resolve, reject) => {
     const child = spawn(cmd, args, {
       cwd,
-      stdio: 'inherit',
+      stdio: options.stdio ?? 'inherit',
       env: process.env
     });
+    const timeoutMs = options.timeoutMs;
+    const timeoutId =
+      typeof timeoutMs === 'number'
+        ? setTimeout(() => {
+            child.kill('SIGTERM');
+            reject(new Error(`Command timed out after ${timeoutMs}ms: ${cmd} ${args.join(' ')}`));
+          }, timeoutMs)
+        : undefined;
 
     child.on('exit', (code) => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
       if (code === 0) {
         resolve();
         return;
@@ -167,7 +209,12 @@ async function run(cmd, args, cwd) {
       reject(new Error(`Command failed (${code}): ${cmd} ${args.join(' ')}`));
     });
 
-    child.on('error', reject);
+    child.on('error', (error) => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+      reject(error);
+    });
   });
 }
 

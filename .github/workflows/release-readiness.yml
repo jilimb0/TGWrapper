@@ -38,6 +38,10 @@ jobs:
         run: pnpm -r publish --dry-run --no-git-checks
         env:
           CHANGESETS_RELEASE: "1"
+      - run: pnpm benchmark
+      - run: pnpm benchmark:trend
+        env:
+          BENCHMARK_MIN_RATIO: "0.80"
 
   reliability:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_reliability == 'true' }}

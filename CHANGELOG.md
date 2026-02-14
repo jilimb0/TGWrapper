@@ -1,5 +1,14 @@
 # @jilimb0/tgwrapper
 
+## 0.5.1 (Unreleased)
+
+### Patch Changes
+
+- add cross-platform adapter contract tests for webhook semantics
+- enforce package size budgets in local/CI release verification
+- enforce benchmark trend regression gate against repository baseline
+- strengthen release-readiness and go/no-go workflows with benchmark checks
+
 ## 0.5.0
 
 ### Minor Changes
@@ -11,21 +20,6 @@
   - threshold-based reliability checks for load/chaos paths with repeated nightly runs
   - observability contract, production checklist, and 0.4 -> 0.5 migration documentation
   - release policy fail-fast for unsupported provenance mode on private repository
-
-## 0.5.0 (Unreleased)
-
-### Stability guarantees added
-
-- Freeze public API surface for `0.5.x` with CI snapshot guard (`dist/index.d.ts`).
-- Enforce release policy for private repository trusted publishing without provenance.
-- Harden chaos/load tests with threshold-based assertions and nightly repeated runs.
-- Define explicit observability contract and production checklist documentation.
-
-### Deferred to 1.0.0
-
-- Strict semver backward-compatibility guarantee lifecycle.
-- Pluggable observability backends (Prometheus/OpenTelemetry adapters).
-- Formal multi-tenant fairness guarantees under noisy-neighbor load.
 
 ## 0.4.0
 

@@ -21,6 +21,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm build
       - run: pnpm api:snapshot:check
+      - run: pnpm pack:size
       - run: pnpm -r build
       - run: pnpm test
 

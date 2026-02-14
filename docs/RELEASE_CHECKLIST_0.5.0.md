@@ -11,12 +11,12 @@ Configure branch protection to require:
 - `Publish Dry Run / publish-dry-run`
 - `Release Readiness / verify`
 - `Release Readiness / summary`
+- `Go No-Go / go-no-go-summary`
 
 Optional for daily PR flow (recommended required for release PRs):
 
 - `Go No-Go / release-gates`
 - `Go No-Go / reliability-gates`
-- `Go No-Go / go-no-go-summary`
 
 ## RC verification flow
 

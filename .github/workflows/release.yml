@@ -14,6 +14,9 @@ jobs:
       contents: write
       pull-requests: write
       id-token: write
+    concurrency:
+      group: release-${{ github.ref }}
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -81,7 +84,8 @@ jobs:
           CHANGESETS_RELEASE: "1"
         run: |
           set -euo pipefail
-          for d in "." "packages/adapter-redis" "packages/observability"; do
+          # Core package is already published and unchanged; preflight only unpublished subpackages.
+          for d in "packages/adapter-redis" "packages/observability"; do
             NAME="$(node -e "console.log(require('./${d}/package.json').name)")"
             VERSION="$(node -e "console.log(require('./${d}/package.json').version)")"
             if npm view "${NAME}@${VERSION}" version >/dev/null 2>&1; then

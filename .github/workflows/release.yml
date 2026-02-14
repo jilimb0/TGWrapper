@@ -33,6 +33,7 @@ jobs:
           echo "always-auth=$(npm config get always-auth || true)"
       - run: pnpm install --frozen-lockfile
       - run: pnpm -r typecheck
+      - run: pnpm build
       - run: pnpm -r build
       - name: Release status
         run: pnpm release:status

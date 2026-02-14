@@ -7,7 +7,14 @@ const rootDir = process.cwd();
 
 async function main() {
   const versions = await loadPublishedVersions();
-  await assertPublishedVersionsExist(versions);
+  const strictMode = process.env.PUBLISHED_SMOKE_STRICT === 'true';
+  const allPublished = await assertPublishedVersionsExist(versions, { strictMode });
+  if (!allPublished) {
+    console.log(
+      'Published smoke skipped: target versions are not available in npm yet (non-strict mode).'
+    );
+    return;
+  }
   const tempDir = await mkdtemp(join(tmpdir(), 'tgwrapper-published-smoke-'));
   console.log(`Temp project: ${tempDir}`);
   console.log(`Target versions: ${JSON.stringify(versions)}`);
@@ -152,12 +159,13 @@ async function loadPublishedVersions() {
   };
 }
 
-async function assertPublishedVersionsExist(versions) {
+async function assertPublishedVersionsExist(versions, options) {
   const checks = [
     ['@jilimb0/tgwrapper', versions.core],
     ['@jilimb0/tgwrapper-adapter-redis', versions.adapterRedis],
     ['@jilimb0/tgwrapper-observability', versions.observability]
   ];
+  const missing = [];
 
   for (const [name, version] of checks) {
     const target = `${name}@${version}`;
@@ -167,15 +175,26 @@ async function assertPublishedVersionsExist(versions) {
         timeoutMs: 20_000
       });
     } catch {
-      throw new Error(
-        [
-          `Published smoke target is not available in npm: ${target}`,
-          'This usually means the workflow is checking out a commit whose package version is newer than what was published.',
-          `Current commit: ${process.env.GITHUB_SHA ?? 'unknown'}`
-        ].join('\n')
-      );
+      missing.push(target);
     }
   }
+
+  if (missing.length === 0) {
+    return true;
+  }
+
+  const details = [
+    `Missing published targets: ${missing.join(', ')}`,
+    'This usually means the workflow is checking out a commit whose package version is newer than what was published.',
+    `Current commit: ${process.env.GITHUB_SHA ?? 'unknown'}`
+  ].join('\n');
+
+  if (options.strictMode) {
+    throw new Error(details);
+  }
+
+  console.warn(details);
+  return false;
 }
 
 async function readJson(filePath) {

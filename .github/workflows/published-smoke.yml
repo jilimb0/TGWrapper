@@ -18,3 +18,5 @@ jobs:
         with:
           node-version: 20
       - run: node scripts/published-smoke.mjs
+        env:
+          PUBLISHED_SMOKE_STRICT: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}

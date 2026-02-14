@@ -8,7 +8,7 @@ on:
 
 jobs:
   release:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -24,9 +24,36 @@ jobs:
           node-version: 20
           cache: pnpm
           registry-url: https://registry.npmjs.org
+      - name: Tooling versions
+        run: |
+          node -v
+          npm -v
+          pnpm -v
+          echo "registry=$(npm config get registry)"
+          echo "always-auth=$(npm config get always-auth || true)"
       - run: pnpm install --frozen-lockfile
       - run: pnpm -r typecheck
       - run: pnpm -r build
+      - name: Release status
+        run: pnpm release:status
+      - name: Package metadata snapshot
+        run: |
+          node -e "const fs=require('fs');const pkgs=['package.json','packages/adapter-redis/package.json','packages/observability/package.json'];for(const p of pkgs){const v=JSON.parse(fs.readFileSync(p,'utf8'));console.log(JSON.stringify({file:p,name:v.name,version:v.version,files:v.files,exports:v.exports,publishConfig:v.publishConfig},null,2));}"
+      - name: NPM registry visibility
+        continue-on-error: true
+        run: |
+          set -euxo pipefail
+          npm view @jilimb0/tgwrapper --json || true
+          npm view @jilimb0/tgwrapper-adapter-redis --json || true
+          npm view @jilimb0/tgwrapper-observability --json || true
+      - name: Pack artifact check
+        run: |
+          set -euo pipefail
+          for d in "." "packages/adapter-redis" "packages/observability"; do
+            echo "Checking pack contents in ${d}"
+            (cd "${d}" && npm pack --dry-run --json > /tmp/pack.json)
+            node -e "const fs=require('fs');const pack=JSON.parse(fs.readFileSync('/tmp/pack.json','utf8'))[0];const files=new Set(pack.files.map(f=>f.path));const pkg=JSON.parse(fs.readFileSync('${d}/package.json','utf8'));const required=['package.json'];if('${d}'==='.') required.push('dist/index.js','dist/index.d.ts'); else required.push('dist/index.js','dist/index.d.ts');for(const f of required){if(!files.has(f)){console.error('Missing packed file',f,'for',pkg.name);process.exit(1);}}console.log('Pack OK',pkg.name,pkg.version,'files=',pack.files.length);"
+          done
       - run: |
           test -n "${ACTIONS_ID_TOKEN_REQUEST_URL}"
           test -n "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
@@ -43,6 +70,20 @@ jobs:
           echo "  workflow_ref=${GITHUB_WORKFLOW_REF}"
           echo "OIDC payload"
           echo "${JWT}" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const token=s.trim();const parts=token.split('.');if(parts.length<2){throw new Error('Invalid JWT');}const payload=JSON.parse(Buffer.from(parts[1],'base64url').toString('utf8'));const out={iss:payload.iss,aud:payload.aud,sub:payload.sub,repository:payload.repository,repository_owner:payload.repository_owner,ref:payload.ref,job_workflow_ref:payload.job_workflow_ref,workflow_ref:payload.workflow_ref,actor:payload.actor};console.log(JSON.stringify(out,null,2));})"
+      - name: OIDC publish preflight (dry-run)
+        id: oidc_preflight
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          for d in "." "packages/adapter-redis" "packages/observability"; do
+            echo "OIDC dry-run publish in ${d}"
+            (cd "${d}" && npm publish --access public --provenance --dry-run)
+          done
+      - name: Fail if OIDC preflight failed
+        if: steps.oidc_preflight.outcome == 'failure'
+        run: |
+          echo "OIDC preflight failed. Check previous step logs for package-specific error details."
+          exit 1
       - uses: changesets/action@v1
         with:
           publish: pnpm -r publish --access public --provenance --no-git-checks

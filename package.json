@@ -25,7 +25,8 @@
     "prepublishOnly": "node scripts/enforce-ci-publish.mjs",
     "release:status": "changeset status",
     "release:version": "changeset version",
-    "release:publish": "changeset publish"
+    "release:publish": "changeset publish",
+    "test:published-smoke": "node scripts/published-smoke.mjs"
   },
   "keywords": [
     "telegram",

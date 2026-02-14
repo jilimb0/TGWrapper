@@ -23,6 +23,10 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
+      - name: Upgrade npm for trusted publishing
+        run: |
+          npm i -g npm@11.8.0
+          npm -v
       - name: Tooling versions
         run: |
           node -v

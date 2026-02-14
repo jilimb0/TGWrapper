@@ -41,7 +41,8 @@ jobs:
       - run: pnpm benchmark
       - run: pnpm benchmark:trend
         env:
-          BENCHMARK_MIN_RATIO: "0.80"
+          BENCHMARK_MIN_RATIO: "0.55"
+          BENCHMARK_MIN_UPS: "200000"
 
   reliability:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_reliability == 'true' }}

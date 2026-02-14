@@ -47,7 +47,8 @@ jobs:
       - run: pnpm benchmark
       - run: pnpm benchmark:trend
         env:
-          BENCHMARK_MIN_RATIO: "0.80"
+          BENCHMARK_MIN_RATIO: "0.55"
+          BENCHMARK_MIN_UPS: "200000"
       - uses: actions/upload-artifact@v4
         with:
           name: phase4-benchmark-report

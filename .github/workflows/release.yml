@@ -23,7 +23,6 @@ jobs:
         with:
           node-version: 20
           cache: pnpm
-          registry-url: https://registry.npmjs.org
       - name: Tooling versions
         run: |
           node -v
@@ -87,6 +86,11 @@ jobs:
         run: |
           echo "OIDC preflight failed. Check previous step logs for package-specific error details."
           exit 1
+      - name: Drop token auth to force OIDC trusted publishing
+        run: |
+          set -euo pipefail
+          rm -f "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" || true
+          rm -f "$HOME/.npmrc" || true
       - uses: changesets/action@v1
         with:
           publish: pnpm -r publish --access public --provenance --no-git-checks
@@ -95,3 +99,4 @@ jobs:
           CHANGESETS_RELEASE: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: "true"
+          NODE_AUTH_TOKEN: ""

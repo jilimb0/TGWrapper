@@ -1,4 +1,4 @@
-import type { ApiMethods, Update } from '@grammyjs/types';
+import type { ApiMethods, Update } from './telegram.js';
 
 export type JsonValue = string | number | boolean | null | JsonObject | JsonValue[];
 export type JsonObject = { [key: string]: JsonValue | undefined };

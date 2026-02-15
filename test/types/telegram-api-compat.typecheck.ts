@@ -15,7 +15,7 @@ const _userFields: User = {
   is_bot: false,
   first_name: 'topic-user',
   has_main_web_app: true,
-  added_to_attachment_menu: false
+  added_to_attachment_menu: true
 };
 
 const _inlineButtonWithCopyText: InlineKeyboardButton = {
@@ -41,7 +41,8 @@ const _businessLikeUpdate: Update = {
     date: 1,
     chat: {
       id: 1,
-      type: 'private'
+      type: 'private',
+      first_name: 'chat-user'
     },
     from: {
       id: 2,

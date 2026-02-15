@@ -3,7 +3,7 @@
 ## Compatibility Target
 
 - Target baseline: **Telegram Bot API 9.4**.
-- Type baseline: `@grammyjs/types` resolved in lockfile.
+- Type baseline: **local TGWrapper Telegram types** in `/Users/jilimbo/Documents/Personal/TGWrapper/src/types/telegram.ts`.
 - Policy: compatibility is validated by release gates (`typecheck:compat` + contract tests).
 
 ## Supported
@@ -47,12 +47,13 @@
 
 ## Upgrade Procedure
 
-1. Update `@grammyjs/types`.
-2. Run:
+1. Review latest official Telegram Bot API changelog.
+2. Update local types in `/Users/jilimbo/Documents/Personal/TGWrapper/src/types/telegram.ts` and related compatibility tests.
+3. Run:
    - `pnpm typecheck:compat`
    - `pnpm test`
    - `pnpm verify:release`
-3. If Telegram introduces new behavior used by TGWrapper, add/adjust:
+4. If Telegram introduces new behavior used by TGWrapper, add/adjust:
    - runtime fallback logic,
    - compatibility tests,
    - this document.

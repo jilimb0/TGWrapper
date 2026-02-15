@@ -56,10 +56,15 @@
 1. Review latest official Telegram Bot API changelog.
 2. Update local types in `/Users/jilimbo/Documents/Personal/TGWrapper/src/types/telegram.ts` and related compatibility tests.
 3. Run:
+   - `pnpm telegram:baseline:latest`
    - `pnpm typecheck:compat`
    - `pnpm test`
    - `pnpm verify:release`
-4. If Telegram introduces new behavior used by TGWrapper, add/adjust:
+4. If Telegram released a newer Bot API version:
+   - run `pnpm telegram:baseline:sync`,
+   - update local types/contracts/runtime fallbacks,
+   - re-run compatibility and release checks.
+5. If Telegram introduces new behavior used by TGWrapper, add/adjust:
    - runtime fallback logic,
    - compatibility tests,
    - this document.

@@ -25,6 +25,8 @@
     "benchmark:trend": "node scripts/check-benchmark-trend.mjs",
     "pack:size": "node scripts/check-package-size-budget.mjs",
     "telegram:baseline:check": "node scripts/check-telegram-api-baseline.mjs",
+    "telegram:baseline:latest": "node scripts/sync-telegram-api-baseline.mjs --check",
+    "telegram:baseline:sync": "node scripts/sync-telegram-api-baseline.mjs --write",
     "docs": "typedoc src/index.ts --out docs/api",
     "api:snapshot:check": "node scripts/check-api-snapshot.mjs",
     "api:snapshot:update": "node scripts/update-api-snapshot.mjs",

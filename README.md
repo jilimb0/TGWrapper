@@ -30,6 +30,7 @@ REDIS_URL=redis://127.0.0.1:6379 pnpm test:integration
 - Node HTTP: `pnpm --dir examples/node-http dev`
 - AWS Lambda: `pnpm --dir examples/aws-lambda deploy`
 - Cloudflare Worker: `pnpm --dir examples/cloudflare-worker deploy`
+- Starter template (polling + webhook): see `/Users/jilimbo/Documents/Personal/TGWrapper/examples/template-bot/README.md`
 
 All examples require env vars (`BOT_TOKEN`, `WEBHOOK_SECRET`) and do not hardcode secrets.
 

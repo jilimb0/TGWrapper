@@ -1,0 +1,15 @@
+{
+  "name": "example-template-bot",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:polling": "tsx src/polling.ts",
+    "dev:webhook": "tsx src/server.ts"
+  },
+  "dependencies": {
+    "@jilimb0/tgwrapper": "^0.6.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  }
+}

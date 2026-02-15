@@ -43,6 +43,7 @@
 
 - Type-level compatibility checks: `test/types/telegram-api-compat.typecheck.ts`
 - Contract tests: `test/telegram-api-compat.contract.test.ts`
+- CI weekly watchdog: `.github/workflows/ci.yml` schedule (every Monday) runs `pnpm telegram:baseline:check`.
 - Release gate command: `pnpm verify:release`
 
 ## Upgrade Procedure

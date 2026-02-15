@@ -43,8 +43,15 @@ function extractTopLevelOptionalKeys(block) {
 }
 
 function parseDocForMethods(html) {
-  const methods = [...html.matchAll(/\/bot<token>\/([A-Za-z0-9_]+)/g)].map((match) => match[1]);
-  return uniqueSorted(methods);
+  const fromEndpointExamples = [...html.matchAll(/\/bot<token>\/([A-Za-z0-9_]+)/g)].map((match) => match[1]);
+  const fromMethodHeadings = [...html.matchAll(/<h4[^>]*>\s*<a[^>]*>\s*<i>([A-Za-z][A-Za-z0-9_]+)<\/i>/gim)].map(
+    (match) => match[1]
+  );
+  const fromAnchorNames = [...html.matchAll(/<a[^>]+name="([a-z][a-z0-9_]+)"[^>]*>\s*<i>/gim)].map((match) => match[1]);
+
+  return uniqueSorted(
+    [...fromEndpointExamples, ...fromMethodHeadings, ...fromAnchorNames].filter((name) => /^[a-z]/.test(name))
+  );
 }
 
 function parseDocForUpdateKeys(html) {

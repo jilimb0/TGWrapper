@@ -1,10 +1,10 @@
 import type { ApiMethods } from '../../src/types/telegram.js';
 
-type _SendMessagePayload = Parameters<ApiMethods<unknown>['sendMessage']>[0];
-type _GetUpdatesPayload = Parameters<ApiMethods<unknown>['getUpdates']>[0];
-type _SetWebhookPayload = Parameters<ApiMethods<unknown>['setWebhook']>[0];
-type _SendInvoicePayload = Parameters<ApiMethods<unknown>['sendInvoice']>[0];
-type _UploadStickerFilePayload = Parameters<ApiMethods<unknown>['uploadStickerFile']>[0];
+type _SendMessagePayload = Parameters<ApiMethods['sendMessage']>[0];
+type _GetUpdatesPayload = Parameters<ApiMethods['getUpdates']>[0];
+type _SetWebhookPayload = Parameters<ApiMethods['setWebhook']>[0];
+type _SendInvoicePayload = Parameters<ApiMethods['sendInvoice']>[0];
+type _UploadStickerFilePayload = Parameters<ApiMethods['uploadStickerFile']>[0];
 
 const _okSendMessage: _SendMessagePayload = {
   chat_id: 1,

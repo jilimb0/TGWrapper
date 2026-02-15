@@ -40,6 +40,8 @@
     "telegram:schema:types:check": "node scripts/check-telegram-schema-types-generated.mjs",
     "telegram:schema:payloads:generate": "node scripts/generate-telegram-schema-payloads.mjs",
     "telegram:schema:payloads:check": "node scripts/check-telegram-schema-payloads-generated.mjs",
+    "telegram:schema:results:generate": "node scripts/generate-telegram-schema-results.mjs",
+    "telegram:schema:results:check": "node scripts/check-telegram-schema-results-generated.mjs",
     "telegram:schema:release:gate": "node scripts/check-telegram-schema-release-gate.mjs",
     "docs": "typedoc src/index.ts --out docs/api",
     "api:snapshot:check": "node scripts/check-api-snapshot.mjs",
@@ -50,7 +52,7 @@
     "release:version": "changeset version",
     "release:publish": "changeset publish",
     "test:published-smoke": "node scripts/published-smoke.mjs",
-    "verify:release": "pnpm changeset:lint && pnpm telegram:baseline:check && pnpm telegram:schema:types:check && pnpm telegram:schema:payloads:check && pnpm test && pnpm typecheck:compat && pnpm -r typecheck && pnpm build && pnpm -r build && pnpm api:snapshot:check && pnpm pack:size"
+    "verify:release": "pnpm changeset:lint && pnpm telegram:baseline:check && pnpm telegram:schema:types:check && pnpm telegram:schema:payloads:check && pnpm telegram:schema:results:check && pnpm test && pnpm typecheck:compat && pnpm -r typecheck && pnpm build && pnpm -r build && pnpm api:snapshot:check && pnpm pack:size"
   },
   "keywords": [
     "telegram",

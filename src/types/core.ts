@@ -122,4 +122,4 @@ export interface WebhookHandlerOptions {
   secretHeader?: string;
 }
 
-export type TelegramMethod = keyof ApiMethods<unknown>;
+export type TelegramMethod = keyof ApiMethods;

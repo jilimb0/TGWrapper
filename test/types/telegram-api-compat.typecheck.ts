@@ -6,9 +6,9 @@ import type {
   User
 } from '../../src/types/telegram.js';
 
-type _SendMessageDraftParams = Parameters<ApiMethods<unknown>['sendMessageDraft']>[0];
-type _CreateChatSubscriptionInviteLinkParams = Parameters<ApiMethods<unknown>['createChatSubscriptionInviteLink']>[0];
-type _SetMessageReactionParams = Parameters<ApiMethods<unknown>['setMessageReaction']>[0];
+type _SendMessageDraftParams = Parameters<ApiMethods['sendMessageDraft']>[0];
+type _CreateChatSubscriptionInviteLinkParams = Parameters<ApiMethods['createChatSubscriptionInviteLink']>[0];
+type _SetMessageReactionParams = Parameters<ApiMethods['setMessageReaction']>[0];
 
 const _userFields: User = {
   id: 1,

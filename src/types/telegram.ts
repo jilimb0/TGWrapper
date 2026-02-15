@@ -1,5 +1,6 @@
 import type { TelegramApiMethodName, TelegramUpdateKey } from './telegram.schema.generated.js';
 import type { TelegramApiMethodPayloads } from './telegram.payloads.generated.js';
+import type { TelegramApiMethodResults } from './telegram.results.generated.js';
 
 type UnknownObject = Record<string, unknown>;
 
@@ -196,6 +197,6 @@ export type Update = {
     [key: string]: unknown;
   };
 
-export type ApiMethods<T = unknown> = Record<string, (payload: UnknownObject) => T> & {
-  [K in TelegramApiMethodName]: (payload: TelegramApiMethodPayloads[K]) => T;
+export type ApiMethods = Record<string, (payload: UnknownObject) => unknown> & {
+  [K in TelegramApiMethodName]: (payload: TelegramApiMethodPayloads[K]) => TelegramApiMethodResults[K];
 };

@@ -90,7 +90,7 @@ describe('Telegram API compatibility contract', () => {
       }
     });
 
-    const method: keyof ApiMethods<unknown> = 'sendMessageDraft';
+    const method: keyof ApiMethods = 'sendMessageDraft';
     await client.callApi(method, { chat_id: 1, message_thread_id: 1, text: 'compat-draft' });
 
     expect(calls).toContain('sendMessageDraft');

@@ -49,3 +49,5 @@ export type { ApiGatewayV2Event, ApiGatewayV2Response } from './adapters/aws-lam
 export type { RedisLikeClient, RedisLikeTransaction, SessionCrypto } from './storage/redis-session-storage.js';
 
 export type { ApiMethods, CallbackQuery, Chat, Message, Update, User } from './types/telegram.js';
+export type { TelegramApiMethodPayloads } from './types/telegram.payloads.generated.js';
+export type { TelegramApiMethodResults } from './types/telegram.results.generated.js';

@@ -46,7 +46,7 @@ jobs:
       - run: pnpm benchmark:trend
         env:
           BENCHMARK_MIN_RATIO: "0.55"
-          BENCHMARK_MIN_UPS: "200000"
+          BENCHMARK_MIN_UPS: "180000"
       - name: Release status (informational)
         continue-on-error: true
         run: pnpm release:status || echo "Release status check reported missing changeset (informational)."

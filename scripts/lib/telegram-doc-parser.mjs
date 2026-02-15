@@ -16,24 +16,6 @@ const METHOD_BLOCKLIST = new Set([
   'parsemode'
 ]);
 
-const UPDATE_BLOCKLIST = new Set([
-  'optional',
-  'required',
-  'integer',
-  'string',
-  'boolean',
-  'array',
-  'object',
-  'true',
-  'false',
-  'update',
-  'webhookinfo',
-  'webhooksetup',
-  'messageid',
-  'chatid',
-  'userid'
-]);
-
 function decodeEntities(input) {
   return input
     .replace(/&lt;/g, '<')
@@ -45,6 +27,39 @@ function decodeEntities(input) {
 
 function stripTags(input) {
   return decodeEntities(input).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function getFirstTableAfterOffset(html, offset) {
+  if (offset < 0) return '';
+  const tail = html.slice(offset);
+  const tableStart = tail.search(/<table[^>]*>/i);
+  if (tableStart === -1) return '';
+  const tableTail = tail.slice(tableStart);
+  const tableEnd = tableTail.search(/<\/table>/i);
+  if (tableEnd === -1) return '';
+  return tableTail.slice(0, tableEnd + '</table>'.length);
+}
+
+function getFirstStructuredBlockAfterOffset(html, offset) {
+  if (offset < 0) return '';
+  const tail = html.slice(offset);
+  const tableStart = tail.search(/<table[^>]*>/i);
+  const dlStart = tail.search(/<dl[^>]*>/i);
+
+  if (tableStart === -1 && dlStart === -1) return '';
+
+  const useTable = tableStart !== -1 && (dlStart === -1 || tableStart < dlStart);
+  if (useTable) {
+    const tableTail = tail.slice(tableStart);
+    const tableEnd = tableTail.search(/<\/table>/i);
+    if (tableEnd === -1) return '';
+    return tableTail.slice(0, tableEnd + '</table>'.length);
+  }
+
+  const dlTail = tail.slice(dlStart);
+  const dlEnd = dlTail.search(/<\/dl>/i);
+  if (dlEnd === -1) return '';
+  return dlTail.slice(0, dlEnd + '</dl>'.length);
 }
 
 function normalizeMethodCandidate(value) {
@@ -65,51 +80,32 @@ export function parseDocForMethods(html) {
     candidates.push(match[1]);
   }
 
-  for (const match of html.matchAll(/<h4[^>]*>\s*([\s\S]*?)\s*<\/h4>/gim)) {
-    const text = match[1].replace(/<[^>]*>/g, ' ').trim();
-    for (const token of text.split(/\s+/g)) {
-      const normalized = normalizeMethodCandidate(token);
-      if (normalized) {
-        candidates.push(normalized);
-      }
-    }
-  }
-
   return uniqueSorted(candidates.map(normalizeMethodCandidate).filter(Boolean));
 }
 
 export function parseDocForUpdateKeys(html) {
   const candidates = [];
-  let source = '';
+  let updateTable = '';
 
-  const anchorIndex =
-    html.search(/(?:name|id)=["']update["']/i) >= 0
-      ? html.search(/(?:name|id)=["']update["']/i)
-      : html.search(/href=["']#update["']/i);
-  if (anchorIndex >= 0) {
-    const tail = html.slice(anchorIndex);
-    const end =
-      tail.search(/(?:name|id)=["']webhook(?:info|setup)["']/i) >= 0
-        ? tail.search(/(?:name|id)=["']webhook(?:info|setup)["']/i)
-        : tail.search(/<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>/i);
-    source = end > 0 ? tail.slice(0, end) : tail.slice(0, 120000);
+  const headingMatches = [...html.matchAll(/<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>/gi)];
+  for (const match of headingMatches) {
+    const headingText = stripTags(match[0]).toLowerCase();
+    if (headingText !== 'update') continue;
+    updateTable = getFirstStructuredBlockAfterOffset(html, match.index ?? 0);
+    if (updateTable) break;
   }
 
-  if (!source) {
-    const headingMatches = [...html.matchAll(/<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>/gi)];
-    for (const match of headingMatches) {
-      const headingText = stripTags(match[0]).toLowerCase();
-      if (!headingText.includes('update')) {
-        continue;
-      }
-      const fromHeading = html.slice(match.index ?? 0);
-      const nextHeading = fromHeading.search(/<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>/i);
-      source = nextHeading > 0 ? fromHeading.slice(0, nextHeading) : fromHeading.slice(0, 120000);
-      break;
+  if (!updateTable) {
+    const anchorIndex = html.search(/(?:name|id)=["']update["']/i);
+    if (anchorIndex >= 0) {
+      updateTable = getFirstStructuredBlockAfterOffset(html, anchorIndex);
     }
   }
 
-  source ||= html;
+  const source = updateTable;
+  if (!source) {
+    return [];
+  }
 
   for (const row of source.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)) {
     const firstCell = row[1].match(/<td[^>]*>([\s\S]*?)<\/td>/i);
@@ -126,15 +122,5 @@ export function parseDocForUpdateKeys(html) {
     candidates.push(match[1]);
   }
 
-  for (const match of source.matchAll(/(?:^|[\s>])([a-z_][a-z0-9_]*)\??:\s/gi)) {
-    candidates.push(match[1]);
-  }
-
-  for (const match of stripTags(source).matchAll(/\b([a-z_][a-z0-9_]*)\b\s+(?:Optional|Required)\b/gi)) {
-    candidates.push(match[1]);
-  }
-
-  return uniqueSorted(
-    candidates.filter((k) => UPDATE_KEY_RE.test(k) && k !== 'update_id' && !UPDATE_BLOCKLIST.has(k.toLowerCase()))
-  );
+  return uniqueSorted(candidates.filter((k) => UPDATE_KEY_RE.test(k) && k !== 'update_id'));
 }

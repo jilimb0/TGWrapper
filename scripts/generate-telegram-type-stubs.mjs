@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const args = process.argv.slice(2);
@@ -20,8 +20,34 @@ const methods = readArg('--methods')
   .filter(Boolean);
 
 const version = readArg('--version') || 'unknown';
+const driftReportPathArg = readArg('--from-drift-report');
 
-if (updates.length === 0 && methods.length === 0) {
+let resolvedUpdates = updates;
+let resolvedMethods = methods;
+if (driftReportPathArg) {
+  const reportPath = resolve(process.cwd(), driftReportPathArg);
+  const report = JSON.parse(readFileSync(reportPath, 'utf8'));
+  const addedUpdates = Array.isArray(report?.update_key_diff?.added) ? report.update_key_diff.added : [];
+  const addedMethods = Array.isArray(report?.method_diff?.added) ? report.method_diff.added : [];
+  resolvedUpdates = [...new Set([...resolvedUpdates, ...addedUpdates])];
+  resolvedMethods = [...new Set([...resolvedMethods, ...addedMethods])];
+}
+
+if (resolvedUpdates.length === 0 && resolvedMethods.length === 0) {
+  if (driftReportPathArg) {
+    console.log(
+      JSON.stringify(
+        {
+          status: 'no_stubs',
+          reason: 'no added update keys or methods in drift report',
+          drift_report: resolve(process.cwd(), driftReportPathArg)
+        },
+        null,
+        2
+      )
+    );
+    process.exit(0);
+  }
   console.error(
     'Usage: node scripts/generate-telegram-type-stubs.mjs --version=9.5 --updates=gift,owned_gifts --methods=getAvailableGifts'
   );
@@ -33,7 +59,7 @@ const outFile = resolve(outDir, `telegram-type-stubs-${version.replace(/\./g, '_
 
 mkdirSync(outDir, { recursive: true });
 
-const updateStubs = updates
+const updateStubs = resolvedUpdates
   .map(
     (key) => `  ${key}?: {
     // TODO: add concrete Bot API ${version} fields
@@ -42,7 +68,7 @@ const updateStubs = updates
   )
   .join('\n');
 
-const methodStubs = methods
+const methodStubs = resolvedMethods
   .map(
     (name) => `  ${name}: (payload: {
     // TODO: add concrete Bot API ${version} payload fields
@@ -83,8 +109,8 @@ console.log(
       status: 'ok',
       output: outFile,
       version,
-      updates,
-      methods
+      updates: resolvedUpdates,
+      methods: resolvedMethods
     },
     null,
     2

@@ -42,6 +42,9 @@ jobs:
           echo "always-auth=$(npm config get always-auth || true)"
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify:release
+      - run: pnpm telegram:schema:fetch
+      - run: pnpm telegram:schema:drift:report
+      - run: pnpm telegram:schema:release:gate
       - run: pnpm benchmark
       - run: pnpm benchmark:trend
         env:

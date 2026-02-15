@@ -21,6 +21,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm telegram:baseline:check
+      - run: pnpm telegram:schema:fetch:ci
+      - name: Telegram schema drift check (informational)
+        continue-on-error: true
+        run: pnpm telegram:schema:drift:check
       - run: pnpm typecheck:compat
       - run: pnpm typecheck
       - run: pnpm build

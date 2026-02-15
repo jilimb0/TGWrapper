@@ -51,6 +51,8 @@
 - CI weekly watchdog: `.github/workflows/ci.yml` schedule (every Monday) runs `pnpm telegram:baseline:check`.
 - Drift automation: `.github/workflows/telegram-api-watchdog.yml` syncs baseline and opens PR + tracking issue.
 - Merge guard: `.github/workflows/baseline-followup-guard.yml` blocks baseline-only PRs without type/runtime follow-up.
+- Schema drift report: `pnpm telegram:schema:fetch` + `pnpm telegram:schema:drift:report`.
+- Release gate: `.github/workflows/release.yml` runs `pnpm telegram:schema:release:gate` and fails when schema drift exists without Telegram follow-up changeset (after snapshot is calibrated from remote schema source).
 - Release gate command: `pnpm verify:release`
 
 ## Upgrade Procedure
@@ -64,8 +66,11 @@
    - `pnpm verify:release`
 4. If Telegram released a newer Bot API version:
    - run `pnpm telegram:baseline:sync`,
+   - run `pnpm telegram:schema:fetch` and `pnpm telegram:schema:drift:report`,
    - optionally generate scaffold with `pnpm telegram:types:stub -- --version=X.Y --updates=... --methods=...`,
+   - or generate from diff report: `pnpm telegram:types:stub -- --version=X.Y --from-drift-report=docs/telegram-api-schema.drift-report.json`,
    - update local types/contracts/runtime fallbacks,
+   - after implementing/validating changes, promote snapshot with `pnpm telegram:schema:snapshot:update`,
    - re-run compatibility and release checks.
 5. If Telegram introduces new behavior used by TGWrapper, add/adjust:
    - runtime fallback logic,

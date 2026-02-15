@@ -7,3 +7,5 @@ telegram_framework_agent_prompt.md
 *.tgz
 .internal/
 docs/generated/
+docs/telegram-api-schema.latest.json
+docs/telegram-api-schema.drift-report.json

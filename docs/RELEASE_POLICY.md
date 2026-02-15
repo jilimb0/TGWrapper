@@ -6,6 +6,7 @@
 - Publishing is CI-only through `/Users/jilimbo/Documents/Personal/TGWrapper/.github/workflows/release.yml`.
 - Manual local `pnpm publish` is blocked by `prepublishOnly` checks.
 - Telegram Bot API target baseline is tracked in `/Users/jilimbo/Documents/Personal/TGWrapper/docs/telegram-api-baseline.json` and validated by `pnpm telegram:baseline:check`.
+- Telegram API schema snapshot is tracked in `/Users/jilimbo/Documents/Personal/TGWrapper/docs/telegram-api-schema.snapshot.json` and compared via `pnpm telegram:schema:drift:report`.
 
 ## Supported npm Publish Modes
 
@@ -57,6 +58,8 @@
 - Publish dry-run workflow must pass.
 - OIDC preflight in Release workflow must pass for unpublished package versions.
 - Release job must pass publish-mode assertion for repository visibility/provenance policy.
+- Release job runs schema drift gate and fails when Telegram schema drift exists without a Telegram follow-up changeset (after remote schema snapshot calibration).
+- Telegram schema follow-up changeset must target `@jilimb0/tgwrapper` and mention telegram/schema compatibility context.
 
 ## npm OIDC Setup
 

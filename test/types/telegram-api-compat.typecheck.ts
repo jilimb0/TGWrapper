@@ -14,7 +14,6 @@ const _userFields: User = {
   id: 1,
   is_bot: false,
   first_name: 'topic-user',
-  has_main_web_app: true,
   added_to_attachment_menu: true
 };
 

@@ -35,4 +35,22 @@ describe('telegram doc parser', () => {
     expect(keys).toContain('callback_query');
     expect(keys).toContain('chat_boost');
   });
+
+  it('parses update keys from heading+table layout without update anchors', () => {
+    const html = `
+      <h4>Update</h4>
+      <table>
+        <tr><td><em>message</em></td><td>Optional</td></tr>
+        <tr><td><em>edited_message</em></td><td>Optional</td></tr>
+        <tr><td><code>chat_member</code></td><td>Optional</td></tr>
+      </table>
+      <h4>WebhookInfo</h4>
+    `;
+
+    const keys = parseDocForUpdateKeys(html);
+
+    expect(keys).toContain('message');
+    expect(keys).toContain('edited_message');
+    expect(keys).toContain('chat_member');
+  });
 });

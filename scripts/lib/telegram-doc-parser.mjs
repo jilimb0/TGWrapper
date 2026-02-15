@@ -49,8 +49,32 @@ export function parseDocForMethods(html) {
 
 export function parseDocForUpdateKeys(html) {
   const candidates = [];
-  const sectionMatch = html.match(/name="update"[\s\S]*?(name="webhookinfo"|name="webhooksetup")/i);
-  const source = sectionMatch ? sectionMatch[0] : html;
+  const sectionByAnchor =
+    html.match(/(?:name|id)="update"[\s\S]*?(?:name|id)="webhook(?:info|setup)"/i)?.[0] ?? '';
+
+  let sectionByHeading = '';
+  const headingMatches = [...html.matchAll(/<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>/gi)];
+  for (const match of headingMatches) {
+    const headingHtml = match[0];
+    const headingText = headingHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+    if (headingText !== 'update') {
+      continue;
+    }
+    const fromHeading = html.slice(match.index ?? 0);
+    const tableStart = fromHeading.search(/<table[^>]*>/i);
+    if (tableStart === -1) {
+      continue;
+    }
+    const tableSlice = fromHeading.slice(tableStart);
+    const tableEnd = tableSlice.search(/<\/table>/i);
+    if (tableEnd === -1) {
+      continue;
+    }
+    sectionByHeading = tableSlice.slice(0, tableEnd + '</table>'.length);
+    break;
+  }
+
+  const source = `${sectionByAnchor}\n${sectionByHeading}`.trim() || html;
 
   for (const match of source.matchAll(/<td>\s*<(?:em|code)>([a-z_]+)<\/(?:em|code)>\s*<\/td>/gi)) {
     candidates.push(match[1]);

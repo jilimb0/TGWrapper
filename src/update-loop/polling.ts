@@ -30,18 +30,23 @@ export class PollingSource implements UpdateSource {
     this.running = true;
 
     while (this.running && !this.options.signal?.aborted) {
-      const response = await this.apiClient.callApi<Update[]>('getUpdates', {
+      const response = await this.apiClient.callApi<unknown>('getUpdates', {
         offset: this.offset,
         timeout: this.options.timeoutSeconds,
         limit: this.options.limit
       });
 
-      for (const update of response) {
-        this.offset = update.update_id + 1;
+      if (!Array.isArray(response)) {
+        continue;
+      }
 
-        if (!isValidTelegramUpdate(update)) {
+      for (const candidate of response) {
+        if (!isValidTelegramUpdate(candidate)) {
           continue;
         }
+
+        const update = candidate as Update;
+        this.offset = update.update_id + 1;
 
         if (this.options.dropPendingUpdates && !isFreshUpdate(update)) {
           continue;

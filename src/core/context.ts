@@ -50,6 +50,8 @@ export class Context<TState extends string, TData extends JsonObject> {
       this.primaryMessage?.from ??
       this.update.callback_query?.from ??
       this.update.inline_query?.from ??
+      this.update.business_connection?.user ??
+      this.update.poll_answer?.user ??
       this.update.chosen_inline_result?.from ??
       this.update.shipping_query?.from ??
       this.update.pre_checkout_query?.from ??
@@ -154,6 +156,18 @@ export class Context<TState extends string, TData extends JsonObject> {
 
     if (this.update.removed_chat_boost?.chat?.id) {
       return this.update.removed_chat_boost.chat.id;
+    }
+
+    if (this.update.chat_boost?.chat?.id) {
+      return this.update.chat_boost.chat.id;
+    }
+
+    if (this.update.deleted_business_messages?.chat?.id) {
+      return this.update.deleted_business_messages.chat.id;
+    }
+
+    if (this.update.poll_answer?.voter_chat?.id) {
+      return this.update.poll_answer.voter_chat.id;
     }
 
     return undefined;

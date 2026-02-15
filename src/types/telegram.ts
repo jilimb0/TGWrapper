@@ -88,8 +88,45 @@ export interface Update {
   edited_channel_post?: Message;
   business_message?: Message;
   edited_business_message?: Message;
+  deleted_business_messages?: {
+    business_connection_id: string;
+    chat: Chat;
+    message_ids: number[];
+    [key: string]: unknown;
+  };
+  business_connection?: {
+    id: string;
+    user: User;
+    user_chat_id: number;
+    date: number;
+    can_reply: boolean;
+    is_enabled: boolean;
+    [key: string]: unknown;
+  };
   callback_query?: CallbackQuery;
   inline_query?: InlineQuery;
+  poll?: {
+    id: string;
+    question: string;
+    total_voter_count: number;
+    is_closed: boolean;
+    is_anonymous: boolean;
+    type: string;
+    allows_multiple_answers: boolean;
+    options: Array<{
+      text: string;
+      voter_count: number;
+      [key: string]: unknown;
+    }>;
+    [key: string]: unknown;
+  };
+  poll_answer?: {
+    poll_id: string;
+    user?: User;
+    voter_chat?: Chat;
+    option_ids: number[];
+    [key: string]: unknown;
+  };
   chosen_inline_result?: {
     from: User;
     [key: string]: unknown;
@@ -128,6 +165,16 @@ export interface Update {
   };
   removed_chat_boost?: {
     chat: Chat;
+    [key: string]: unknown;
+  };
+  chat_boost?: {
+    chat: Chat;
+    boost: {
+      boost_id: string;
+      add_date: number;
+      expiration_date: number;
+      [key: string]: unknown;
+    };
     [key: string]: unknown;
   };
   [key: string]: unknown;

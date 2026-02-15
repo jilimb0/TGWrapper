@@ -17,6 +17,9 @@
   - `edited_channel_post`
   - `business_message`
   - `edited_business_message`
+  - `deleted_business_messages`
+- Business connectivity flows:
+  - `business_connection`
 - Callback flows:
   - `callback_query`
 - Context chat/source fallback support for non-message updates:
@@ -26,6 +29,8 @@
   - `message_reaction`
   - `message_reaction_count`
   - `removed_chat_boost`
+  - `chat_boost`
+  - `poll_answer.voter_chat`
 
 ## Limited
 

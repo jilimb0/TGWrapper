@@ -85,4 +85,40 @@ describe('Context compatibility fallbacks', () => {
     const ctx = makeContext(update, []);
     expect(ctx.fromId).toBe(700);
   });
+
+  it('resolves fromId from business_connection updates', () => {
+    const update = {
+      update_id: 4,
+      business_connection: {
+        id: 'bc_1',
+        user: { id: 901, is_bot: false, first_name: 'biz-owner' },
+        user_chat_id: 42,
+        date: 1,
+        can_reply: true,
+        is_enabled: true
+      }
+    } as unknown as Update;
+
+    const ctx = makeContext(update, []);
+    expect(ctx.fromId).toBe(901);
+  });
+
+  it('resolves chat_id from deleted_business_messages updates', async () => {
+    const calls: Array<{ method: string; payload: Record<string, unknown> }> = [];
+    const update = {
+      update_id: 5,
+      deleted_business_messages: {
+        business_connection_id: 'bc_2',
+        chat: { id: 707, type: 'private', first_name: 'biz-chat' },
+        message_ids: [1, 2]
+      }
+    } as unknown as Update;
+
+    const ctx = makeContext(update, calls);
+    await ctx.reply('restored');
+
+    expect(ctx.chatId).toBe(707);
+    expect(calls.at(0)?.method).toBe('sendMessage');
+    expect(calls.at(0)?.payload.chat_id).toBe(707);
+  });
 });

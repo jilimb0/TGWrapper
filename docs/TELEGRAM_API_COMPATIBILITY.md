@@ -3,7 +3,7 @@
 ## Compatibility Target
 
 - Target baseline: **Telegram Bot API 9.4**.
-- Type baseline: `@grammyjs/types` resolved in lockfile.
+- Type baseline: **local TGWrapper Telegram types** in `/Users/jilimbo/Documents/Personal/TGWrapper/src/types/telegram.ts`.
 - Policy: compatibility is validated by release gates (`typecheck:compat` + contract tests).
 
 ## Supported
@@ -17,6 +17,9 @@
   - `edited_channel_post`
   - `business_message`
   - `edited_business_message`
+  - `deleted_business_messages`
+- Business connectivity flows:
+  - `business_connection`
 - Callback flows:
   - `callback_query`
 - Context chat/source fallback support for non-message updates:
@@ -26,6 +29,8 @@
   - `message_reaction`
   - `message_reaction_count`
   - `removed_chat_boost`
+  - `chat_boost`
+  - `poll_answer.voter_chat`
 
 ## Limited
 
@@ -43,16 +48,18 @@
 
 - Type-level compatibility checks: `test/types/telegram-api-compat.typecheck.ts`
 - Contract tests: `test/telegram-api-compat.contract.test.ts`
+- CI weekly watchdog: `.github/workflows/ci.yml` schedule (every Monday) runs `pnpm telegram:baseline:check`.
 - Release gate command: `pnpm verify:release`
 
 ## Upgrade Procedure
 
-1. Update `@grammyjs/types`.
-2. Run:
+1. Review latest official Telegram Bot API changelog.
+2. Update local types in `/Users/jilimbo/Documents/Personal/TGWrapper/src/types/telegram.ts` and related compatibility tests.
+3. Run:
    - `pnpm typecheck:compat`
    - `pnpm test`
    - `pnpm verify:release`
-3. If Telegram introduces new behavior used by TGWrapper, add/adjust:
+4. If Telegram introduces new behavior used by TGWrapper, add/adjust:
    - runtime fallback logic,
    - compatibility tests,
    - this document.

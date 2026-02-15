@@ -8,12 +8,25 @@ describe('Telegram API compatibility contract', () => {
   it('accepts Update payloads with newer Bot API fields', () => {
     const update = {
       update_id: 100,
+      business_connection: {
+        id: 'bc_1',
+        user: { id: 501, is_bot: false, first_name: 'Owner' },
+        user_chat_id: 777,
+        date: Math.floor(Date.now() / 1000),
+        can_reply: true,
+        is_enabled: true
+      },
       business_message: {
         message_id: 1,
         date: Math.floor(Date.now() / 1000),
         chat: { id: 42, type: 'private' },
         from: { id: 42, is_bot: false, first_name: 'Alice' },
         text: 'hello from business'
+      },
+      deleted_business_messages: {
+        business_connection_id: 'bc_1',
+        chat: { id: 42, type: 'private' },
+        message_ids: [1]
       },
       message_reaction: {
         chat: { id: 42, type: 'private' },

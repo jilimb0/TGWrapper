@@ -2,6 +2,8 @@
 
 Production-grade Telegram Bot Framework with serverless-first architecture, native FSM, optimistic locking, and ecosystem packages.
 
+TGWrapper uses internal Telegram Bot API type definitions (`/Users/jilimbo/Documents/Personal/TGWrapper/src/types/telegram.ts`) with an explicit compatibility baseline (`/Users/jilimbo/Documents/Personal/TGWrapper/docs/telegram-api-baseline.json`).
+
 ## Packages
 
 - `@jilimb0/tgwrapper` - framework kernel, transport, router, FSM, adapters

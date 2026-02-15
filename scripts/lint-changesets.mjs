@@ -28,7 +28,7 @@ for (const file of files) {
     continue;
   }
 
-  const hasPackageBump = /"@jilimb0\/[^"]+"\s*:\s*"(major|minor|patch)"/.test(frontmatter);
+  const hasPackageBump = /"@jilimb0\/[^"]+"\s*:\s*("(major|minor|patch)"|(major|minor|patch))/.test(frontmatter);
   if (!hasPackageBump) {
     invalid.push({ file, reason: 'frontmatter has no package semver bump entries' });
   }

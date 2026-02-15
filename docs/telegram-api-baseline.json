@@ -1,0 +1,6 @@
+{
+  "target_bot_api_version": "9.4",
+  "source_changelog": "https://core.telegram.org/bots/api-changelog",
+  "reviewed_at": "2026-02-15",
+  "notes": "Local Telegram types are aligned to framework-supported Bot API 9.4 surface used by TGWrapper runtime/contracts."
+}

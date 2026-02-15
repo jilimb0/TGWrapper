@@ -5,6 +5,7 @@
 - Versioning is managed by Changesets in `.changeset/`.
 - Publishing is CI-only through `/Users/jilimbo/Documents/Personal/TGWrapper/.github/workflows/release.yml`.
 - Manual local `pnpm publish` is blocked by `prepublishOnly` checks.
+- Telegram Bot API target baseline is tracked in `/Users/jilimbo/Documents/Personal/TGWrapper/docs/telegram-api-baseline.json` and validated by `pnpm telegram:baseline:check`.
 
 ## Supported npm Publish Modes
 

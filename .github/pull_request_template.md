@@ -15,6 +15,7 @@
 - [ ] `pnpm -r publish --dry-run --no-git-checks` passes locally or via CI `Publish Dry Run`
 - [ ] If Redis adapter changed: `REDIS_URL=redis://127.0.0.1:6379 pnpm test:integration` passes
 - [ ] Migration docs updated when API behavior changes (`docs/MIGRATION_FROM_TELEGRAF.md` / `docs/MIGRATION_COOKBOOK.md`)
+- [ ] If `docs/telegram-api-baseline.json` changed: updated `src/types/telegram.ts`, compatibility tests, and `docs/TELEGRAM_API_COMPATIBILITY.md`
 
 ## Breaking Changes
 

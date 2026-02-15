@@ -49,6 +49,8 @@
 - Type-level compatibility checks: `test/types/telegram-api-compat.typecheck.ts`
 - Contract tests: `test/telegram-api-compat.contract.test.ts`
 - CI weekly watchdog: `.github/workflows/ci.yml` schedule (every Monday) runs `pnpm telegram:baseline:check`.
+- Drift automation: `.github/workflows/telegram-api-watchdog.yml` syncs baseline and opens PR + tracking issue.
+- Merge guard: `.github/workflows/baseline-followup-guard.yml` blocks baseline-only PRs without type/runtime follow-up.
 - Release gate command: `pnpm verify:release`
 
 ## Upgrade Procedure
@@ -62,6 +64,7 @@
    - `pnpm verify:release`
 4. If Telegram released a newer Bot API version:
    - run `pnpm telegram:baseline:sync`,
+   - optionally generate scaffold with `pnpm telegram:types:stub -- --version=X.Y --updates=... --methods=...`,
    - update local types/contracts/runtime fallbacks,
    - re-run compatibility and release checks.
 5. If Telegram introduces new behavior used by TGWrapper, add/adjust:

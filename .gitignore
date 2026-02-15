@@ -6,3 +6,4 @@ telegram_framework_agent_prompt.md
 .npm-cache
 *.tgz
 .internal/
+docs/generated/

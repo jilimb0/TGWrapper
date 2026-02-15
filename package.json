@@ -27,6 +27,8 @@
     "telegram:baseline:check": "node scripts/check-telegram-api-baseline.mjs",
     "telegram:baseline:latest": "node scripts/sync-telegram-api-baseline.mjs --check",
     "telegram:baseline:sync": "node scripts/sync-telegram-api-baseline.mjs --write",
+    "telegram:baseline:followup:check": "node scripts/check-baseline-followup.mjs origin/main",
+    "telegram:types:stub": "node scripts/generate-telegram-type-stubs.mjs",
     "docs": "typedoc src/index.ts --out docs/api",
     "api:snapshot:check": "node scripts/check-api-snapshot.mjs",
     "api:snapshot:update": "node scripts/update-api-snapshot.mjs",

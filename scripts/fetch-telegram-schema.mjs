@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { parseDocForMethods, parseDocForUpdateKeys } from './lib/telegram-doc-parser.mjs';
 
 const API_DOC_URL = 'https://core.telegram.org/bots/api';
 
@@ -42,29 +43,6 @@ function extractTopLevelOptionalKeys(block) {
   );
 }
 
-function parseDocForMethods(html) {
-  const fromEndpointExamples = [...html.matchAll(/\/bot<token>\/([A-Za-z0-9_]+)/g)].map((match) => match[1]);
-  const fromMethodHeadings = [...html.matchAll(/<h4[^>]*>\s*<a[^>]*>\s*<i>([A-Za-z][A-Za-z0-9_]+)<\/i>/gim)].map(
-    (match) => match[1]
-  );
-  const fromAnchorNames = [...html.matchAll(/<a[^>]+name="([a-z][a-z0-9_]+)"[^>]*>\s*<i>/gim)].map((match) => match[1]);
-
-  return uniqueSorted(
-    [...fromEndpointExamples, ...fromMethodHeadings, ...fromAnchorNames].filter((name) => /^[a-z]/.test(name))
-  );
-}
-
-function parseDocForUpdateKeys(html) {
-  const sectionMatch = html.match(/name="update"[\s\S]*?(name="webhookinfo"|name="webhooksetup")/i);
-  if (!sectionMatch) {
-    return [];
-  }
-
-  const section = sectionMatch[0];
-  const rowMatches = [...section.matchAll(/<td>\s*<em>([a-z_]+)<\/em>\s*<\/td>/gi)];
-  return uniqueSorted(rowMatches.map((match) => match[1]).filter((key) => key !== 'update_id'));
-}
-
 function parseLocalTypes() {
   const src = readFileSync(resolve(process.cwd(), 'src/types/telegram.ts'), 'utf8');
   const generatedPath = resolve(process.cwd(), 'src/types/telegram.schema.generated.ts');
@@ -104,8 +82,8 @@ async function parseRemoteTypes() {
   const methods = parseDocForMethods(html);
   const updateKeys = parseDocForUpdateKeys(html);
 
-  if (methods.length === 0) {
-    throw new Error('No API methods parsed from Telegram API page');
+  if (methods.length === 0 || updateKeys.length === 0) {
+    throw new Error(`Invalid parsed schema from Telegram API page (methods=${methods.length}, update_keys=${updateKeys.length})`);
   }
 
   return {

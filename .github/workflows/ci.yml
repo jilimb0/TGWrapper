@@ -22,6 +22,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm telegram:baseline:check
       - run: pnpm telegram:schema:fetch:ci
+      - name: Telegram schema completeness check (informational)
+        continue-on-error: true
+        run: pnpm telegram:schema:completeness:check
       - name: Telegram schema drift check (informational)
         continue-on-error: true
         run: pnpm telegram:schema:drift:check

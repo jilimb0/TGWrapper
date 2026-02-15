@@ -52,6 +52,7 @@
 - Drift automation: `.github/workflows/telegram-api-watchdog.yml` syncs baseline and opens PR + tracking issue.
 - Merge guard: `.github/workflows/baseline-followup-guard.yml` blocks baseline-only PRs without type/runtime follow-up.
 - Schema drift report: `pnpm telegram:schema:fetch` + `pnpm telegram:schema:drift:report`.
+- Schema completeness gate: `pnpm telegram:schema:completeness:check` (requires remote schema source and minimum method/update-key counts from `/Users/jilimbo/Documents/Personal/TGWrapper/docs/telegram-api-baseline.json`).
 - Release gate: `.github/workflows/release.yml` runs `pnpm telegram:schema:release:gate` and fails when schema drift exists without Telegram follow-up changeset (after snapshot is calibrated from remote schema source).
 - Release gate command: `pnpm verify:release`
 

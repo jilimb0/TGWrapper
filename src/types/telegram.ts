@@ -1,3 +1,7 @@
+import type { TelegramApiMethodName, TelegramUpdateKey } from './telegram.schema.generated.js';
+
+type UnknownObject = Record<string, unknown>;
+
 export interface User {
   id: number;
   is_bot: boolean;
@@ -80,8 +84,11 @@ export interface InlineKeyboardButton {
   [key: string]: unknown;
 }
 
-export interface Update {
-  update_id: number;
+type GeneratedUpdateFields = {
+  [K in TelegramUpdateKey]?: UnknownObject;
+};
+
+type TypedUpdateFields = {
   message?: Message;
   edited_message?: Message;
   channel_post?: Message;
@@ -147,16 +154,13 @@ export interface Update {
   chat_member?: {
     chat: Chat;
     from: User;
+    date?: number;
     [key: string]: unknown;
   };
   my_chat_member?: {
     chat: Chat;
     from: User;
-    [key: string]: unknown;
-  };
-  message_reaction?: {
-    chat: Chat;
-    user?: User;
+    date?: number;
     [key: string]: unknown;
   };
   message_reaction_count?: {
@@ -177,10 +181,22 @@ export interface Update {
     };
     [key: string]: unknown;
   };
-  [key: string]: unknown;
-}
+  message_reaction?: {
+    chat: Chat;
+    user?: User;
+    [key: string]: unknown;
+  };
+};
 
-export type ApiMethods<T = unknown> = Record<string, (payload: Record<string, unknown>) => T> & {
+export type Update = {
+  update_id: number;
+} & GeneratedUpdateFields &
+  TypedUpdateFields & {
+    [key: string]: unknown;
+  };
+
+export type ApiMethods<T = unknown> = Record<string, (payload: UnknownObject) => T> &
+  { [K in TelegramApiMethodName]: (payload: UnknownObject) => T } & {
   sendMessage: (payload: { chat_id: number; text: string; [key: string]: unknown }) => T;
   editMessageText: (payload: { chat_id: number; message_id: number; text: string; [key: string]: unknown }) => T;
   answerCallbackQuery: (payload: { callback_query_id: string; text?: string; [key: string]: unknown }) => T;

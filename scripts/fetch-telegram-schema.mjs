@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const API_DOC_URL = 'https://core.telegram.org/bots/api';
@@ -67,20 +67,30 @@ function parseDocForUpdateKeys(html) {
 
 function parseLocalTypes() {
   const src = readFileSync(resolve(process.cwd(), 'src/types/telegram.ts'), 'utf8');
-  const updateBlock = extractBlockByHeader(src, 'export interface Update');
+  const generatedPath = resolve(process.cwd(), 'src/types/telegram.schema.generated.ts');
+  const generatedSrc = existsSync(generatedPath) ? readFileSync(generatedPath, 'utf8') : '';
   const apiMethodsBlock = src.match(/export type ApiMethods<[\s\S]*?\{([\s\S]*?)\n\};/);
 
-  const updateKeys = updateBlock ? extractTopLevelOptionalKeys(updateBlock) : [];
+  const generatedUpdateKeys = [
+    ...generatedSrc.matchAll(/export type TelegramUpdateKey =([\s\S]*?);/g)
+  ].flatMap((match) => [...match[1].matchAll(/\|\s*'([a-z_][a-z0-9_]*)'/g)].map((item) => item[1]));
+
+  const generatedMethods = [
+    ...generatedSrc.matchAll(/export type TelegramApiMethodName =([\s\S]*?);/g)
+  ].flatMap((match) => [...match[1].matchAll(/\|\s*'([A-Za-z][A-Za-z0-9_]*)'/g)].map((item) => item[1]));
 
   const methods = apiMethodsBlock
     ? uniqueSorted([...apiMethodsBlock[1].matchAll(/^\s*([A-Za-z][A-Za-z0-9_]*)\s*:/gm)].map((match) => match[1]))
     : [];
 
+  const updateBlock = extractBlockByHeader(src, 'export interface Update');
+  const fallbackUpdateKeys = updateBlock ? extractTopLevelOptionalKeys(updateBlock) : [];
+
   return {
     source: 'local-types',
     source_url: null,
-    methods,
-    update_keys: updateKeys
+    methods: uniqueSorted([...generatedMethods, ...methods]),
+    update_keys: uniqueSorted([...generatedUpdateKeys, ...fallbackUpdateKeys])
   };
 }
 

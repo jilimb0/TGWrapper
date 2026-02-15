@@ -35,6 +35,8 @@
     "telegram:schema:drift:report": "node scripts/diff-telegram-schema.mjs --latest=docs/telegram-api-schema.latest.json --snapshot=docs/telegram-api-schema.snapshot.json --report=docs/telegram-api-schema.drift-report.json",
     "telegram:schema:drift:check": "node scripts/diff-telegram-schema.mjs --latest=docs/telegram-api-schema.latest.json --snapshot=docs/telegram-api-schema.snapshot.json --report=docs/telegram-api-schema.drift-report.json --check",
     "telegram:schema:snapshot:update": "node scripts/promote-telegram-schema-snapshot.mjs",
+    "telegram:schema:types:generate": "node scripts/generate-telegram-schema-types.mjs",
+    "telegram:schema:types:check": "node scripts/check-telegram-schema-types-generated.mjs",
     "telegram:schema:release:gate": "node scripts/check-telegram-schema-release-gate.mjs",
     "docs": "typedoc src/index.ts --out docs/api",
     "api:snapshot:check": "node scripts/check-api-snapshot.mjs",
@@ -45,7 +47,7 @@
     "release:version": "changeset version",
     "release:publish": "changeset publish",
     "test:published-smoke": "node scripts/published-smoke.mjs",
-    "verify:release": "pnpm changeset:lint && pnpm telegram:baseline:check && pnpm test && pnpm typecheck:compat && pnpm -r typecheck && pnpm build && pnpm -r build && pnpm api:snapshot:check && pnpm pack:size"
+    "verify:release": "pnpm changeset:lint && pnpm telegram:baseline:check && pnpm telegram:schema:types:check && pnpm test && pnpm typecheck:compat && pnpm -r typecheck && pnpm build && pnpm -r build && pnpm api:snapshot:check && pnpm pack:size"
   },
   "keywords": [
     "telegram",

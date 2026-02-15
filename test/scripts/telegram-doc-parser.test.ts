@@ -53,4 +53,18 @@ describe('telegram doc parser', () => {
     expect(keys).toContain('edited_message');
     expect(keys).toContain('chat_member');
   });
+
+  it('parses update keys from definition list layout', () => {
+    const html = `
+      <a id="update"></a>
+      <dl>
+        <dt><code>message</code></dt><dd>Optional. New message.</dd>
+        <dt><code>callback_query</code></dt><dd>Optional. Callback query.</dd>
+      </dl>
+      <a id="webhookinfo"></a>
+    `;
+    const keys = parseDocForUpdateKeys(html);
+    expect(keys).toContain('message');
+    expect(keys).toContain('callback_query');
+  });
 });

@@ -16,6 +16,37 @@ const METHOD_BLOCKLIST = new Set([
   'parsemode'
 ]);
 
+const UPDATE_BLOCKLIST = new Set([
+  'optional',
+  'required',
+  'integer',
+  'string',
+  'boolean',
+  'array',
+  'object',
+  'true',
+  'false',
+  'update',
+  'webhookinfo',
+  'webhooksetup',
+  'messageid',
+  'chatid',
+  'userid'
+]);
+
+function decodeEntities(input) {
+  return input
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
+function stripTags(input) {
+  return decodeEntities(input).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 function normalizeMethodCandidate(value) {
   const candidate = value.trim();
   if (!METHOD_NAME_RE.test(candidate)) {
@@ -49,34 +80,49 @@ export function parseDocForMethods(html) {
 
 export function parseDocForUpdateKeys(html) {
   const candidates = [];
-  const sectionByAnchor =
-    html.match(/(?:name|id)="update"[\s\S]*?(?:name|id)="webhook(?:info|setup)"/i)?.[0] ?? '';
+  let source = '';
 
-  let sectionByHeading = '';
-  const headingMatches = [...html.matchAll(/<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>/gi)];
-  for (const match of headingMatches) {
-    const headingHtml = match[0];
-    const headingText = headingHtml.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
-    if (headingText !== 'update') {
-      continue;
-    }
-    const fromHeading = html.slice(match.index ?? 0);
-    const tableStart = fromHeading.search(/<table[^>]*>/i);
-    if (tableStart === -1) {
-      continue;
-    }
-    const tableSlice = fromHeading.slice(tableStart);
-    const tableEnd = tableSlice.search(/<\/table>/i);
-    if (tableEnd === -1) {
-      continue;
-    }
-    sectionByHeading = tableSlice.slice(0, tableEnd + '</table>'.length);
-    break;
+  const anchorIndex =
+    html.search(/(?:name|id)=["']update["']/i) >= 0
+      ? html.search(/(?:name|id)=["']update["']/i)
+      : html.search(/href=["']#update["']/i);
+  if (anchorIndex >= 0) {
+    const tail = html.slice(anchorIndex);
+    const end =
+      tail.search(/(?:name|id)=["']webhook(?:info|setup)["']/i) >= 0
+        ? tail.search(/(?:name|id)=["']webhook(?:info|setup)["']/i)
+        : tail.search(/<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>/i);
+    source = end > 0 ? tail.slice(0, end) : tail.slice(0, 120000);
   }
 
-  const source = `${sectionByAnchor}\n${sectionByHeading}`.trim() || html;
+  if (!source) {
+    const headingMatches = [...html.matchAll(/<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>/gi)];
+    for (const match of headingMatches) {
+      const headingText = stripTags(match[0]).toLowerCase();
+      if (!headingText.includes('update')) {
+        continue;
+      }
+      const fromHeading = html.slice(match.index ?? 0);
+      const nextHeading = fromHeading.search(/<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>/i);
+      source = nextHeading > 0 ? fromHeading.slice(0, nextHeading) : fromHeading.slice(0, 120000);
+      break;
+    }
+  }
 
-  for (const match of source.matchAll(/<td>\s*<(?:em|code)>([a-z_]+)<\/(?:em|code)>\s*<\/td>/gi)) {
+  source ||= html;
+
+  for (const row of source.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)) {
+    const firstCell = row[1].match(/<td[^>]*>([\s\S]*?)<\/td>/i);
+    if (!firstCell) {
+      continue;
+    }
+    const token = stripTags(firstCell[1]).match(/\b([a-z_][a-z0-9_]*)\b/);
+    if (token) {
+      candidates.push(token[1]);
+    }
+  }
+
+  for (const match of source.matchAll(/<dt[^>]*>[\s\S]*?<code[^>]*>([a-z_][a-z0-9_]*)<\/code>[\s\S]*?<\/dt>/gi)) {
     candidates.push(match[1]);
   }
 
@@ -84,5 +130,11 @@ export function parseDocForUpdateKeys(html) {
     candidates.push(match[1]);
   }
 
-  return uniqueSorted(candidates.filter((k) => UPDATE_KEY_RE.test(k) && k !== 'update_id'));
+  for (const match of stripTags(source).matchAll(/\b([a-z_][a-z0-9_]*)\b\s+(?:Optional|Required)\b/gi)) {
+    candidates.push(match[1]);
+  }
+
+  return uniqueSorted(
+    candidates.filter((k) => UPDATE_KEY_RE.test(k) && k !== 'update_id' && !UPDATE_BLOCKLIST.has(k.toLowerCase()))
+  );
 }

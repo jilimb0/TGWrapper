@@ -2,7 +2,7 @@
   "target_bot_api_version": "9.4",
   "source_changelog": "https://core.telegram.org/bots/api-changelog",
   "reviewed_at": "2026-02-15",
-  "min_method_count": 120,
+  "min_method_count": 150,
   "min_update_key_count": 20,
   "notes": "Schema completeness gate for full Bot API coverage. Values are conservative lower bounds for Bot API 9.4 and should be raised if Telegram adds new methods/update keys."
 }

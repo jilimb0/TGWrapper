@@ -23,15 +23,35 @@ describe('telegram doc parser', () => {
 
   it('does not include random heading words as methods', () => {
     const html = `
-      <h4>Methods and objects</h4>
-      <h4>When to use</h4>
+      <h3>Available methods</h3>
+      <h4>sendMessage</h4>
+      <h4>editMessageText</h4>
+      <h3>Available types</h3>
+      <h4>Message</h4>
+      <h4>Chat</h4>
       <p>Use endpoint /bot&lt;token&gt;/sendMessage</p>
     `;
     const methods = parseDocForMethods(html);
     expect(methods).toContain('sendMessage');
-    expect(methods).not.toContain('methods');
-    expect(methods).not.toContain('objects');
-    expect(methods).not.toContain('when');
+    expect(methods).toContain('editMessageText');
+    expect(methods).not.toContain('Message');
+    expect(methods).not.toContain('Chat');
+  });
+
+  it('extracts methods from getting-updates section headings with method context', () => {
+    const html = `
+      <h3>Getting updates</h3>
+      <h4>getUpdates</h4>
+      <p>Use this method to receive incoming updates.</p>
+      <h4>setWebhook</h4>
+      <p>Use this method to specify a URL and receive incoming updates via webhook.</p>
+      <h4>Update</h4>
+      <p>This object represents an incoming update.</p>
+    `;
+    const methods = parseDocForMethods(html);
+    expect(methods).toContain('getUpdates');
+    expect(methods).toContain('setWebhook');
+    expect(methods).not.toContain('Update');
   });
 
   it('parses update keys from update section table markup', () => {

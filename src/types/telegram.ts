@@ -1,4 +1,5 @@
 import type { TelegramApiMethodName, TelegramUpdateKey } from './telegram.schema.generated.js';
+import type { TelegramApiMethodPayloads } from './telegram.payloads.generated.js';
 
 type UnknownObject = Record<string, unknown>;
 
@@ -195,13 +196,6 @@ export type Update = {
     [key: string]: unknown;
   };
 
-export type ApiMethods<T = unknown> = Record<string, (payload: UnknownObject) => T> &
-  { [K in TelegramApiMethodName]: (payload: UnknownObject) => T } & {
-  sendMessage: (payload: { chat_id: number; text: string; [key: string]: unknown }) => T;
-  editMessageText: (payload: { chat_id: number; message_id: number; text: string; [key: string]: unknown }) => T;
-  answerCallbackQuery: (payload: { callback_query_id: string; text?: string; [key: string]: unknown }) => T;
-  getUpdates: (payload: { offset?: number; limit?: number; timeout?: number; [key: string]: unknown }) => T;
-  sendMessageDraft: (payload: { chat_id: number; text: string; [key: string]: unknown }) => T;
-  createChatSubscriptionInviteLink: (payload: { chat_id: number; [key: string]: unknown }) => T;
-  setMessageReaction: (payload: { chat_id: number; message_id: number; [key: string]: unknown }) => T;
+export type ApiMethods<T = unknown> = Record<string, (payload: UnknownObject) => T> & {
+  [K in TelegramApiMethodName]: (payload: TelegramApiMethodPayloads[K]) => T;
 };

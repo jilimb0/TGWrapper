@@ -30,7 +30,7 @@ export class PollingSource implements UpdateSource {
     this.running = true;
 
     while (this.running && !this.options.signal?.aborted) {
-      const response = await this.apiClient.callApi<unknown>('getUpdates', {
+      const response = await this.apiClient.callApi('getUpdates', {
         offset: this.offset,
         timeout: this.options.timeoutSeconds,
         limit: this.options.limit

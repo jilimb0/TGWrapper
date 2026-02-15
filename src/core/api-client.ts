@@ -1,6 +1,8 @@
 import { CircuitBreaker } from './circuit-breaker.js';
 import { CircuitOpenError, CoreError, TelegramApiError } from './errors.js';
 import type { ApiClientOptions, JsonObject, RetryOptions } from '../types/core.js';
+import type { TelegramApiMethodName } from '../types/telegram.schema.generated.js';
+import type { TelegramApiMethodPayloads } from '../types/telegram.payloads.generated.js';
 
 const DEFAULT_RETRY: RetryOptions = {
   maxRetries: 3,
@@ -30,7 +32,14 @@ export class ApiClient {
     this.circuitBreaker = new CircuitBreaker(options.circuitBreaker);
   }
 
-  public async callApi<TResponse>(method: string, payload: JsonObject): Promise<TResponse> {
+  public async callApi<TMethod extends TelegramApiMethodName, TResponse = unknown>(
+    method: TMethod,
+    payload: TelegramApiMethodPayloads[TMethod]
+  ): Promise<TResponse> {
+    return this.callApiUnsafe(method, payload as JsonObject);
+  }
+
+  public async callApiUnsafe<TResponse = unknown>(method: string, payload: JsonObject): Promise<TResponse> {
     const requestId = crypto.randomUUID();
     const started = Date.now();
 

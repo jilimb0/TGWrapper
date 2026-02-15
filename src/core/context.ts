@@ -110,7 +110,7 @@ export class Context<TState extends string, TData extends JsonObject> {
 
     return this.apiClient.callApi('answerCallbackQuery', {
       callback_query_id: callbackQueryId,
-      text
+      ...(text === undefined ? {} : { text })
     });
   }
 

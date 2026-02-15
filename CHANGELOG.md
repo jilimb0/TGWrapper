@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper
 
+## 0.6.0
+
+### Minor Changes
+
+- 9de9fd0: Replace `@grammyjs/types` with internal Telegram type definitions, add Telegram API baseline sync checks, and expand runtime/context compatibility fallbacks for newer update scenarios.
+
 ## 0.5.2
 
 ### Patch Changes

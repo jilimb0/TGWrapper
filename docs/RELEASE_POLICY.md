@@ -8,25 +8,32 @@
 - Telegram Bot API target baseline is tracked in `/Users/jilimbo/Documents/Personal/TGWrapper/docs/telegram-api-baseline.json` and validated by `pnpm telegram:baseline:check`.
 - Telegram API schema snapshot is tracked in `/Users/jilimbo/Documents/Personal/TGWrapper/docs/telegram-api-schema.snapshot.json` and compared via `pnpm telegram:schema:drift:report`.
 
+## 1.0.0 Policy Decision
+
+- `1.0.0` is the first stable production version.
+- From `1.0.0`, SemVer is strict for public exports from `/Users/jilimbo/Documents/Personal/TGWrapper/src/index.ts`.
+- Release candidate and final release must pass `pnpm verify:1.0`.
+
+
+## 1.0.0 Formal Readiness ("100% at release-time")
+
+- Readiness contract is defined in `/Users/jilimbo/Documents/Personal/TGWrapper/docs/DEFINITION_OF_DONE_1.0.0.md`.
+- `pnpm verify:1.0` is mandatory for 1.0 release candidates and final release.
+- `pnpm telegram:schema:coverage:full:check` must pass (snapshot and generated method/update/payload/result maps must match 1:1).
+
 ## Supported npm Publish Modes
 
 | Repository Visibility | npm Provenance | Status | Notes |
 |---|---|---|---|
 | private | enabled | unsupported | npm rejects trusted publish provenance bundle for private source repository visibility in our current setup. |
-| private | disabled | supported (current) | **Current 0.5.0 policy**. Release workflow enforces this mode and fails fast on unsupported config. |
+| private | disabled | supported (current) | Current policy. Release workflow enforces this mode and fails fast on unsupported config. |
 | public | enabled | supported | Can be enabled after repository/package policy migration. |
 
-## 0.5.0 Policy Decision
+## SemVer Rules (effective from 1.0.0)
 
-- Keep repository private.
-- Publish with OIDC trusted publishing and **provenance disabled**.
-- Fail fast if `NPM_PUBLISH_PROVENANCE=true` is configured.
-
-## SemVer Rules
-
-- `patch`: bug fixes, internal refactors, non-breaking docs/tooling.
-- `minor`: additive APIs, new adapters/features that are backward compatible.
-- `major`: breaking API or behavior changes.
+- `patch`: bug fixes only, no API breaks.
+- `minor`: additive backward-compatible APIs.
+- `major`: any API/runtime behavior break.
 
 ## Package Scope
 
@@ -36,30 +43,28 @@
 
 ## Release Flow
 
-1. Create/update Changeset file with package bump levels.
-2. Open PR; CI runs tests, typecheck, build, API snapshot check, and publish dry-run.
+1. Add real changeset with package bump level.
+2. Open PR; CI + readiness gates must pass.
 3. Merge to `main`.
-4. Release workflow runs `changesets/action` to version + publish.
+4. Release workflow runs version + publish.
 
 ## Tag Guardrails
 
-- Release tags are allowed only for changes that include **real changesets** (package bump entries in frontmatter).
-- Empty changesets (`---` + `---`) are not allowed for release tagging.
-- Guard is enforced by `pnpm changeset:lint` in `verify:release`.
+- Tags/releases only for real changesets with code/docs impact.
+- Empty changesets are not allowed for release tagging.
+- Enforced by `pnpm changeset:lint`.
 
 ## Published Smoke Modes
 
-- Auto run after `Release` workflow: **informational mode** (`PUBLISHED_SMOKE_STRICT=false`), skips when target versions are not yet available in npm.
-- Manual run (`workflow_dispatch`): **strict mode** (`PUBLISHED_SMOKE_STRICT=true`), fails if target versions are not available in npm.
+- Auto run after `Release` workflow: informational mode (`PUBLISHED_SMOKE_STRICT=false`).
+- Manual run (`workflow_dispatch`): strict mode (`PUBLISHED_SMOKE_STRICT=true`).
 
 ## Safety Gates
 
-- CI must be green before release.
-- Publish dry-run workflow must pass.
-- OIDC preflight in Release workflow must pass for unpublished package versions.
-- Release job must pass publish-mode assertion for repository visibility/provenance policy.
-- Release job runs schema drift gate and fails when Telegram schema drift exists without a Telegram follow-up changeset (after remote schema snapshot calibration).
-- Telegram schema follow-up changeset must target `@jilimb0/tgwrapper` and mention telegram/schema compatibility context.
+- `pnpm verify:release` must pass.
+- `pnpm verify:1.0` must pass for 1.0 candidates/final.
+- OIDC preflight and publish mode assertion must pass.
+- Schema drift gate must pass or be accompanied by required follow-up changeset.
 
 ## npm OIDC Setup
 

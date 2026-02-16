@@ -1,8 +1,8 @@
-# Observability Contract (0.5.0)
+# Observability Contract
 
-## Metric naming and tags
+## Metric Naming and Tags
 
-- Use snake_case metric names.
+- Use `snake_case` metric names.
 - Keep tag set bounded and low-cardinality.
 - Supported common tags:
   - `tenant`
@@ -22,7 +22,7 @@
 | `runtime_dropped_queue_overflow` | counter | count | `tenant` | Updates dropped due to bounded queue overflow | medium (tenant count) | >0.1% of processed updates |
 | `runtime_handler_errors` | counter | count | `tenant`, `update_type` | Handler failures while processing accepted updates | medium | non-zero sustained rate |
 
-## Notes for collectors
+## Notes for Collectors
 
 - In-memory collector is a reference implementation for tests/local validation.
 - Production sink should preserve metric names and tag semantics above.

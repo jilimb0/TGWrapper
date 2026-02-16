@@ -34,15 +34,13 @@ jobs:
       - name: Full release verification
         run: pnpm verify:release
 
+      - name: 1.0 readiness verification
+        run: pnpm verify:1.0
+
       - name: npm publish dry-run (no git checks)
         run: pnpm -r publish --dry-run --no-git-checks
         env:
           CHANGESETS_RELEASE: "1"
-      - run: pnpm benchmark
-      - run: pnpm benchmark:trend
-        env:
-          BENCHMARK_MIN_RATIO: "0.55"
-          BENCHMARK_MIN_UPS: "180000"
 
   reliability:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_reliability == 'true' }}

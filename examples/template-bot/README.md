@@ -11,36 +11,36 @@ Minimal starter template for building Telegram bots with TGWrapper.
 
 ## Setup
 
-1. Copy env template:
-
 ```bash
 cp .env.example .env
 ```
 
-2. Fill required variables:
+Set required variables:
 
 - `BOT_TOKEN`
-- `WEBHOOK_SECRET` (for webhook mode)
+- `WEBHOOK_SECRET` (webhook mode)
 - `PORT` (optional, default `3000`)
 
-## Run: polling mode
+Install dependencies:
 
 ```bash
-pnpm --dir examples/template-bot install
-pnpm --dir examples/template-bot dev:polling
+pnpm install
 ```
 
-## Run: webhook mode (Node HTTP)
+## Run: Polling
 
 ```bash
-pnpm --dir examples/template-bot install
-pnpm --dir examples/template-bot dev:webhook
+pnpm dev:polling
 ```
 
-Then send Telegram webhook requests to the server path used by your deployment setup.
+## Run: Webhook (Node HTTP)
+
+```bash
+pnpm dev:webhook
+```
 
 ## What to edit first
 
 - Router handlers in `src/polling.ts` / `src/server.ts`
 - Session shape (`Data`) and states (`State`)
-- `resolveSessionKey` strategy if you need tenant/user scoping changes
+- `resolveSessionKey` strategy for your user/tenant model

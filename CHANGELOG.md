@@ -1,5 +1,21 @@
 # @jilimb0/tgwrapper
 
+## 0.8.0
+
+### Minor Changes
+
+- Consolidate and modernize documentation in English, add a complete bot development guide, and introduce stricter release/readiness guardrails.
+
+  ### Highlights
+
+  - Add `docs/BOT_DEVELOPMENT_GUIDE.md` with end-to-end setup for polling and webhook bots.
+  - Add `docs/DOCUMENTATION.md` as a single docs entrypoint.
+  - Formalize release quality criteria with `DEFINITION_OF_DONE_1.0.0.md`.
+  - Add strict schema full-coverage check and wire it into `verify:1.0`.
+  - Update release workflows (`release-readiness`, `go-no-go`) for stronger pre-release confidence.
+  - Remove obsolete 0.5.x documentation and legacy tracking files.
+  - Align example package dependencies with current framework version.
+
 ## 0.7.0
 
 ### Minor Changes

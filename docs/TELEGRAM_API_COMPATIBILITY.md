@@ -2,14 +2,16 @@
 
 ## Compatibility Target
 
-- Target baseline: **Telegram Bot API 9.4**.
-- Type baseline: **local TGWrapper Telegram types** in `/Users/jilimbo/Documents/Personal/TGWrapper/src/types/telegram.ts`.
-- Policy: compatibility is validated by release gates (`typecheck:compat` + contract tests).
+- Target baseline: **Telegram Bot API 9.4**
+- Local type source: `src/types/telegram.ts`
+- Baseline file: `docs/telegram-api-baseline.json`
+
+Compatibility is release-gated by type checks, contract tests, schema checks, and release readiness workflows.
 
 ## Supported
 
-- Generic method invocation through `ApiClient.callApi(method, payload)` for any Telegram method name.
-- Update intake for all Bot API update objects that include numeric `update_id`.
+- Generic API invocation via `ApiClient.callApi(method, payload)` for Telegram method names.
+- Update intake for Telegram update objects with numeric `update_id`.
 - Message-centric flows:
   - `message`
   - `edited_message`
@@ -18,11 +20,9 @@
   - `business_message`
   - `edited_business_message`
   - `deleted_business_messages`
-- Business connectivity flows:
-  - `business_connection`
-- Callback flows:
-  - `callback_query`
-- Context chat/source fallback support for non-message updates:
+- Business connectivity flow: `business_connection`
+- Callback flow: `callback_query`
+- Context fallbacks for non-message updates:
   - `chat_join_request`
   - `chat_member`
   - `my_chat_member`
@@ -34,46 +34,35 @@
 
 ## Limited
 
-- `Context.reply` requires resolvable `chat_id`; updates without chat scope are intentionally rejected.
+- `Context.reply` requires resolvable `chat_id`; updates without chat scope are rejected intentionally.
 - `Context.editMessage` requires resolvable message target (`callback_query.message` or message-like update).
-- Router command extraction is message-text centric and does not interpret non-message commands.
+- Router command extraction is message-text centric.
 
-## Not Covered Yet
+## Not Covered as High-Level Helpers
 
-- Per-feature high-level helpers for every new 9.x object/method.
-- Dedicated runtime handlers for every 9.x business/stars/gifts workflow.
-- Auto-generated, version-pinned internal Telegram schema.
+- Dedicated helper methods for every Bot API object/method.
+- Feature-specific runtime abstractions for every business/stars/gifts workflow.
+
+These are still reachable through typed `callApi` contracts.
 
 ## Verification Gates
 
 - Type-level compatibility checks: `test/types/telegram-api-compat.typecheck.ts`
 - Contract tests: `test/telegram-api-compat.contract.test.ts`
-- CI weekly watchdog: `.github/workflows/ci.yml` schedule (every Monday) runs `pnpm telegram:baseline:check`.
-- Drift automation: `.github/workflows/telegram-api-watchdog.yml` syncs baseline and opens PR + tracking issue.
-- Merge guard: `.github/workflows/baseline-followup-guard.yml` blocks baseline-only PRs without type/runtime follow-up.
-- Schema drift report: `pnpm telegram:schema:fetch` + `pnpm telegram:schema:drift:report`.
-- Schema completeness gate: `pnpm telegram:schema:completeness:check` (requires remote schema source and minimum method/update-key counts from `/Users/jilimbo/Documents/Personal/TGWrapper/docs/telegram-api-baseline.json`).
-- Release gate: `.github/workflows/release.yml` runs `pnpm telegram:schema:release:gate` and fails when schema drift exists without Telegram follow-up changeset (after snapshot is calibrated from remote schema source).
-- Release gate command: `pnpm verify:release`
+- Baseline check: `pnpm telegram:baseline:check`
+- Schema completeness check: `pnpm telegram:schema:completeness:check`
+- Strict full-coverage check: `pnpm telegram:schema:coverage:full:check`
+- Release checks: `pnpm verify:release` and `pnpm verify:1.0`
 
 ## Upgrade Procedure
 
-1. Review latest official Telegram Bot API changelog.
-2. Update local types in `/Users/jilimbo/Documents/Personal/TGWrapper/src/types/telegram.ts` and related compatibility tests.
-3. Run:
+1. Review latest Telegram Bot API changelog.
+2. Run baseline/snapshot sync pipeline:
    - `pnpm telegram:baseline:latest`
-   - `pnpm typecheck:compat`
-   - `pnpm test`
+   - `pnpm telegram:schema:fetch`
+   - `pnpm telegram:schema:drift:report`
+3. Update local types/runtime/tests as needed.
+4. Regenerate schema-derived artifacts if required.
+5. Re-run:
    - `pnpm verify:release`
-4. If Telegram released a newer Bot API version:
-   - run `pnpm telegram:baseline:sync`,
-   - run `pnpm telegram:schema:fetch` and `pnpm telegram:schema:drift:report`,
-   - optionally generate scaffold with `pnpm telegram:types:stub -- --version=X.Y --updates=... --methods=...`,
-   - or generate from diff report: `pnpm telegram:types:stub -- --version=X.Y --from-drift-report=docs/telegram-api-schema.drift-report.json`,
-   - update local types/contracts/runtime fallbacks,
-   - after implementing/validating changes, promote snapshot with `pnpm telegram:schema:snapshot:update`,
-   - re-run compatibility and release checks.
-5. If Telegram introduces new behavior used by TGWrapper, add/adjust:
-   - runtime fallback logic,
-   - compatibility tests,
-   - this document.
+   - `pnpm verify:1.0`

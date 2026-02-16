@@ -1,52 +1,65 @@
-# Framework Core
+# TGWrapper
 
-Production-grade Telegram Bot Framework with serverless-first architecture, native FSM, optimistic locking, and ecosystem packages.
-
-TGWrapper uses internal Telegram Bot API type definitions (`/Users/jilimbo/Documents/Personal/TGWrapper/src/types/telegram.ts`) with an explicit compatibility baseline (`/Users/jilimbo/Documents/Personal/TGWrapper/docs/telegram-api-baseline.json`).
+Production-grade Telegram bot framework focused on reliability, typed API contracts, and serverless/runtime portability.
 
 ## Packages
 
-- `@jilimb0/tgwrapper` - framework kernel, transport, router, FSM, adapters
-- `@jilimb0/tgwrapper-adapter-redis` - ioredis-backed atomic session storage
-- `@jilimb0/tgwrapper-observability` - ECS JSON logger and metrics helpers
+- `@jilimb0/tgwrapper` - core runtime, router, FSM, transports, adapters
+- `@jilimb0/tgwrapper-adapter-redis` - Redis-backed atomic session storage
+- `@jilimb0/tgwrapper-observability` - logging and metrics helpers
 
-## Quick start
+## Telegram API Baseline
+
+- Target compatibility baseline: **Telegram Bot API 9.4**
+- Baseline file: `docs/telegram-api-baseline.json`
+- Compatibility contract: `docs/TELEGRAM_API_COMPATIBILITY.md`
+
+## Quick Project Validation
 
 ```bash
 pnpm install
 pnpm test
 pnpm build
+pnpm verify:release
 ```
 
-## Integration tests (Redis)
+For release-grade validation:
 
 ```bash
-docker compose -f docker-compose.redis.yml up -d
-REDIS_URL=redis://127.0.0.1:6379 pnpm test:integration
+pnpm verify:1.0
 ```
 
-## Deploy examples
+## Build a Bot
 
-- Node HTTP: `pnpm --dir examples/node-http dev`
-- AWS Lambda: `pnpm --dir examples/aws-lambda deploy`
-- Cloudflare Worker: `pnpm --dir examples/cloudflare-worker deploy`
-- Starter template (polling + webhook): see `/Users/jilimbo/Documents/Personal/TGWrapper/examples/template-bot/README.md`
+Start here:
 
-All examples require env vars (`BOT_TOKEN`, `WEBHOOK_SECRET`) and do not hardcode secrets.
+- Full step-by-step guide: `docs/BOT_DEVELOPMENT_GUIDE.md`
+- Template bot: `examples/template-bot`
 
-## Release
+## Examples
 
-Releases are CI-gated only via Changesets workflow.
-Manual local publishing is not part of supported flow.
-See `/Users/jilimbo/Documents/Personal/TGWrapper/docs/RELEASE_POLICY.md` for semver and process details.
+- Polling starter: `examples/polling-bot.ts`
+- Node HTTP webhook: `examples/node-http`
+- AWS Lambda webhook: `examples/aws-lambda`
+- Cloudflare Worker webhook: `examples/cloudflare-worker`
+- Full template (polling + webhook): `examples/template-bot`
 
-## Release Readiness Docs
+## Documentation
 
-- API stability contract: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/API_STABILITY_0.5.md`
-- Telegram Bot API compatibility target: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/TELEGRAM_API_COMPATIBILITY.md`
-- Observability contract: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/OBSERVABILITY_CONTRACT.md`
-- Production checklist: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/PRODUCTION_CHECKLIST.md`
-- Migration notes (`0.4.0 -> 0.5.0`): `/Users/jilimbo/Documents/Personal/TGWrapper/docs/MIGRATION_0.4_TO_0.5.md`
-- Release runbook checklist: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/RELEASE_CHECKLIST_0.5.0.md`
-- Next patch release checklist: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/RELEASE_CHECKLIST_0.5.1.md`
-- Current patch release checklist: `/Users/jilimbo/Documents/Personal/TGWrapper/docs/RELEASE_CHECKLIST_0.5.2.md`
+- Documentation index: `docs/DOCUMENTATION.md`
+- 1.0 release definition of done: `docs/DEFINITION_OF_DONE_1.0.0.md`
+- 1.0 release plan: `docs/RELEASE_1.0.0_PLAN.md`
+- Production checklist: `docs/PRODUCTION_CHECKLIST.md`
+- Release policy: `docs/RELEASE_POLICY.md`
+- Operations runbook: `docs/OPERATIONS_RUNBOOK.md`
+- Observability contract: `docs/OBSERVABILITY_CONTRACT.md`
+
+## Release Policy
+
+Releases are CI-gated via Changesets and GitHub Actions.
+Manual local publish is not the supported path.
+
+Use:
+
+- `docs/RELEASE_POLICY.md`
+- `docs/RELEASE_CHECKLIST_1.0.0.md`

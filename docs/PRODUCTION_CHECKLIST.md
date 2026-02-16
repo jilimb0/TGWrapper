@@ -1,38 +1,36 @@
-# Production Checklist (0.5.0)
+# Production Checklist (1.0)
 
-## 1) Webhook security
+## 1) Webhook Security
 
 - Configure `WEBHOOK_SECRET` and validate secret header via `WebhookHandler`.
 - Enforce HTTPS/TLS termination at ingress.
 - Restrict ingress paths to webhook endpoint only.
-- Ensure bot token is provided via secret manager, never hardcoded.
+- Ensure bot token is injected from secret manager.
 
-## 2) Redis durability and session safety
+## 2) Redis Durability and Session Safety
 
-- Use managed Redis with persistence settings suitable for your RPO/RTO.
-- Monitor Redis latency and memory pressure continuously.
-- Validate CAS/session conflict rates (`session_conflict_count`) against expected tenant load.
-- If using encryption-required sessions, verify encrypted session invariant in staging.
+- Use managed Redis with persistence aligned to your RPO/RTO.
+- Monitor Redis latency and memory pressure.
+- Track session conflict metric (`session_conflict_count`).
+- Validate encryption-required session invariant in staging.
 
-## 3) Concurrency and tenant controls
+## 3) Concurrency and Tenant Controls
 
-- Set bounded concurrency queue capacity according to worker memory limits.
-- Configure token bucket limits per tenant based on expected traffic profile.
+- Set bounded queue capacity to match worker memory limits.
+- Configure tenant token bucket limits from expected traffic profile.
 - Monitor:
   - `runtime_dropped_rate_limited`
   - `runtime_dropped_queue_overflow`
-- Keep queue overflow under 0.1% sustained for steady traffic.
+- Keep sustained queue overflow under 0.1%.
 
-## 4) Release and rollback flow
+## 4) Release and Rollback
 
-- Use CI-only publish flow from `main` via Release workflow.
-- Validate publish dry-run and OIDC preflight before release.
-- Rollback strategy:
-  - npm package versions are immutable, so rollback = publish forward fix patch.
-  - keep previous deployment artifact for rapid runtime rollback.
+- Publish only via CI release workflow from `main`.
+- Require `verify:1.0` for release candidates and final release.
+- Rollback strategy: publish forward fix patch (npm versions are immutable).
 
-## 5) Observability and incident readiness
+## 5) Observability and Incident Readiness
 
-- Implement dashboard for metrics in `/Users/jilimbo/Documents/Personal/TGWrapper/docs/OBSERVABILITY_CONTRACT.md`.
+- Implement dashboard from `/Users/jilimbo/Documents/Personal/TGWrapper/docs/OBSERVABILITY_CONTRACT.md`.
 - Link alerts to runbook actions in `/Users/jilimbo/Documents/Personal/TGWrapper/docs/OPERATIONS_RUNBOOK.md`.
-- Verify on-call can execute Redis degraded and Telegram outage procedures.
+- Verify on-call runbook for Redis degraded and Telegram outage scenarios.

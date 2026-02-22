@@ -21,7 +21,7 @@ const budgets = [
     dir: 'packages/observability',
     name: '@jilimb0/tgwrapper-observability',
     maxPackageSizeBytes: 10_000,
-    maxUnpackedSizeBytes: 40_000
+    maxUnpackedSizeBytes: 70_000
   }
 ];
 

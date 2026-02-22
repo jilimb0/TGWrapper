@@ -72,6 +72,32 @@ function parseLocalTypes() {
   };
 }
 
+function parseSnapshotFallback() {
+  const snapshotPath = resolve(process.cwd(), 'docs/telegram-api-schema.snapshot.json');
+  if (!existsSync(snapshotPath)) {
+    return null;
+  }
+
+  const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8'));
+  const methods = Array.isArray(snapshot.methods) ? uniqueSorted(snapshot.methods) : [];
+  const updateKeys = Array.isArray(snapshot.update_keys) ? uniqueSorted(snapshot.update_keys) : [];
+  const source = snapshot.source ?? 'unknown';
+
+  if (source !== 'telegram-api-doc') {
+    return null;
+  }
+  if (methods.length === 0 || updateKeys.length === 0) {
+    return null;
+  }
+
+  return {
+    source: 'telegram-api-doc',
+    source_url: snapshot.source_url ?? API_DOC_URL,
+    methods,
+    update_keys: updateKeys
+  };
+}
+
 async function parseRemoteTypes() {
   const response = await fetch(API_DOC_URL);
   if (!response.ok) {
@@ -105,8 +131,17 @@ async function main() {
       if (!allowNetworkFailure) {
         throw error;
       }
-      parsed = parseLocalTypes();
-      parsed.warning = error instanceof Error ? error.message : 'network failure';
+      const fallbackError = error instanceof Error ? error.message : 'network failure';
+      const snapshotFallback = parseSnapshotFallback();
+      if (snapshotFallback) {
+        parsed = {
+          ...snapshotFallback,
+          warning: `${fallbackError}; used snapshot fallback`
+        };
+      } else {
+        parsed = parseLocalTypes();
+        parsed.warning = `${fallbackError}; used local-types fallback`;
+      }
     }
   }
 

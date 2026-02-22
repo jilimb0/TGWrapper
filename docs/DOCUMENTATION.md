@@ -8,6 +8,8 @@
 
 ## Core references
 
+- Observability APM 0.5.1: 
+
 - Telegram API compatibility target: `docs/TELEGRAM_API_COMPATIBILITY.md`
 - Observability contract: `docs/OBSERVABILITY_CONTRACT.md`
 - Operations runbook: `docs/OPERATIONS_RUNBOOK.md`

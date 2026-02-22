@@ -1,4 +1,5 @@
 export { ApiClient } from './core/api-client.js';
+export type { BinaryInput } from './core/api-client.js';
 export { BotKernel } from './core/bot-kernel.js';
 export { Context } from './core/context.js';
 export { CircuitBreaker } from './core/circuit-breaker.js';
@@ -7,6 +8,8 @@ export { TokenBucketRateLimiter } from './guards/token-bucket-rate-limiter.js';
 export { BoundedConcurrencyQueue, QueueOverflowError } from './guards/bounded-concurrency.js';
 export { EcsJsonLogger } from './observability/ecs-logger.js';
 export { InMemoryMetrics } from './observability/metrics.js';
+export { createRuntimeHooks } from './observability/runtime-hooks.js';
+export { createApiHooks } from './observability/api-hooks.js';
 export { createSessionKey, createSessionNamespace } from './tenant/key-namespace.js';
 export { SessionManager } from './fsm/session-manager.js';
 export { TreeRouter } from './router/router.js';
@@ -16,6 +19,8 @@ export { RedisSessionStorage } from './storage/redis-session-storage.js';
 export { PollingSource } from './update-loop/polling.js';
 export { WebhookSource } from './update-loop/webhook.js';
 export { isFreshUpdate, isValidTelegramUpdate } from './update-loop/update-validator.js';
+export { MockApiClient } from './testkit/mock-api-client.js';
+export { createCallbackUpdate, createMessageUpdate } from './testkit/update-factory.js';
 export { AwsLambdaHandler } from './adapters/aws-lambda-handler.js';
 export { CloudflareWorkerHandler } from './adapters/cloudflare-worker-handler.js';
 export { NodeHttpHandler } from './adapters/node-http-handler.js';
@@ -23,6 +28,9 @@ export { WebhookHandler } from './adapters/webhook-handler.js';
 
 export type {
   ApiClientOptions,
+  ApiCallEvent,
+  ApiErrorEvent,
+  ApiResultEvent,
   CasResult,
   CircuitBreakerOptions,
   ContextShortcuts,
@@ -34,6 +42,10 @@ export type {
   MetricsCollector,
   PollingOptions,
   RetryOptions,
+  RuntimeErrorEvent,
+  RuntimeHooks,
+  RuntimeLifecycle,
+  RuntimeUpdateEvent,
   RouteCandidate,
   SessionEnvelope,
   SessionStorage,

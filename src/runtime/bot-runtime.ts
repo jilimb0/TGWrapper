@@ -1,6 +1,6 @@
 import { BoundedConcurrencyQueue } from '../guards/bounded-concurrency.js';
 import { TokenBucketRateLimiter } from '../guards/token-bucket-rate-limiter.js';
-import type { Logger, MetricsCollector, UpdateSource } from '../types/core.js';
+import type { Logger, MetricsCollector, RuntimeHooks, RuntimeLifecycle, UpdateSource } from '../types/core.js';
 import type { Update } from '../types/telegram.js';
 
 export interface RuntimeHandler {
@@ -13,13 +13,16 @@ export interface RuntimeGuardOptions {
   concurrencyQueue?: BoundedConcurrencyQueue;
   logger?: Logger;
   metrics?: MetricsCollector;
+  hooks?: RuntimeHooks;
 }
 
-export class BotRuntime {
+export class BotRuntime implements RuntimeLifecycle {
   private readonly source: UpdateSource;
   private readonly handler: RuntimeHandler;
   private readonly pending = new Set<Promise<void>>();
   private readonly guards: RuntimeGuardOptions;
+  private readonly errorHandlers = new Set<(error: unknown) => void | Promise<void>>();
+  private running = false;
 
   public constructor(source: UpdateSource, handler: RuntimeHandler, guards: RuntimeGuardOptions = {}) {
     this.source = source;
@@ -28,6 +31,7 @@ export class BotRuntime {
   }
 
   public async start(): Promise<void> {
+    this.running = true;
     await this.source.run(async (update) => {
       const task = this.processUpdate(update).finally(() => {
         this.pending.delete(task);
@@ -35,14 +39,32 @@ export class BotRuntime {
       this.pending.add(task);
       await task;
     });
+    this.running = false;
+  }
+
+  public async stop(): Promise<void> {
+    await this.source.stop();
+    await Promise.allSettled([...this.pending]);
+    this.running = false;
   }
 
   public async shutdown(): Promise<void> {
-    await this.source.stop();
-    await Promise.allSettled([...this.pending]);
+    await this.stop();
+  }
+
+  public onError(handler: (error: unknown) => void | Promise<void>): () => void {
+    this.errorHandlers.add(handler);
+    return () => {
+      this.errorHandlers.delete(handler);
+    };
+  }
+
+  public isRunning(): boolean {
+    return this.running;
   }
 
   private async processUpdate(update: Update): Promise<void> {
+    const startedAt = new Date().toISOString();
     const updateType = this.detectUpdateType(update);
     this.guards.metrics?.increment('runtime_updates_received', 1, { update_type: updateType });
 
@@ -62,6 +84,12 @@ export class BotRuntime {
         });
       }
     }
+    await this.guards.hooks?.onUpdate?.({
+      update,
+      updateType,
+      tenantKey,
+      startedAt
+    });
 
     if (this.guards.rateLimiter && !this.guards.rateLimiter.allow(tenantKey)) {
       this.guards.metrics?.increment('runtime_dropped_rate_limited', 1, { tenant: tenantKey });
@@ -75,13 +103,13 @@ export class BotRuntime {
     }
 
     if (!this.guards.concurrencyQueue) {
-      await this.safeHandleUpdate(update, tenantKey, updateType);
+      await this.safeHandleUpdate(update, tenantKey, updateType, startedAt);
       return;
     }
 
     try {
       await this.guards.concurrencyQueue.run(async () => {
-        await this.safeHandleUpdate(update, tenantKey, updateType);
+        await this.safeHandleUpdate(update, tenantKey, updateType, startedAt);
       });
     } catch (error: unknown) {
       this.guards.metrics?.increment('runtime_dropped_queue_overflow', 1, { tenant: tenantKey });
@@ -97,7 +125,7 @@ export class BotRuntime {
     }
   }
 
-  private async safeHandleUpdate(update: Update, tenantKey: string, updateType: string): Promise<void> {
+  private async safeHandleUpdate(update: Update, tenantKey: string, updateType: string, startedAt: string): Promise<void> {
     try {
       await this.handler.handleUpdate(update);
     } catch (error: unknown) {
@@ -115,6 +143,16 @@ export class BotRuntime {
           message: error instanceof Error ? error.message : 'unknown'
         }
       });
+      await this.guards.hooks?.onError?.({
+        update,
+        updateType,
+        tenantKey,
+        error,
+        startedAt
+      });
+      for (const handler of this.errorHandlers) {
+        await handler(error);
+      }
       throw error;
     }
   }

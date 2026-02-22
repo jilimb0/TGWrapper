@@ -12,6 +12,8 @@ interface BotKernelOptions<TState extends string, TData extends JsonObject> {
   resolveSessionKey: (update: Update) => string | null;
   transitions?: Record<TState, readonly TState[]>;
   onTransition?: (from: TState | null, to: TState, sessionKey: string) => Promise<void>;
+  onUpdate?: (update: Update, sessionKey: string) => Promise<void>;
+  onError?: (error: unknown, update: Update, sessionKey: string) => Promise<void>;
 }
 
 export class BotKernel<TState extends string, TData extends JsonObject> {
@@ -21,6 +23,8 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
   private readonly resolveSessionKey: (update: Update) => string | null;
   private readonly transitions: Record<TState, readonly TState[]>;
   private readonly onTransition: ((from: TState | null, to: TState, sessionKey: string) => Promise<void>) | undefined;
+  private readonly onUpdate: ((update: Update, sessionKey: string) => Promise<void>) | undefined;
+  private readonly onError: ((error: unknown, update: Update, sessionKey: string) => Promise<void>) | undefined;
 
   public constructor(options: BotKernelOptions<TState, TData>) {
     this.apiClient = options.apiClient;
@@ -29,6 +33,8 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
     this.resolveSessionKey = options.resolveSessionKey;
     this.transitions = options.transitions ?? ({} as Record<TState, readonly TState[]>);
     this.onTransition = options.onTransition;
+    this.onUpdate = options.onUpdate;
+    this.onError = options.onError;
   }
 
   public async handleUpdate(update: Update): Promise<void> {
@@ -37,47 +43,53 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
       return;
     }
 
-    await this.sessionManager.runInSession(sessionKey, async (session) => {
-      let ctxRef: Context<TState, TData> | null = null;
-      const ctx = new Context<TState, TData>({
-        update,
-        session,
-        apiClient: this.apiClient,
-        sceneController: {
-          enter: async (nextState) => {
-            this.assertTransitionAllowed(session.current_state, nextState as TState);
-            const previous = session.current_state;
-            const previousHooks = previous ? this.router.getSceneHooks(previous) : undefined;
-            const nextHooks = this.router.getSceneHooks(nextState);
+    try {
+      await this.onUpdate?.(update, sessionKey);
+      await this.sessionManager.runInSession(sessionKey, async (session) => {
+        let ctxRef: Context<TState, TData> | null = null;
+        const ctx = new Context<TState, TData>({
+          update,
+          session,
+          apiClient: this.apiClient,
+          sceneController: {
+            enter: async (nextState) => {
+              this.assertTransitionAllowed(session.current_state, nextState as TState);
+              const previous = session.current_state;
+              const previousHooks = previous ? this.router.getSceneHooks(previous) : undefined;
+              const nextHooks = this.router.getSceneHooks(nextState);
 
-            if (previousHooks?.onLeave && ctxRef) {
-              await previousHooks.onLeave(ctxRef);
-            }
+              if (previousHooks?.onLeave && ctxRef) {
+                await previousHooks.onLeave(ctxRef);
+              }
 
-            session.current_state = nextState as TState;
+              session.current_state = nextState as TState;
 
-            if (nextHooks?.onEnter && ctxRef) {
-              await nextHooks.onEnter(ctxRef);
-            }
+              if (nextHooks?.onEnter && ctxRef) {
+                await nextHooks.onEnter(ctxRef);
+              }
 
-            if (this.onTransition) {
-              await this.onTransition(previous, nextState as TState, sessionKey);
+              if (this.onTransition) {
+                await this.onTransition(previous, nextState as TState, sessionKey);
+              }
+            },
+            leave: async () => {
+              const previous = session.current_state;
+              const previousHooks = previous ? this.router.getSceneHooks(previous) : undefined;
+              if (previousHooks?.onLeave && ctxRef) {
+                await previousHooks.onLeave(ctxRef);
+              }
+              session.current_state = null;
             }
-          },
-          leave: async () => {
-            const previous = session.current_state;
-            const previousHooks = previous ? this.router.getSceneHooks(previous) : undefined;
-            if (previousHooks?.onLeave && ctxRef) {
-              await previousHooks.onLeave(ctxRef);
-            }
-            session.current_state = null;
           }
-        }
-      });
-      ctxRef = ctx;
+        });
+        ctxRef = ctx;
 
-      await this.router.dispatch(Object.assign(ctx, this.extractRoutingMeta(ctx)));
-    });
+        await this.router.dispatch(Object.assign(ctx, this.extractRoutingMeta(ctx)));
+      });
+    } catch (error: unknown) {
+      await this.onError?.(error, update, sessionKey);
+      throw error;
+    }
   }
 
   private extractRoutingMeta(ctx: Context<TState, TData>): {

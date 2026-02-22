@@ -1,5 +1,17 @@
 # @jilimb0/tgwrapper-observability
 
+## 0.3.0
+
+### Minor Changes
+
+- Add production-ready developer APIs and tooling for building complex bots:
+
+  - core: high-level API methods (`sendDocument`, `getFileLink`, `editMessage*`), runtime lifecycle (`start/stop/onError`), runtime and API hooks, and official testkit exports
+  - adapter-redis: generic KV API with namespace/prefix utilities and atomic index helpers
+  - observability: async/timer helpers, runtime observability binding, and standardized metrics snapshots
+
+  This release improves day-1 and day-2 usability while keeping backward compatibility for existing integrations.
+
 ## 0.2.2
 
 ### Patch Changes

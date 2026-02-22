@@ -94,11 +94,38 @@ export class Context<TState extends string, TData extends JsonObject> {
       throw new Error('Cannot edit message: update has no resolvable message.');
     }
 
-    return this.apiClient.callApi('editMessageText', {
+    return this.apiClient.editMessageText({
       chat_id: targetMessage.chat.id,
       message_id: targetMessage.message_id,
       text,
       ...extra
+    });
+  }
+
+  public async editMessageCaption(caption: string, extra: JsonObject = {}): Promise<unknown> {
+    const targetMessage = this.update.callback_query?.message ?? this.primaryMessage;
+    if (!targetMessage) {
+      throw new Error('Cannot edit caption: update has no resolvable message.');
+    }
+
+    return this.apiClient.editMessageCaption({
+      chat_id: targetMessage.chat.id,
+      message_id: targetMessage.message_id,
+      caption,
+      ...extra
+    });
+  }
+
+  public async editMessageReplyMarkup(replyMarkup: JsonObject): Promise<unknown> {
+    const targetMessage = this.update.callback_query?.message ?? this.primaryMessage;
+    if (!targetMessage) {
+      throw new Error('Cannot edit reply markup: update has no resolvable message.');
+    }
+
+    return this.apiClient.editMessageReplyMarkup({
+      chat_id: targetMessage.chat.id,
+      message_id: targetMessage.message_id,
+      reply_markup: replyMarkup
     });
   }
 

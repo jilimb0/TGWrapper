@@ -30,6 +30,16 @@ export interface LogSink {
   write(line: string): void;
 }
 
+export interface RuntimeHookTarget {
+  onError(handler: (error: unknown) => void | Promise<void>): () => void;
+}
+
+export interface RuntimeHookHandlers {
+  onUpdate?: (event: { updateType: string; tenantKey: string }) => void;
+  onError?: (event: { error: unknown }) => void;
+  onApiCall?: (event: { method: string }) => void;
+}
+
 export class EcsJsonLogger implements Logger {
   private readonly context: EcsContext;
   private readonly sink: LogSink;
@@ -82,6 +92,11 @@ interface HistogramBucket {
   values: number[];
 }
 
+export interface MetricsSnapshot {
+  counters: Record<string, number>;
+  histograms: Record<string, { count: number; p50: number; p95: number; min: number; max: number }>;
+}
+
 export class InMemoryMetrics implements MetricsCollector {
   private readonly counters = new Map<string, number>();
   private readonly histograms = new Map<string, HistogramBucket>();
@@ -110,6 +125,28 @@ export class InMemoryMetrics implements MetricsCollector {
     return this.quantile(metric, 0.95, tags);
   }
 
+  public snapshot(): MetricsSnapshot {
+    const counters: Record<string, number> = {};
+    for (const [key, value] of this.counters.entries()) {
+      counters[key] = value;
+    }
+
+    const histograms: MetricsSnapshot['histograms'] = {};
+    for (const [key, bucket] of this.histograms.entries()) {
+      const values = [...bucket.values].sort((a, b) => a - b);
+      const count = values.length;
+      histograms[key] = {
+        count,
+        p50: this.quantileFromSorted(values, 0.5),
+        p95: this.quantileFromSorted(values, 0.95),
+        min: values[0] ?? 0,
+        max: values[count - 1] ?? 0
+      };
+    }
+
+    return { counters, histograms };
+  }
+
   private quantile(metric: string, q: number, tags?: Record<string, string>): number {
     const bucket = this.histograms.get(this.makeKey(metric, tags));
     if (!bucket || bucket.values.length === 0) {
@@ -117,6 +154,13 @@ export class InMemoryMetrics implements MetricsCollector {
     }
 
     const sorted = [...bucket.values].sort((a, b) => a - b);
+    return this.quantileFromSorted(sorted, q);
+  }
+
+  private quantileFromSorted(sorted: number[], q: number): number {
+    if (sorted.length === 0) {
+      return 0;
+    }
     const index = Math.max(0, Math.min(sorted.length - 1, Math.floor((sorted.length - 1) * q)));
     return sorted[index] ?? 0;
   }
@@ -132,4 +176,41 @@ export class InMemoryMetrics implements MetricsCollector {
       .join(',');
     return `${metric}|${tagSuffix}`;
   }
+}
+
+export async function trackAsync<T>(
+  metrics: MetricsCollector,
+  metricName: string,
+  fn: () => Promise<T>,
+  tags?: Record<string, string>
+): Promise<T> {
+  const started = Date.now();
+  try {
+    const result = await fn();
+    metrics.observe(metricName, Date.now() - started, tags);
+    return result;
+  } catch (error: unknown) {
+    metrics.observe(metricName, Date.now() - started, {
+      ...(tags ?? {}),
+      status: 'error'
+    });
+    throw error;
+  }
+}
+
+export function createTimer(metrics: MetricsCollector, metricName: string, tags?: Record<string, string>): () => void {
+  const started = Date.now();
+  return () => {
+    metrics.observe(metricName, Date.now() - started, tags);
+  };
+}
+
+export function bindRuntimeObservability(target: RuntimeHookTarget, handlers: RuntimeHookHandlers): () => void {
+  const unsubscribeError = target.onError(async (error) => {
+    handlers.onError?.({ error });
+  });
+
+  return () => {
+    unsubscribeError();
+  };
 }

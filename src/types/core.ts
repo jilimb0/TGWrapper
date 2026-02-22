@@ -1,4 +1,6 @@
 import type { ApiMethods, Update } from './telegram.js';
+import type { TelegramApiMethodName } from './telegram.schema.generated.js';
+import type { TelegramApiMethodPayloads } from './telegram.payloads.generated.js';
 
 export type JsonValue = string | number | boolean | null | JsonObject | JsonValue[];
 export type JsonObject = { [key: string]: JsonValue | undefined };
@@ -44,6 +46,33 @@ export interface ApiClientOptions {
   fetchImpl?: typeof fetch;
   mockResponder?: (method: string, payload: JsonObject) => Promise<unknown>;
   circuitBreaker?: Partial<CircuitBreakerOptions>;
+  onApiCall?: (event: ApiCallEvent) => void | Promise<void>;
+  onApiResult?: (event: ApiResultEvent) => void | Promise<void>;
+  onApiError?: (event: ApiErrorEvent) => void | Promise<void>;
+}
+
+export interface ApiCallEvent {
+  requestId: string;
+  method: string;
+  attempt: number;
+  payload: JsonObject;
+}
+
+export interface ApiResultEvent {
+  requestId: string;
+  method: string;
+  attempt: number;
+  durationMs: number;
+}
+
+export interface ApiErrorEvent {
+  requestId: string;
+  method: string;
+  attempt: number;
+  durationMs: number;
+  retrying: boolean;
+  retryDelayMs: number;
+  error: unknown;
 }
 
 export interface SessionEnvelope<TState extends string, TData extends JsonObject> {
@@ -103,6 +132,33 @@ export interface UpdateSource {
   stop(): Promise<void>;
 }
 
+export interface RuntimeHooks {
+  onUpdate?: (event: RuntimeUpdateEvent) => void | Promise<void>;
+  onError?: (event: RuntimeErrorEvent) => void | Promise<void>;
+}
+
+export interface RuntimeUpdateEvent {
+  update: Update;
+  updateType: string;
+  tenantKey: string;
+  startedAt: string;
+}
+
+export interface RuntimeErrorEvent {
+  update: Update;
+  updateType: string;
+  tenantKey: string;
+  error: unknown;
+  startedAt: string;
+}
+
+export interface RuntimeLifecycle {
+  start(): Promise<void>;
+  stop(): Promise<void>;
+  onError(handler: (error: unknown) => void | Promise<void>): () => void;
+  isRunning(): boolean;
+}
+
 export interface WebhookRequest {
   method: string;
   headers: Record<string, string | undefined>;
@@ -123,3 +179,4 @@ export interface WebhookHandlerOptions {
 }
 
 export type TelegramMethod = keyof ApiMethods;
+export type TelegramMethodPayload<TMethod extends TelegramApiMethodName> = TelegramApiMethodPayloads[TMethod];

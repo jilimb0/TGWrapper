@@ -3,16 +3,17 @@
   "version": "0.9.0",
   "description": "Serverless-first Telegram bot framework without external bot libraries",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist-cjs/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js"
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "pnpm build:esm && pnpm build:cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:compat": "tsc -p tsconfig.type-tests.json --noEmit",
     "test": "vitest run",
@@ -56,7 +57,9 @@
     "benchmark:trend:release": "BENCHMARK_MIN_RATIO=0.55 BENCHMARK_MIN_UPS=180000 node scripts/check-benchmark-trend.mjs",
     "check:1.0:readiness": "node scripts/check-1-0-readiness.mjs",
     "verify:1.0": "pnpm verify:release && pnpm telegram:schema:completeness:check && pnpm telegram:schema:coverage:full:check && pnpm benchmark && pnpm benchmark:trend:release && pnpm check:1.0:readiness",
-    "telegram:schema:coverage:full:check": "node scripts/check-telegram-schema-full-coverage.mjs"
+    "telegram:schema:coverage:full:check": "node scripts/check-telegram-schema-full-coverage.mjs",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json"
   },
   "keywords": [
     "telegram",
@@ -77,7 +80,9 @@
   },
   "packageManager": "pnpm@10.4.1",
   "files": [
-    "dist",
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "dist-cjs/**/*.js",
     "README.md"
   ],
   "publishConfig": {

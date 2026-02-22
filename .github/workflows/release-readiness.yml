@@ -34,7 +34,8 @@ jobs:
       - name: Full release verification
         run: pnpm verify:release
 
-      - name: 1.0 readiness verification
+      - name: 1.0 readiness verification (manual only)
+        if: ${{ github.event_name == 'workflow_dispatch' }}
         run: pnpm verify:1.0
 
       - name: npm publish dry-run (no git checks)

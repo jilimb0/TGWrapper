@@ -1,5 +1,6 @@
 export { ApiClient } from './core/api-client.js';
 export type { BinaryInput } from './core/api-client.js';
+export { createBotClient } from './core/bot-client.js';
 export { BotKernel } from './core/bot-kernel.js';
 export { Context } from './core/context.js';
 export { CircuitBreaker } from './core/circuit-breaker.js';
@@ -20,6 +21,7 @@ export { PollingSource } from './update-loop/polling.js';
 export { WebhookSource } from './update-loop/webhook.js';
 export { isFreshUpdate, isValidTelegramUpdate } from './update-loop/update-validator.js';
 export { MockApiClient } from './testkit/mock-api-client.js';
+export { MockBotClient } from './testkit/mock-bot-client.js';
 export { createCallbackUpdate, createMessageUpdate } from './testkit/update-factory.js';
 export { AwsLambdaHandler } from './adapters/aws-lambda-handler.js';
 export { CloudflareWorkerHandler } from './adapters/cloudflare-worker-handler.js';
@@ -60,6 +62,21 @@ export type { ApiGatewayV2Event, ApiGatewayV2Response } from './adapters/aws-lam
 
 export type { RedisLikeClient, RedisLikeTransaction, SessionCrypto } from './storage/redis-session-storage.js';
 
-export type { ApiMethods, CallbackQuery, Chat, Message, Update, User } from './types/telegram.js';
+export type {
+  ApiMethods,
+  CallbackQuery,
+  Chat,
+  EditMessageReplyMarkupOptions,
+  EditMessageTextOptions,
+  InlineKeyboardButton,
+  InlineKeyboardMarkup,
+  KeyboardButton,
+  Message,
+  SendDocumentOptions,
+  SendMessageOptions,
+  Update,
+  User
+} from './types/telegram.js';
 export type { TelegramApiMethodPayloads } from './types/telegram.payloads.generated.js';
 export type { TelegramApiMethodResults } from './types/telegram.results.generated.js';
+export type { BotClient, BotClientEventMap, BotEventHandler, BotEventName, CreateBotClientOptions } from './core/bot-client.js';

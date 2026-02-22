@@ -219,6 +219,28 @@ export class ApiClient {
     } as unknown as TelegramApiMethodPayloads['sendDocument']);
   }
 
+  public async sendMessage(
+    chatId: number | string,
+    text: string,
+    extra: JsonObject = {}
+  ): Promise<TelegramApiMethodResults['sendMessage']> {
+    return this.callApi('sendMessage', {
+      chat_id: chatId,
+      text,
+      ...extra
+    } as TelegramApiMethodPayloads['sendMessage']);
+  }
+
+  public async answerCallbackQuery(
+    callbackQueryId: string,
+    extra: JsonObject = {}
+  ): Promise<TelegramApiMethodResults['answerCallbackQuery']> {
+    return this.callApi('answerCallbackQuery', {
+      callback_query_id: callbackQueryId,
+      ...extra
+    } as TelegramApiMethodPayloads['answerCallbackQuery']);
+  }
+
   public async getFileLink(fileId: string): Promise<string> {
     const result = await this.callApi<'getFile'>('getFile', {
       file_id: fileId

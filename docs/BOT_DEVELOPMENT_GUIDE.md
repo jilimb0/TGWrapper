@@ -1,154 +1,140 @@
 # Bot Development Guide
 
-This guide covers end-to-end bot setup with TGWrapper: local development, polling, webhook, and production-readiness checks.
+This guide shows the fastest path to a production-ready bot using TGWrapper.
 
 ## Prerequisites
 
 - Node.js 20+
 - pnpm 10+
 - Telegram bot token from BotFather
-- Optional for webhook local testing: ngrok (or equivalent tunnel)
 
-## 1) Create a New Bot Project
-
-From repository root:
+## 1) Install packages
 
 ```bash
-cp -R examples/template-bot ../my-bot
-cd ../my-bot
-cp .env.example .env
-pnpm install
+pnpm add @jilimb0/tgwrapper @jilimb0/tgwrapper-adapter-redis @jilimb0/tgwrapper-observability
 ```
 
-Fill `.env`:
+## 2) Create a 5-minute bot (polling)
 
-```env
-BOT_TOKEN=123456:YOUR_REAL_TOKEN
-WEBHOOK_SECRET=your-random-long-secret
-PORT=3000
+Create `src/bot.ts`:
+
+```ts
+import { createBotClient } from '@jilimb0/tgwrapper';
+
+const bot = createBotClient({
+  token: process.env.BOT_TOKEN!,
+  mode: 'polling',
+  polling: { timeoutSeconds: 30, limit: 100 }
+});
+
+bot.on('message', async (message) => {
+  if (!('text' in message) || typeof message.text !== 'string') {
+    return;
+  }
+
+  if (message.text === '/start') {
+    await bot.sendMessage(message.chat.id, 'Bot is ready.');
+    return;
+  }
+
+  await bot.sendMessage(message.chat.id, `Echo: ${message.text}`);
+});
+
+bot.on('callback_query', async (callback) => {
+  await bot.answerCallbackQuery(callback.id, { text: 'Received' });
+});
+
+bot.on('error', (error) => {
+  console.error('Bot runtime error', error);
+});
+
+await bot.start();
 ```
 
-## 2) Run in Polling Mode (recommended for first iteration)
-
-Disable webhook first (if already configured):
+Run:
 
 ```bash
-export BOT_TOKEN="123456:YOUR_REAL_TOKEN"
-curl -sS -X POST "https://api.telegram.org/bot${BOT_TOKEN}/deleteWebhook" \
-  -d "drop_pending_updates=true"
+BOT_TOKEN="<your_token>" node --import tsx src/bot.ts
 ```
 
-Start polling bot:
+## 3) Webhook mode
 
-```bash
-pnpm dev:polling
+Use `mode: 'webhook'` and call `bot.ingest(update)` from your HTTP handler:
+
+```ts
+import { createBotClient } from '@jilimb0/tgwrapper';
+
+const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'webhook' });
+
+await bot.start();
+
+export async function handleWebhookRequest(update: unknown): Promise<void> {
+  bot.ingest(update);
+}
 ```
 
-Test in Telegram:
+## 4) High-level API methods (typed)
 
-- `/start`
-- `/name`
-- send text
+Use typed wrappers as default path:
 
-## 3) Run in Webhook Mode
+- `bot.sendMessage(...)`
+- `bot.sendDocument(...)`
+- `bot.answerCallbackQuery(...)`
+- `bot.editMessageText(...)`
+- `bot.editMessageReplyMarkup(...)`
+- `bot.getFileLink(...)`
 
-Start local server:
+Use raw `callApiUnsafe` only as escape hatch.
 
-```bash
-pnpm dev:webhook
+## 5) Redis cache + rate limit
+
+```ts
+import { RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
+
+const kv = new RedisKvStore({ redisUrl: process.env.REDIS_URL!, prefix: 'mybot' });
+const cache = kv.createCacheNamespace('cache');
+const limiter = createRateLimiter(kv, {
+  namespace: 'spam',
+  windowMs: 60_000,
+  limit: 20,
+  blockDurationMs: 30_000
+});
+
+const state = await limiter.check('user:123');
+if (!state.allowed) {
+  console.log('Retry after (sec):', state.retryAfter);
+}
+
+await cache.setJson('profile:123', { language: 'en' }, 3600);
 ```
 
-Expose local port publicly (example with ngrok):
+## 6) Observability in one step
 
-```bash
-ngrok http 3000
+```ts
+import { EcsJsonLogger, InMemoryMetrics, attachBotObservability } from '@jilimb0/tgwrapper-observability';
+
+const metrics = new InMemoryMetrics();
+const logger = new EcsJsonLogger({ serviceName: 'my-bot' }, { write: (line) => console.log(line) });
+
+const detach = attachBotObservability(bot, {
+  metrics,
+  logger,
+  serviceName: 'my-bot'
+});
+
+// later: detach();
 ```
 
-Assume public URL is `https://xxxx.ngrok-free.app`:
+## 7) Release quality gates
 
 ```bash
-export BOT_TOKEN="123456:YOUR_REAL_TOKEN"
-export WEBHOOK_SECRET="your-random-long-secret"
-export PUBLIC_URL="https://xxxx.ngrok-free.app"
-
-curl -sS -X POST "https://api.telegram.org/bot${BOT_TOKEN}/setWebhook" \
-  -d "url=${PUBLIC_URL}" \
-  -d "secret_token=${WEBHOOK_SECRET}" \
-  -d "drop_pending_updates=true"
-```
-
-Verify webhook:
-
-```bash
-curl -sS "https://api.telegram.org/bot${BOT_TOKEN}/getWebhookInfo"
-```
-
-## 4) Where to Implement Bot Logic
-
-Primary files in template:
-
-- `src/polling.ts`
-- `src/server.ts`
-
-What to customize:
-
-- command handlers: `router.command(...)`
-- callback handlers: `router.callback(...)`
-- FSM handlers: `router.state(...)`
-- state/data models: `type State`, `interface Data`
-- session key strategy: `resolveSessionKey`
-
-## 5) Core Runtime Pattern
-
-Minimal flow in TGWrapper:
-
-1. create `ApiClient`
-2. create session storage (`MemorySessionStorage` or Redis)
-3. create `SessionManager`
-4. define `TreeRouter` handlers
-5. create `BotKernel`
-6. run with `BotRuntime + PollingSource` or adapter + `WebhookHandler`
-
-## 6) Local Quality Gates (before deployment)
-
-From framework repository root:
-
-```bash
+pnpm test
+pnpm typecheck:compat
 pnpm verify:release
 ```
 
-For release-grade confidence:
+## 8) Next reads
 
-```bash
-pnpm verify:1.0
-```
-
-## 7) Production Checklist (minimum)
-
-- set `BOT_TOKEN` via secret manager
-- set strong `WEBHOOK_SECRET`
-- add metrics/logging pipeline
-- run Redis-backed sessions for multi-instance bots
-- monitor Telegram latency, retries, and queue overflow
-- keep release process CI-only
-
-See:
-
+- `docs/MIGRATION_FROM_NODE_TELEGRAM_BOT_API.md`
 - `docs/PRODUCTION_CHECKLIST.md`
 - `docs/OBSERVABILITY_CONTRACT.md`
-- `docs/OPERATIONS_RUNBOOK.md`
-
-## 8) Useful Telegram API Commands
-
-Validate token:
-
-```bash
-curl -sS "https://api.telegram.org/bot${BOT_TOKEN}/getMe"
-```
-
-Disable webhook and return to polling:
-
-```bash
-curl -sS -X POST "https://api.telegram.org/bot${BOT_TOKEN}/deleteWebhook" \
-  -d "drop_pending_updates=true"
-```

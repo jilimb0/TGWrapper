@@ -2,19 +2,22 @@
   "name": "@jilimb0/tgwrapper-adapter-redis",
   "version": "0.3.0",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist-cjs/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js"
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "pnpm build:esm && pnpm build:cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:integration": "vitest run test/redis.integration.test.ts",
-    "prepublishOnly": "node ../../scripts/enforce-ci-publish.mjs"
+    "prepublishOnly": "node ../../scripts/enforce-ci-publish.mjs",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json"
   },
   "dependencies": {
     "ioredis": "^5.6.1"
@@ -24,7 +27,9 @@
     "vitest": "^4.0.18"
   },
   "files": [
-    "dist"
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "dist-cjs/**/*.js"
   ],
   "publishConfig": {
     "access": "public"

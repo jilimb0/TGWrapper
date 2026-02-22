@@ -1,5 +1,7 @@
 node_modules
 dist
+dist-cjs
+packages/*/dist-cjs
 .env
 *.log
 telegram_framework_agent_prompt.md

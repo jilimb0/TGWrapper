@@ -81,11 +81,7 @@ export class Context<TState extends string, TData extends JsonObject> {
       throw new Error('Cannot reply: update has no resolvable chat id.');
     }
 
-    return this.apiClient.callApi('sendMessage', {
-      chat_id: chatId,
-      text,
-      ...extra
-    });
+    return this.apiClient.sendMessage(chatId, text, extra);
   }
 
   public async editMessage(text: string, extra: JsonObject = {}): Promise<unknown> {
@@ -135,10 +131,7 @@ export class Context<TState extends string, TData extends JsonObject> {
       throw new Error('Cannot answer callback query for non-callback update.');
     }
 
-    return this.apiClient.callApi('answerCallbackQuery', {
-      callback_query_id: callbackQueryId,
-      ...(text === undefined ? {} : { text })
-    });
+    return this.apiClient.answerCallbackQuery(callbackQueryId, text === undefined ? {} : { text });
   }
 
   private get primaryMessage(): Message | undefined {

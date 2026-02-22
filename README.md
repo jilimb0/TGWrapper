@@ -4,9 +4,9 @@ Production-grade Telegram bot framework focused on reliability, typed API contra
 
 ## Packages
 
-- `@jilimb0/tgwrapper` - core runtime, router, FSM, transports, adapters
-- `@jilimb0/tgwrapper-adapter-redis` - Redis-backed atomic session storage
-- `@jilimb0/tgwrapper-observability` - logging and metrics helpers
+- `@jilimb0/tgwrapper` - core runtime, typed BotClient facade, router, FSM, transports, adapters
+- `@jilimb0/tgwrapper-adapter-redis` - Redis sessions, cache namespaces, and distributed rate limiter
+- `@jilimb0/tgwrapper-observability` - logging, metrics, runtime binding, and snapshot helpers
 
 ## Telegram API Baseline
 

@@ -86,6 +86,11 @@ export interface InlineKeyboardButton {
   [key: string]: unknown;
 }
 
+export interface InlineKeyboardMarkup {
+  inline_keyboard: InlineKeyboardButton[][];
+  [key: string]: unknown;
+}
+
 type GeneratedUpdateFields = {
   [K in TelegramUpdateKey]?: UnknownObject;
 };
@@ -200,3 +205,8 @@ export type Update = {
 export type ApiMethods = Record<string, (payload: UnknownObject) => unknown> & {
   [K in TelegramApiMethodName]: (payload: TelegramApiMethodPayloads[K]) => TelegramApiMethodResults[K];
 };
+
+export type SendMessageOptions = Omit<TelegramApiMethodPayloads['sendMessage'], 'chat_id' | 'text'>;
+export type SendDocumentOptions = Omit<TelegramApiMethodPayloads['sendDocument'], 'chat_id' | 'document'>;
+export type EditMessageTextOptions = TelegramApiMethodPayloads['editMessageText'];
+export type EditMessageReplyMarkupOptions = TelegramApiMethodPayloads['editMessageReplyMarkup'];

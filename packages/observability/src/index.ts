@@ -40,6 +40,20 @@ export interface RuntimeHookHandlers {
   onApiCall?: (event: { method: string }) => void;
 }
 
+export interface BotLikeEventTarget {
+  on?: (event: string, handler: (payload: unknown) => void | Promise<void>) => () => void;
+  onError?: (handler: (error: unknown) => void | Promise<void>) => () => void;
+}
+
+export interface AttachBotObservabilityOptions {
+  metrics: MetricsCollector;
+  logger?: Logger;
+  serviceName: string;
+  tenantId?: string;
+  botId?: string;
+  redact?: (data: JsonObject | undefined) => JsonObject | undefined;
+}
+
 export class EcsJsonLogger implements Logger {
   private readonly context: EcsContext;
   private readonly sink: LogSink;
@@ -93,6 +107,7 @@ interface HistogramBucket {
 }
 
 export interface MetricsSnapshot {
+  timestamp: string;
   counters: Record<string, number>;
   histograms: Record<string, { count: number; p50: number; p95: number; min: number; max: number }>;
 }
@@ -144,7 +159,7 @@ export class InMemoryMetrics implements MetricsCollector {
       };
     }
 
-    return { counters, histograms };
+    return { timestamp: new Date().toISOString(), counters, histograms };
   }
 
   private quantile(metric: string, q: number, tags?: Record<string, string>): number {
@@ -212,5 +227,94 @@ export function bindRuntimeObservability(target: RuntimeHookTarget, handlers: Ru
 
   return () => {
     unsubscribeError();
+  };
+}
+
+export function attachBotObservability(target: BotLikeEventTarget, options: AttachBotObservabilityOptions): () => void {
+  const unsubscribers: Array<() => void> = [];
+  const log = (level: LogLevel, event: string, data?: JsonObject): void => {
+    if (!options.logger) {
+      return;
+    }
+    const redacted = options.redact ? options.redact(data) : data;
+    options.logger.log({
+      level,
+      event,
+      timestamp: new Date().toISOString(),
+      data: {
+        service: options.serviceName,
+        tenant_id: options.tenantId,
+        bot_id: options.botId,
+        ...(redacted ?? {})
+      }
+    });
+  };
+
+  options.metrics.increment('bot_launch_total', 1, {
+    service: options.serviceName
+  });
+  log('info', 'bot_launch');
+
+  if (target.onError) {
+    const unsubscribeError = target.onError((error) => {
+      options.metrics.increment('bot_runtime_error_total', 1, {
+        service: options.serviceName
+      });
+      log('error', 'bot_runtime_error', {
+        message: error instanceof Error ? error.message : 'unknown'
+      });
+    });
+    unsubscribers.push(unsubscribeError);
+  }
+
+  if (target.on) {
+    unsubscribers.push(
+      target.on('update', (payload) => {
+        const update = payload as Record<string, unknown>;
+        const updateType = Object.keys(update).find((key) => key !== 'update_id' && update[key] !== undefined) ?? 'unknown';
+        options.metrics.increment('bot_update_total', 1, {
+          service: options.serviceName,
+          update_type: updateType
+        });
+      })
+    );
+    unsubscribers.push(
+      target.on('api_call', (payload) => {
+        const method = (payload as { method?: string }).method ?? 'unknown';
+        options.metrics.increment('bot_api_call_total', 1, {
+          service: options.serviceName,
+          method
+        });
+      })
+    );
+    unsubscribers.push(
+      target.on('api_result', (payload) => {
+        const event = payload as { method?: string; durationMs?: number };
+        const method = event.method ?? 'unknown';
+        options.metrics.observe('bot_api_latency_ms', event.durationMs ?? 0, {
+          service: options.serviceName,
+          method
+        });
+      })
+    );
+    unsubscribers.push(
+      target.on('api_error', (payload) => {
+        const method = (payload as { method?: string }).method ?? 'unknown';
+        options.metrics.increment('bot_api_error_total', 1, {
+          service: options.serviceName,
+          method
+        });
+      })
+    );
+  }
+
+  return () => {
+    for (const unsubscribe of unsubscribers) {
+      unsubscribe();
+    }
+    options.metrics.increment('bot_shutdown_total', 1, {
+      service: options.serviceName
+    });
+    log('info', 'bot_shutdown');
   };
 }

@@ -1,53 +1,43 @@
 # Migration Cookbook
 
-## 1) Simple Echo Bot
+## A) Text message handler
 
-### Telegraf
 ```ts
-bot.on('text', (ctx) => ctx.reply(ctx.message.text));
-```
-
-### Framework
-```ts
-router.use(async (ctx) => {
-  await ctx.reply(ctx.message?.text ?? '');
+bot.on('message', async (message) => {
+  if (!('text' in message)) return;
+  await bot.sendMessage(message.chat.id, message.text);
 });
 ```
 
-## 2) Wizard Scene (Step-by-step)
+## B) Callback button handler
 
-### Telegraf
 ```ts
-wizard.step((ctx) => {
-  ctx.wizard.state.name = ctx.message.text;
-  return ctx.wizard.next();
-});
-```
-
-### Framework
-```ts
-router.scene('await_name', [
-  async (ctx) => {
-    ctx.session.data.name = ctx.message?.text;
-    await ctx.scene.enter('await_email');
+bot.on('callback_query', async (callback) => {
+  await bot.answerCallbackQuery(callback.id, { text: 'Done' });
+  if (callback.message) {
+    await bot.editMessageReplyMarkup({
+      chat_id: callback.message.chat.id,
+      message_id: callback.message.message_id,
+      reply_markup: { inline_keyboard: [] }
+    });
   }
-]);
-```
-
-## 3) Middleware migration
-
-### Telegraf
-```ts
-bot.use(async (ctx, next) => {
-  if (!ctx.from) return;
-  await next();
 });
 ```
 
-### Framework
+## C) Add Redis cache + index
+
 ```ts
-router.use(async (ctx) => {
-  if (!ctx.fromId) return;
-  // handler logic
-});
+const cache = kv.createCacheNamespace('cache');
+await cache.setJson('settings:chat:1', { locale: 'en' }, 3600);
+await cache.index.upsert('active_chats', '1');
+```
+
+## D) Add anti-spam
+
+```ts
+const limiter = createRateLimiter(kv, { windowMs: 60_000, limit: 20, blockDurationMs: 30_000 });
+const state = await limiter.check(`user:${userId}`);
+if (!state.allowed) {
+  return;
+}
 ```

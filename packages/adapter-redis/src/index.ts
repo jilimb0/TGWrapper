@@ -36,6 +36,20 @@ export interface ScanOptions {
   count?: number;
 }
 
+export interface RedisRateLimiterConfig {
+  namespace?: string;
+  windowMs: number;
+  limit: number;
+  blockDurationMs?: number;
+}
+
+export interface RateLimitResult {
+  allowed: boolean;
+  remaining: number;
+  retryAfter?: number;
+  resetAt: number;
+}
+
 const CAS_SCRIPT = `
 local key = KEYS[1]
 local expected = tonumber(ARGV[1])
@@ -76,6 +90,93 @@ return 1
 const INDEX_REMOVE_SCRIPT = `
 redis.call('SREM', KEYS[1], ARGV[1])
 return 1
+`;
+
+const RATE_LIMITER_SCRIPT = `
+local counter_key = KEYS[1]
+local block_key = KEYS[2]
+local now = tonumber(ARGV[1])
+local window_ms = tonumber(ARGV[2])
+local limit = tonumber(ARGV[3])
+local block_ms = tonumber(ARGV[4])
+local member = ARGV[5]
+
+local block_ttl = redis.call('PTTL', block_key)
+if block_ttl > 0 then
+  local retry_after = math.ceil(block_ttl / 1000)
+  return {0, 0, retry_after, now + block_ttl}
+end
+
+redis.call('ZREMRANGEBYSCORE', counter_key, 0, now - window_ms)
+local current = redis.call('ZCARD', counter_key)
+if current >= limit then
+  local oldest = redis.call('ZRANGE', counter_key, 0, 0, 'WITHSCORES')
+  local oldest_score = now
+  if oldest[2] then
+    oldest_score = tonumber(oldest[2])
+  end
+  local reset_ms = oldest_score + window_ms
+  local retry_ms = math.max(1, reset_ms - now)
+
+  if block_ms > 0 then
+    redis.call('PSETEX', block_key, block_ms, '1')
+    retry_ms = block_ms
+    reset_ms = now + block_ms
+  end
+
+  return {0, 0, math.ceil(retry_ms / 1000), reset_ms}
+end
+
+redis.call('ZADD', counter_key, now, member)
+redis.call('PEXPIRE', counter_key, window_ms + 1000)
+local next_count = redis.call('ZCARD', counter_key)
+local remaining = limit - next_count
+if remaining < 0 then
+  remaining = 0
+end
+
+local oldest = redis.call('ZRANGE', counter_key, 0, 0, 'WITHSCORES')
+local oldest_score = now
+if oldest[2] then
+  oldest_score = tonumber(oldest[2])
+end
+local reset_at = oldest_score + window_ms
+return {1, remaining, 0, reset_at}
+`;
+
+const RATE_LIMITER_INFO_SCRIPT = `
+local counter_key = KEYS[1]
+local block_key = KEYS[2]
+local now = tonumber(ARGV[1])
+local window_ms = tonumber(ARGV[2])
+local limit = tonumber(ARGV[3])
+
+local block_ttl = redis.call('PTTL', block_key)
+if block_ttl > 0 then
+  local retry_after = math.ceil(block_ttl / 1000)
+  return {0, 0, retry_after, now + block_ttl}
+end
+
+redis.call('ZREMRANGEBYSCORE', counter_key, 0, now - window_ms)
+local current = redis.call('ZCARD', counter_key)
+local remaining = limit - current
+if remaining < 0 then
+  remaining = 0
+end
+
+local oldest = redis.call('ZRANGE', counter_key, 0, 0, 'WITHSCORES')
+local oldest_score = now
+if oldest[2] then
+  oldest_score = tonumber(oldest[2])
+end
+local reset_at = oldest_score + window_ms
+local allowed = 1
+local retry_after = 0
+if current >= limit then
+  allowed = 0
+  retry_after = math.ceil(math.max(1, reset_at - now) / 1000)
+end
+return {allowed, remaining, retry_after, reset_at}
 `;
 
 export class RedisSessionAdapter<TSession extends { version: number }> implements SessionStorage<TSession> {
@@ -175,6 +276,14 @@ export class RedisKvStore {
     return new RedisKvNamespace(this, namespace);
   }
 
+  public createCacheNamespace(namespace: string): RedisCacheStore {
+    return new RedisCacheStore(this.withNamespace(namespace));
+  }
+
+  public createSessionNamespace(namespace: string): RedisKvNamespace {
+    return this.withNamespace(namespace);
+  }
+
   public async get(key: string): Promise<string | null> {
     return this.redis.get(this.fullKey(key));
   }
@@ -238,6 +347,17 @@ export class RedisKvStore {
     await this.redis.quit();
   }
 
+  public async eval(script: string, numKeys: number, ...args: string[]): Promise<unknown> {
+    return this.redis.eval(script, numKeys, ...args);
+  }
+
+  public async delStorageKeys(...storageKeys: string[]): Promise<void> {
+    if (storageKeys.length === 0) {
+      return;
+    }
+    await this.redis.del(...storageKeys);
+  }
+
   public createPrefix(...parts: string[]): string {
     const normalized = parts
       .map((part) => part.trim())
@@ -248,6 +368,10 @@ export class RedisKvStore {
 
   private fullKey(key: string): string {
     return `${this.prefix}:${key}`;
+  }
+
+  public toStorageKey(key: string): string {
+    return this.fullKey(key);
   }
 
   private indexKey(indexName: string): string {
@@ -288,10 +412,11 @@ export class RedisKvNamespace {
     return this.store.incr(this.qualify(key));
   }
 
-  public async scanKeys(options: Omit<ScanOptions, 'match'> = {}): Promise<string[]> {
+  public async scanKeys(options: ScanOptions = {}): Promise<string[]> {
+    const scopedMatch = options.match ? `${this.namespace}:${options.match}` : `${this.namespace}:*`;
     const keys = await this.store.scanKeys({
       ...options,
-      match: `${this.namespace}:*`
+      match: scopedMatch
     });
     return keys.map((key) => (key.startsWith(`${this.namespace}:`) ? key.slice(this.namespace.length + 1) : key));
   }
@@ -312,4 +437,157 @@ export class RedisKvNamespace {
   private qualify(key: string): string {
     return `${this.namespace}:${key}`;
   }
+}
+
+export class RedisCacheStore {
+  private readonly namespace: RedisKvNamespace;
+
+  public constructor(namespace: RedisKvNamespace) {
+    this.namespace = namespace;
+  }
+
+  public async getJson<T>(key: string): Promise<T | null> {
+    const raw = await this.namespace.get(key);
+    if (!raw) {
+      return null;
+    }
+    return JSON.parse(raw) as T;
+  }
+
+  public async setJson<T>(key: string, value: T, ttlSeconds?: number): Promise<void> {
+    await this.namespace.set(key, JSON.stringify(value), ttlSeconds);
+  }
+
+  public async del(key: string): Promise<void> {
+    await this.namespace.del(key);
+  }
+
+  public async exists(key: string): Promise<boolean> {
+    return this.namespace.exists(key);
+  }
+
+  public async ttl(key: string): Promise<number> {
+    return this.namespace.ttl(key);
+  }
+
+  public async incr(key: string): Promise<number> {
+    return this.namespace.incr(key);
+  }
+
+  public async keys(pattern = '*', count?: number): Promise<string[]> {
+    return this.namespace.scanKeys({
+      match: pattern,
+      count
+    } as ScanOptions);
+  }
+
+  public async clear(pattern = '*', count = 200): Promise<number> {
+    const keys = await this.namespace.scanKeys({ match: pattern, count } as ScanOptions);
+    if (keys.length === 0) {
+      return 0;
+    }
+    for (const key of keys) {
+      await this.namespace.del(key);
+    }
+    return keys.length;
+  }
+
+  public readonly index = {
+    upsert: async (indexName: string, key: string): Promise<void> => {
+      await this.namespace.indexAdd(indexName, key);
+    },
+    remove: async (indexName: string, key: string): Promise<void> => {
+      await this.namespace.indexRemove(indexName, key);
+    },
+    members: async (indexName: string): Promise<string[]> => {
+      return this.namespace.indexMembers(indexName);
+    }
+  };
+}
+
+export class RedisRateLimiter {
+  private readonly store: RedisKvStore;
+  private readonly config: Required<RedisRateLimiterConfig>;
+
+  public constructor(store: RedisKvStore, config: RedisRateLimiterConfig) {
+    this.store = store;
+    this.config = {
+      namespace: config.namespace ?? 'rate_limit',
+      windowMs: config.windowMs,
+      limit: config.limit,
+      blockDurationMs: config.blockDurationMs ?? 0
+    };
+  }
+
+  public async check(key: string): Promise<RateLimitResult> {
+    const now = Date.now();
+    const normalizedKey = this.normalizeKey(key);
+    const counterKey = this.store.toStorageKey(`${this.config.namespace}:${normalizedKey}:counter`);
+    const blockKey = this.store.toStorageKey(`${this.config.namespace}:${normalizedKey}:block`);
+    const member = `${now}:${Math.random().toString(36).slice(2, 10)}`;
+    const result = (await this.store.eval(
+      RATE_LIMITER_SCRIPT,
+      2,
+      counterKey,
+      blockKey,
+      String(now),
+      String(this.config.windowMs),
+      String(this.config.limit),
+      String(this.config.blockDurationMs),
+      member
+    )) as [number, number, number, number];
+
+    const allowed = result[0] === 1;
+    const remaining = Number(result[1] ?? 0);
+    const retryAfter = Number(result[2] ?? 0);
+    const resetAt = Number(result[3] ?? now + this.config.windowMs);
+    return {
+      allowed,
+      remaining,
+      ...(retryAfter > 0 ? { retryAfter } : {}),
+      resetAt
+    };
+  }
+
+  public async reset(key: string): Promise<void> {
+    const normalizedKey = this.normalizeKey(key);
+    const counterKey = this.store.toStorageKey(`${this.config.namespace}:${normalizedKey}:counter`);
+    const blockKey = this.store.toStorageKey(`${this.config.namespace}:${normalizedKey}:block`);
+    await this.store.delStorageKeys(counterKey, blockKey);
+  }
+
+  public async getInfo(key: string): Promise<RateLimitResult> {
+    const now = Date.now();
+    const normalizedKey = this.normalizeKey(key);
+    const counterKey = this.store.toStorageKey(`${this.config.namespace}:${normalizedKey}:counter`);
+    const blockKey = this.store.toStorageKey(`${this.config.namespace}:${normalizedKey}:block`);
+    const result = (await this.store.eval(
+      RATE_LIMITER_INFO_SCRIPT,
+      2,
+      counterKey,
+      blockKey,
+      String(now),
+      String(this.config.windowMs),
+      String(this.config.limit)
+    )) as [number, number, number, number];
+
+    const allowed = result[0] === 1;
+    const remaining = Number(result[1] ?? 0);
+    const retryAfter = Number(result[2] ?? 0);
+    const resetAt = Number(result[3] ?? now + this.config.windowMs);
+    return {
+      allowed,
+      remaining,
+      ...(retryAfter > 0 ? { retryAfter } : {}),
+      resetAt
+    };
+  }
+
+  private normalizeKey(key: string): string {
+    return key.replaceAll(':', '_');
+  }
+}
+
+export function createRateLimiter(store: RedisKvStore, config: RedisRateLimiterConfig): RedisRateLimiter {
+  return new RedisRateLimiter(store, config);
 }

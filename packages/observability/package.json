@@ -2,24 +2,29 @@
   "name": "@jilimb0/tgwrapper-observability",
   "version": "0.3.0",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist-cjs/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js"
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "pnpm build:esm && pnpm build:cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "prepublishOnly": "node ../../scripts/enforce-ci-publish.mjs"
+    "prepublishOnly": "node ../../scripts/enforce-ci-publish.mjs",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json"
   },
   "devDependencies": {
     "typescript": "5.8.2"
   },
   "files": [
-    "dist"
+    "dist/**/*.js",
+    "dist/**/*.d.ts",
+    "dist-cjs/**/*.js"
   ],
   "publishConfig": {
     "access": "public"

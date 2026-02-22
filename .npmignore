@@ -1,0 +1,8 @@
+**/*.map
+**/*.tsbuildinfo
+src/
+test/
+examples/
+benchmark/
+docs/
+.github/

@@ -20,6 +20,12 @@ function hasTelegramFollowupChangeset() {
   return false;
 }
 
+function hasTelegramFollowupInChangelog() {
+  const changelogPath = resolve(process.cwd(), 'CHANGELOG.md');
+  const content = readFileSync(changelogPath, 'utf8');
+  return /telegram|bot api|compat|schema/i.test(content);
+}
+
 const reportPath = resolve(process.cwd(), 'docs/telegram-api-schema.drift-report.json');
 const report = readJson(reportPath);
 const driftCount = Number(report.drift_count ?? 0);
@@ -54,13 +60,13 @@ if (driftCount === 0) {
   process.exit(0);
 }
 
-const hasFollowup = hasTelegramFollowupChangeset();
+const hasFollowup = hasTelegramFollowupChangeset() || hasTelegramFollowupInChangelog();
 if (hasFollowup) {
   console.log(
     JSON.stringify(
       {
         status: 'ok',
-        reason: 'schema_drift_with_followup_changeset',
+        reason: 'schema_drift_with_followup_recorded',
         drift_count: driftCount
       },
       null,

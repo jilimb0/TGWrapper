@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper
 
+## 0.10.1
+
+### Patch Changes
+
+- 3b40fad: Add telegram/schema compatibility follow-up for detected schema drift and release-gate tracking.
+
 ## 0.10.0
 
 ### Minor Changes

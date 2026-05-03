@@ -103,6 +103,19 @@ describe('Context compatibility fallbacks', () => {
     expect(ctx.fromId).toBe(901);
   });
 
+  it('resolves fromId from purchased_paid_media updates', () => {
+    const update = {
+      update_id: 44,
+      purchased_paid_media: {
+        from: { id: 1001, is_bot: false, first_name: 'payer' },
+        paid_media_payload: 'payload-v2'
+      }
+    } as unknown as Update;
+
+    const ctx = makeContext(update, []);
+    expect(ctx.fromId).toBe(1001);
+  });
+
   it('resolves chat_id from deleted_business_messages updates', async () => {
     const calls: Array<{ method: string; payload: Record<string, unknown> }> = [];
     const update = {

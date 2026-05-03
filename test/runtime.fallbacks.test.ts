@@ -16,6 +16,38 @@ class OneShotSource implements UpdateSource {
 }
 
 describe('BotRuntime fallback behavior', () => {
+  it('records known metrics tag for newly added update types', async () => {
+    const increments: Array<{ metric: string; tags?: Record<string, string> }> = [];
+    const metrics: MetricsCollector = {
+      increment: (metric, _value, tags) => {
+        increments.push({ metric, tags });
+      },
+      observe: () => undefined
+    };
+
+    const runtime = new BotRuntime(
+      new OneShotSource({
+        update_id: 10,
+        purchased_paid_media: { paid_media_payload: 'x' }
+      } as Update),
+      {
+        handleUpdate: async () => undefined
+      },
+      { metrics }
+    );
+
+    await runtime.start();
+
+    expect(increments).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          metric: 'runtime_updates_received',
+          tags: expect.objectContaining({ update_type: 'purchased_paid_media' })
+        })
+      ])
+    );
+  });
+
   it('records unknown update type metrics instead of silently dropping visibility', async () => {
     const increments: Array<{ metric: string; tags?: Record<string, string> }> = [];
     const metrics: MetricsCollector = {

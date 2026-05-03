@@ -34,6 +34,10 @@ describe('Telegram API compatibility contract', () => {
         date: Math.floor(Date.now() / 1000),
         old_reaction: [],
         new_reaction: []
+      },
+      purchased_paid_media: {
+        from: { id: 42, is_bot: false, first_name: 'Alice' },
+        paid_media_payload: 'media-token-v2'
       }
     } as unknown;
 
@@ -94,5 +98,21 @@ describe('Telegram API compatibility contract', () => {
     await client.callApi(method, { chat_id: 1, message_thread_id: 1, text: 'compat-draft' });
 
     expect(calls).toContain('sendMessageDraft');
+  });
+
+  it('supports newer moderation/account methods through typed callApi', async () => {
+    const calls: string[] = [];
+    const client = new ApiClient({
+      token: 'TEST_TOKEN',
+      mockResponder: async (method) => {
+        calls.push(method);
+        return { ok: true };
+      }
+    });
+
+    const method: keyof ApiMethods = 'verifyUser';
+    await client.callApi(method, { user_id: 1, custom_description: 'compat-check' });
+
+    expect(calls).toContain('verifyUser');
   });
 });

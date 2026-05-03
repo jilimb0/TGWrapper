@@ -68,6 +68,11 @@ export class Context<TState extends string, TData extends JsonObject> {
       return reactionActor.id;
     }
 
+    const paidMediaBuyer = this.update.purchased_paid_media?.from;
+    if (paidMediaBuyer) {
+      return paidMediaBuyer.id;
+    }
+
     return undefined;
   }
 

@@ -9,6 +9,7 @@ import type {
 type _SendMessageDraftParams = Parameters<ApiMethods['sendMessageDraft']>[0];
 type _CreateChatSubscriptionInviteLinkParams = Parameters<ApiMethods['createChatSubscriptionInviteLink']>[0];
 type _SetMessageReactionParams = Parameters<ApiMethods['setMessageReaction']>[0];
+type _VerifyUserParams = Parameters<ApiMethods['verifyUser']>[0];
 
 const _userFields: User = {
   id: 1,
@@ -74,7 +75,24 @@ const _businessLikeUpdate: Update = {
   }
 };
 
+const _paidMediaUpdate: Update = {
+  update_id: 2,
+  purchased_paid_media: {
+    from: {
+      id: 88,
+      is_bot: false,
+      first_name: 'buyer'
+    },
+    paid_media_payload: 'invoice-ref-1'
+  }
+};
+
 void _userFields;
 void _inlineButtonWithCopyText;
 void _keyboardButtonWithRequest;
 void _businessLikeUpdate;
+void _paidMediaUpdate;
+void (null as unknown as _SendMessageDraftParams);
+void (null as unknown as _CreateChatSubscriptionInviteLinkParams);
+void (null as unknown as _SetMessageReactionParams);
+void (null as unknown as _VerifyUserParams);

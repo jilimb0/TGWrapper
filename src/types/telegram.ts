@@ -193,6 +193,11 @@ type TypedUpdateFields = {
     user?: User;
     [key: string]: unknown;
   };
+  purchased_paid_media?: {
+    from?: User;
+    paid_media_payload?: string;
+    [key: string]: unknown;
+  };
 };
 
 export type Update = {

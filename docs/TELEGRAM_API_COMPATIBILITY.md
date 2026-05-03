@@ -1,8 +1,8 @@
-# Telegram Bot API Compatibility (Target: 9.4)
+# Telegram Bot API Compatibility (Target: 9.4+)
 
 ## Compatibility Target
 
-- Target baseline: **Telegram Bot API 9.4**
+- Target baseline: **Telegram Bot API 9.4+**
 - Local type source: `src/types/telegram.ts`
 - Baseline file: `docs/telegram-api-baseline.json`
 
@@ -30,6 +30,7 @@ Compatibility is release-gated by type checks, contract tests, schema checks, an
   - `message_reaction_count`
   - `removed_chat_boost`
   - `chat_boost`
+  - `purchased_paid_media`
   - `poll_answer.voter_chat`
 
 ## Limited
@@ -62,6 +63,10 @@ These are still reachable through typed `callApi` contracts.
    - `pnpm telegram:schema:fetch`
    - `pnpm telegram:schema:drift:report`
 3. Update local types/runtime/tests as needed.
+   - Keep explicit coverage for newly added update keys (for example `purchased_paid_media`) in:
+     - `src/types/telegram.ts`
+     - `test/context.compat.test.ts`
+     - `test/runtime.fallbacks.test.ts`
 4. Regenerate schema-derived artifacts if required.
 5. Re-run:
    - `pnpm verify:release`

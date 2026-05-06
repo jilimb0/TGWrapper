@@ -16,6 +16,8 @@
 - Production stack recipe: `docs/PRODUCTION_STACK_RECIPE.md`
 - Reference implementations overview: `docs/REFERENCE_IMPLEMENTATIONS.md`
 - `0.11.0` release notes draft: `docs/RELEASE_NOTES_0_11_0_DRAFT.md`
+- `0.11.0` execution plan: `docs/EXECUTION_PLAN_0_11_0.md`
+- `0.11.0` release checklist: `docs/RELEASE_CHECKLIST_0_11_0.md`
 - Positioning: `docs/WHY_TGWRAPPER.md` and `docs/COMPARISON.md`
 - Observability contract: `docs/OBSERVABILITY_CONTRACT.md`
 - Operations runbook: `docs/OPERATIONS_RUNBOOK.md`

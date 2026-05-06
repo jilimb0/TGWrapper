@@ -123,6 +123,10 @@ Start here:
 
 - Full step-by-step guide: `docs/BOT_DEVELOPMENT_GUIDE.md`
 - Template bot: `examples/template-bot`
+- Canonical starters:
+  - `examples/polling-starter`
+  - `examples/serverless-webhook-starter`
+  - `examples/ai-bot-starter`
 
 ## Examples
 
@@ -135,12 +139,17 @@ Start here:
 ## Documentation
 
 - Documentation index: `docs/DOCUMENTATION.md`
+- Why TGWrapper: `docs/WHY_TGWRAPPER.md`
+- Framework comparison: `docs/COMPARISON.md`
+- Migration from grammY: `docs/MIGRATION_FROM_GRMMY.md`
 - 1.0 release definition of done: `docs/DEFINITION_OF_DONE_1.0.0.md`
 - 1.0 release plan: `docs/RELEASE_1.0.0_PLAN.md`
 - Production checklist: `docs/PRODUCTION_CHECKLIST.md`
 - Release policy: `docs/RELEASE_POLICY.md`
 - Operations runbook: `docs/OPERATIONS_RUNBOOK.md`
 - Observability contract: `docs/OBSERVABILITY_CONTRACT.md`
+- Production stack recipe: `docs/PRODUCTION_STACK_RECIPE.md`
+- 0.11.0 execution plan: `docs/EXECUTION_PLAN_0_11_0.md`
 
 ## Open Source
 

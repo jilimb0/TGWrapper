@@ -75,8 +75,8 @@
   "dependencies": {},
   "devDependencies": {
     "@changesets/cli": "^2.29.6",
-    "typedoc": "^0.27.9",
-    "typescript": "5.8.2",
+    "typedoc": "^0.28.19",
+    "typescript": "6.0.3",
     "vitest": "^4.0.18"
   },
   "packageManager": "pnpm@10.4.1",

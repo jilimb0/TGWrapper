@@ -25,7 +25,7 @@ importers:
     dependencies:
       ioredis:
         specifier: ^5.6.1
-        version: 5.9.3
+        version: 5.10.1
     devDependencies:
       typescript:
         specifier: 5.8.2
@@ -272,8 +272,8 @@ packages:
       '@types/node':
         optional: true
 
-  '@ioredis/commands@1.5.0':
-    resolution: {integrity: sha512-eUgLqrMf8nJkZxT24JvVRrQya1vZkQh8BBeYNwGDqa5I0VUi8ACx7uFvAaLxintokpTenkK6DASvo/bvNbBGow==}
+  '@ioredis/commands@1.5.1':
+    resolution: {integrity: sha512-JH8ZL/ywcJyR9MmJ5BNqZllXNZQqQbnVZOqpPQqE1vHiFgAw4NHbvE0FOduNU8IX9babitBT46571OnPTT0Zcw==}
 
   '@jridgewell/sourcemap-codec@1.5.5':
     resolution: {integrity: sha512-cYQ9310grqxueWbl+WuIUIaiUaDcj7WOq5fVhEljNVgRfOUhY9fy2zTvfoqWsnebh8Sl70VScFbICvJnLKB0Og==}
@@ -650,8 +650,8 @@ packages:
     resolution: {integrity: sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g==}
     engines: {node: '>= 4'}
 
-  ioredis@5.9.3:
-    resolution: {integrity: sha512-VI5tMCdeoxZWU5vjHWsiE/Su76JGhBvWF1MJnV9ZtGltHk9BmD48oDq8Tj8haZ85aceXZMxLNDQZRVo5QKNgXA==}
+  ioredis@5.10.1:
+    resolution: {integrity: sha512-HuEDBTI70aYdx1v6U97SbNx9F1+svQKBDo30o0b9fw055LMepzpOOd0Ccg9Q6tbqmBSJaMuY0fB7yw9/vjBYCA==}
     engines: {node: '>=12.22.0'}
 
   is-extglob@2.1.1:
@@ -1274,7 +1274,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.10.13
 
-  '@ioredis/commands@1.5.0': {}
+  '@ioredis/commands@1.5.1': {}
 
   '@jridgewell/sourcemap-codec@1.5.5': {}
 
@@ -1620,9 +1620,9 @@ snapshots:
 
   ignore@5.3.2: {}
 
-  ioredis@5.9.3:
+  ioredis@5.10.1:
     dependencies:
-      '@ioredis/commands': 1.5.0
+      '@ioredis/commands': 1.5.1
       cluster-key-slot: 1.1.2
       debug: 4.4.3
       denque: 2.1.0

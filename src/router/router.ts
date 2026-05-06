@@ -20,10 +20,11 @@ export interface RouterContextMeta {
 
 export class TreeRouter<TContext> implements Router<TContext> {
   private readonly routes: Array<RouteCandidate<TContext & RouterContextMeta>> = [];
+  private sortedRoutesCache: Array<RouteCandidate<TContext & RouterContextMeta>> | null = null;
   private readonly sceneHooks = new Map<string, SceneHooks<TContext>>();
 
   public command(command: string, handler: Handler<TContext>, priority = 100): void {
-    this.routes.push({
+    this.addRoute({
       priority,
       match: (ctx) => ctx.command === command,
       handler: handler as Handler<TContext & RouterContextMeta>
@@ -31,7 +32,7 @@ export class TreeRouter<TContext> implements Router<TContext> {
   }
 
   public regex(pattern: RegExp, handler: Handler<TContext>, priority = 50): void {
-    this.routes.push({
+    this.addRoute({
       priority,
       match: (ctx) => typeof ctx.text === 'string' && pattern.test(ctx.text),
       handler: handler as Handler<TContext & RouterContextMeta>
@@ -39,7 +40,7 @@ export class TreeRouter<TContext> implements Router<TContext> {
   }
 
   public callbackData(pattern: RegExp, handler: Handler<TContext>, priority = 70): void {
-    this.routes.push({
+    this.addRoute({
       priority,
       match: (ctx) => typeof ctx.callbackData === 'string' && pattern.test(ctx.callbackData),
       handler: handler as Handler<TContext & RouterContextMeta>
@@ -47,7 +48,7 @@ export class TreeRouter<TContext> implements Router<TContext> {
   }
 
   public state(state: string, handler: Handler<TContext>, priority = 200): void {
-    this.routes.push({
+    this.addRoute({
       priority,
       match: (ctx) => ctx.currentState === state,
       handler: handler as Handler<TContext & RouterContextMeta>
@@ -74,7 +75,7 @@ export class TreeRouter<TContext> implements Router<TContext> {
   }
 
   public use(handler: Handler<TContext>, priority = 0): void {
-    this.routes.push({
+    this.addRoute({
       priority,
       match: () => true,
       handler: handler as Handler<TContext & RouterContextMeta>
@@ -82,7 +83,7 @@ export class TreeRouter<TContext> implements Router<TContext> {
   }
 
   public async dispatch(ctx: TContext & RouterContextMeta): Promise<boolean> {
-    const sorted = [...this.routes].sort((a, b) => b.priority - a.priority);
+    const sorted = this.getSortedRoutes();
     for (const route of sorted) {
       if (!route.match(ctx)) {
         continue;
@@ -93,5 +94,19 @@ export class TreeRouter<TContext> implements Router<TContext> {
     }
 
     return false;
+  }
+
+  private addRoute(route: RouteCandidate<TContext & RouterContextMeta>): void {
+    this.routes.push(route);
+    this.sortedRoutesCache = null;
+  }
+
+  private getSortedRoutes(): Array<RouteCandidate<TContext & RouterContextMeta>> {
+    if (this.sortedRoutesCache) {
+      return this.sortedRoutesCache;
+    }
+
+    this.sortedRoutesCache = [...this.routes].sort((a, b) => b.priority - a.priority);
+    return this.sortedRoutesCache;
   }
 }

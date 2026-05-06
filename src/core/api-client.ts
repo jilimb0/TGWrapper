@@ -332,7 +332,7 @@ async function toBlob(value: BinaryInput): Promise<Blob> {
     return value;
   }
   if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
-    return new Blob([value]);
+    return new Blob([toBlobPart(value)]);
   }
 
   const stream = value as AsyncIterable<Uint8Array | ArrayBuffer | string>;
@@ -346,5 +346,15 @@ async function toBlob(value: BinaryInput): Promise<Blob> {
       chunks.push(new Uint8Array(chunk));
     }
   }
-  return new Blob(chunks);
+  return new Blob(chunks.map((chunk) => toBlobPart(chunk)));
+}
+
+function toBlobPart(value: Uint8Array | ArrayBuffer): BlobPart {
+  if (value instanceof ArrayBuffer) {
+    return value.slice(0);
+  }
+
+  const copy = new Uint8Array(value.byteLength);
+  copy.set(value);
+  return copy.buffer as ArrayBuffer;
 }

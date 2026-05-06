@@ -74,12 +74,14 @@ const METHOD_PREFIXES = [
 ];
 
 function decodeEntities(input) {
-  return input
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'");
+  const entities = {
+    '&lt;': '<',
+    '&gt;': '>',
+    '&amp;': '&',
+    '&quot;': '"',
+    '&#39;': "'"
+  };
+  return input.replace(/&(lt|gt|amp|quot|#39);/g, (match) => entities[`&${match.slice(1)}`] ?? match);
 }
 
 function stripTags(input) {

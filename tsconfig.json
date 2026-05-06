@@ -14,6 +14,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "skipLibCheck": true,
+    "ignoreDeprecations": "5.0",
     "esModuleInterop": false,
     "forceConsistentCasingInFileNames": true
   },

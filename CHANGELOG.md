@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper
 
+## 0.10.3
+
+### Patch Changes
+
+- b9de156: Improve production readiness with CI/security hardening, TypeScript 6 compatibility updates, and dependency safety fixes (including Vite patch-level security update).
+
 ## 0.10.2
 
 ### Patch Changes

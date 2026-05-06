@@ -20,7 +20,7 @@ jobs:
           --health-retries 10
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v6
         with:
           version: 10.4.1
       - uses: actions/setup-node@v6
@@ -49,7 +49,7 @@ jobs:
         env:
           BENCHMARK_MIN_RATIO: "0.55"
           BENCHMARK_MIN_UPS: "180000"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: phase4-benchmark-report
           path: |

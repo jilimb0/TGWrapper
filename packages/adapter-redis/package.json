@@ -23,7 +23,7 @@
     "ioredis": "^5.6.1"
   },
   "devDependencies": {
-    "typescript": "5.8.2",
+    "typescript": "6.0.3",
     "vitest": "^4.0.18"
   },
   "files": [

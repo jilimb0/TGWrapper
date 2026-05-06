@@ -3,6 +3,9 @@ name: 1.0 Readiness
 on:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   verify-1-0:
     runs-on: ubuntu-latest

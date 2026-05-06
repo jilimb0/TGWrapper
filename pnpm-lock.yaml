@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  vite: 7.3.2
+
 importers:
 
   .:
@@ -17,9 +20,12 @@ importers:
       typescript:
         specifier: 6.0.3
         version: 6.0.3
+      vite:
+        specifier: 7.3.2
+        version: 7.3.2(@types/node@25.6.0)(yaml@2.8.4)
       vitest:
         specifier: ^4.0.18
-        version: 4.1.5(@types/node@25.6.0)(vite@7.3.1(@types/node@25.6.0)(yaml@2.8.4))
+        version: 4.1.5(@types/node@25.6.0)(vite@7.3.2(@types/node@25.6.0)(yaml@2.8.4))
 
   packages/adapter-redis:
     dependencies:
@@ -32,7 +38,7 @@ importers:
         version: 6.0.3
       vitest:
         specifier: ^4.0.18
-        version: 4.1.5(@types/node@25.6.0)(vite@7.3.1(@types/node@25.6.0)(yaml@2.8.4))
+        version: 4.1.5(@types/node@25.6.0)(vite@7.3.2(@types/node@25.6.0)(yaml@2.8.4))
 
   packages/observability:
     devDependencies:
@@ -467,7 +473,7 @@ packages:
     resolution: {integrity: sha512-/x2EmFC4mT4NNzqvC3fmesuV97w5FC903KPmey4gsnJiMQ3Be1IlDKVaDaG8iqaLFHqJ2FVEkxZk5VmeLjIItw==}
     peerDependencies:
       msw: ^2.4.9
-      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
+      vite: 7.3.2
     peerDependenciesMeta:
       msw:
         optional: true
@@ -953,8 +959,8 @@ packages:
     resolution: {integrity: sha512-rBJeI5CXAlmy1pV+617WB9J63U6XcazHHF2f2dbJix4XzpUF0RS3Zbj0FGIOCAva5P/d/GBOYaACQ1w+0azUkg==}
     engines: {node: '>= 4.0.0'}
 
-  vite@7.3.1:
-    resolution: {integrity: sha512-w+N7Hifpc3gRjZ63vYBXA56dvvRlNWRczTdmCBBa+CotUzAPf5b7YMdMR/8CQoeYE5LX3W4wj6RYTgonm1b9DA==}
+  vite@7.3.2:
+    resolution: {integrity: sha512-Bby3NOsna2jsjfLVOHKes8sGwgl4TT0E6vvpYgnAYDIF/tie7MRaFthmKuHx1NSXjiTueXH3do80FMQgvEktRg==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -1009,7 +1015,7 @@ packages:
       '@vitest/ui': 4.1.5
       happy-dom: '*'
       jsdom: '*'
-      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
+      vite: 7.3.2
     peerDependenciesMeta:
       '@edge-runtime/vm':
         optional: true
@@ -1448,13 +1454,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.5(vite@7.3.1(@types/node@25.6.0)(yaml@2.8.4))':
+  '@vitest/mocker@4.1.5(vite@7.3.2(@types/node@25.6.0)(yaml@2.8.4))':
     dependencies:
       '@vitest/spy': 4.1.5
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.1(@types/node@25.6.0)(yaml@2.8.4)
+      vite: 7.3.2(@types/node@25.6.0)(yaml@2.8.4)
 
   '@vitest/pretty-format@4.1.5':
     dependencies:
@@ -1913,7 +1919,7 @@ snapshots:
 
   universalify@0.1.2: {}
 
-  vite@7.3.1(@types/node@25.6.0)(yaml@2.8.4):
+  vite@7.3.2(@types/node@25.6.0)(yaml@2.8.4):
     dependencies:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.4)
@@ -1926,10 +1932,10 @@ snapshots:
       fsevents: 2.3.3
       yaml: 2.8.4
 
-  vitest@4.1.5(@types/node@25.6.0)(vite@7.3.1(@types/node@25.6.0)(yaml@2.8.4)):
+  vitest@4.1.5(@types/node@25.6.0)(vite@7.3.2(@types/node@25.6.0)(yaml@2.8.4)):
     dependencies:
       '@vitest/expect': 4.1.5
-      '@vitest/mocker': 4.1.5(vite@7.3.1(@types/node@25.6.0)(yaml@2.8.4))
+      '@vitest/mocker': 4.1.5(vite@7.3.2(@types/node@25.6.0)(yaml@2.8.4))
       '@vitest/pretty-format': 4.1.5
       '@vitest/runner': 4.1.5
       '@vitest/snapshot': 4.1.5
@@ -1946,7 +1952,7 @@ snapshots:
       tinyexec: 1.1.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vite: 7.3.1(@types/node@25.6.0)(yaml@2.8.4)
+      vite: 7.3.2(@types/node@25.6.0)(yaml@2.8.4)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 25.6.0

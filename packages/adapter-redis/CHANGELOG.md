@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper-adapter-redis
 
+## 0.4.1
+
+### Patch Changes
+
+- f29938e: Improve TypeScript 6 compatibility in CI/build pipelines and refresh release, security, and onboarding documentation.
+
 ## 0.4.0
 
 ### Minor Changes

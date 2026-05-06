@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper-observability
 
+## 0.5.2
+
+### Patch Changes
+
+- f29938e: Improve TypeScript 6 compatibility in CI/build pipelines and refresh release, security, and onboarding documentation.
+
 ## 0.5.1
 
 ### Patch Changes

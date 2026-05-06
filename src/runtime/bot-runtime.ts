@@ -23,11 +23,13 @@ export class BotRuntime implements RuntimeLifecycle {
   private readonly guards: RuntimeGuardOptions;
   private readonly errorHandlers = new Set<(error: unknown) => void | Promise<void>>();
   private running = false;
+  private inMemoryRateLimiterWarningLogged = false;
 
   public constructor(source: UpdateSource, handler: RuntimeHandler, guards: RuntimeGuardOptions = {}) {
     this.source = source;
     this.handler = handler;
     this.guards = guards;
+    this.warnAboutInMemoryRateLimiterInProduction();
   }
 
   public async start(): Promise<void> {
@@ -167,5 +169,32 @@ export class BotRuntime implements RuntimeLifecycle {
       }
     }
     return 'unknown';
+  }
+
+  private warnAboutInMemoryRateLimiterInProduction(): void {
+    if (!this.guards.rateLimiter || this.inMemoryRateLimiterWarningLogged) {
+      return;
+    }
+    const nodeEnv =
+      typeof globalThis === 'object' &&
+      'process' in globalThis &&
+      typeof (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env?.NODE_ENV ===
+        'string'
+        ? (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env?.NODE_ENV
+        : undefined;
+    if (nodeEnv !== 'production') {
+      return;
+    }
+
+    this.inMemoryRateLimiterWarningLogged = true;
+    this.guards.logger?.log({
+      level: 'warn',
+      event: 'runtime_in_memory_rate_limiter_in_production',
+      timestamp: new Date().toISOString(),
+      data: {
+        recommendation:
+          'Use @jilimb0/tgwrapper-adapter-redis createRateLimiter(...) for distributed multi-instance deployments.'
+      }
+    });
   }
 }

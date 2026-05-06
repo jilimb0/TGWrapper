@@ -88,6 +88,8 @@ Use raw `callApiUnsafe` only as escape hatch.
 
 ## 5) Redis cache + rate limit
 
+For production multi-instance deployments, prefer Redis-backed distributed rate limiting. The core in-memory limiter is suitable for local development and single-instance setups only.
+
 ```ts
 import { RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
 

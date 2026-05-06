@@ -1,0 +1,14 @@
+{
+  "name": "serverless-webhook-starter",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --import tsx src/local-dev.ts"
+  },
+  "dependencies": {
+    "@jilimb0/tgwrapper": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.6"
+  }
+}

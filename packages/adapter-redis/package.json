@@ -1,6 +1,10 @@
 {
   "name": "@jilimb0/tgwrapper-adapter-redis",
   "version": "0.4.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jilimb0/TGWrapper"
+  },
   "type": "module",
   "main": "./dist-cjs/index.js",
   "types": "./dist/index.d.ts",

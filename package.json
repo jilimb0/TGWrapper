@@ -1,6 +1,6 @@
 {
   "name": "@jilimb0/tgwrapper",
-  "version": "0.10.3",
+  "version": "0.11.0",
   "description": "Serverless-first Telegram bot framework without external bot libraries",
   "repository": {
     "type": "git",
@@ -80,7 +80,7 @@
     "@changesets/cli": "^2.29.6",
     "typedoc": "^0.28.19",
     "typescript": "6.0.3",
-    "vite": "7.3.2",
+    "vite": "8.0.11",
     "vitest": "^4.0.18"
   },
   "packageManager": "pnpm@10.4.1",
@@ -95,7 +95,7 @@
   },
   "pnpm": {
     "overrides": {
-      "vite": "7.3.2"
+      "vite": "8.0.11"
     }
   }
 }

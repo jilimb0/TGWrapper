@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper-adapter-redis
 
+## 0.4.3
+
+### Patch Changes
+
+- f60b373: Improve production readiness with CI/security hardening, TypeScript 6 compatibility updates, and dependency safety fixes (including Vite patch-level security update).
+
 ## 0.4.2
 
 ### Patch Changes

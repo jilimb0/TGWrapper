@@ -1,7 +1,7 @@
 {
-  "target_bot_api_version": "9.6",
+  "target_bot_api_version": "10.0",
   "source_changelog": "https://core.telegram.org/bots/api-changelog",
-  "reviewed_at": "2026-04-27",
+  "reviewed_at": "2026-05-11",
   "min_method_count": 150,
   "min_update_key_count": 20,
   "notes": "Auto-synced target version from Telegram Bot API changelog. Review local types/tests/docs before release."

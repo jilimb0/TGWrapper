@@ -33,6 +33,7 @@ export type StrictTelegramApiMethodResultName = keyof StrictTelegramApiMethodRes
 
 export type TelegramApiMethodResults = {
   answerCallbackQuery: boolean;
+  answerGuestQuery: UnknownResult;
   answerInlineQuery: boolean;
   answerPreCheckoutQuery: boolean;
   answerShippingQuery: boolean;
@@ -54,11 +55,13 @@ export type TelegramApiMethodResults = {
   createNewStickerSet: UnknownResult;
   declineChatJoinRequest: UnknownResult;
   declineSuggestedPost: UnknownResult;
+  deleteAllMessageReactions: UnknownResult;
   deleteBusinessMessages: UnknownResult;
   deleteChatPhoto: UnknownResult;
   deleteChatStickerSet: UnknownResult;
   deleteForumTopic: UnknownResult;
   deleteMessage: boolean;
+  deleteMessageReaction: UnknownResult;
   deleteMessages: boolean;
   deleteMyCommands: UnknownResult;
   deleteStickerFromSet: UnknownResult;
@@ -94,6 +97,8 @@ export type TelegramApiMethodResults = {
   getFile: UnknownResult;
   getForumTopicIconStickers: UnknownResult;
   getGameHighScores: UnknownResult;
+  getManagedBotAccessSettings: UnknownResult;
+  getManagedBotToken: UnknownResult;
   getMe: import("./telegram.js").User;
   getMyCommands: UnknownResult;
   getMyDefaultAdministratorRights: UnknownResult;
@@ -106,6 +111,7 @@ export type TelegramApiMethodResults = {
   getUpdates: import("./telegram.js").Update[];
   getUserChatBoosts: UnknownResult;
   getUserGifts: UnknownResult;
+  getUserPersonalChatMessages: UnknownResult;
   getUserProfileAudios: UnknownResult;
   getUserProfilePhotos: UnknownResult;
   getWebhookInfo: UnknownResult;
@@ -124,10 +130,12 @@ export type TelegramApiMethodResults = {
   removeUserVerification: UnknownResult;
   reopenForumTopic: UnknownResult;
   reopenGeneralForumTopic: UnknownResult;
+  replaceManagedBotToken: UnknownResult;
   replaceStickerInSet: UnknownResult;
   restrictChatMember: UnknownResult;
   revokeChatInviteLink: UnknownResult;
   savePreparedInlineMessage: UnknownResult;
+  savePreparedKeyboardButton: UnknownResult;
   sendAnimation: UnknownResult;
   sendAudio: UnknownResult;
   sendChatAction: UnknownResult;
@@ -138,6 +146,7 @@ export type TelegramApiMethodResults = {
   sendGame: UnknownResult;
   sendGift: UnknownResult;
   sendInvoice: import("./telegram.js").Message;
+  sendLivePhoto: UnknownResult;
   sendLocation: UnknownResult;
   sendMediaGroup: import("./telegram.js").Message[];
   sendMessage: import("./telegram.js").Message;
@@ -157,6 +166,7 @@ export type TelegramApiMethodResults = {
   setBusinessAccountUsername: UnknownResult;
   setChatAdministratorCustomTitle: UnknownResult;
   setChatDescription: UnknownResult;
+  setChatMemberTag: UnknownResult;
   setChatMenuButton: UnknownResult;
   setChatPermissions: UnknownResult;
   setChatPhoto: UnknownResult;
@@ -164,6 +174,7 @@ export type TelegramApiMethodResults = {
   setChatTitle: UnknownResult;
   setCustomEmojiStickerSetThumbnail: UnknownResult;
   setGameScore: import("./telegram.js").Message | boolean;
+  setManagedBotAccessSettings: UnknownResult;
   setMessageReaction: boolean;
   setMyCommands: UnknownResult;
   setMyDefaultAdministratorRights: UnknownResult;

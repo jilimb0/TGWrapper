@@ -13,6 +13,7 @@ export interface User {
   language_code?: string;
   has_main_web_app?: boolean;
   added_to_attachment_menu?: boolean;
+  supports_guest_queries?: boolean;
   [key: string]: unknown;
 }
 
@@ -39,6 +40,9 @@ export namespace Message {
       length: number;
       [key: string]: unknown;
     }>;
+    guest_bot_caller_user?: User;
+    guest_bot_caller_chat?: Chat;
+    guest_query_id?: string | number;
     [key: string]: unknown;
   }
 
@@ -198,6 +202,7 @@ type TypedUpdateFields = {
     paid_media_payload?: string;
     [key: string]: unknown;
   };
+  guest_message?: Message;
 };
 
 export type Update = {

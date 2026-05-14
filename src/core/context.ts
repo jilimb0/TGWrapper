@@ -146,7 +146,8 @@ export class Context<TState extends string, TData extends JsonObject> {
       this.update.channel_post ??
       this.update.edited_channel_post ??
       this.update.business_message ??
-      this.update.edited_business_message
+      this.update.edited_business_message ??
+      this.update.guest_message
     );
   }
 

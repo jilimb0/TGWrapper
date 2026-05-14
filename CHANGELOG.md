@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper
 
+## 0.12.0
+
+### Minor Changes
+
+- 497805e: Update to 10.0 Telegram Bot API
+
 ## 0.11.0
 
 ### Minor Changes

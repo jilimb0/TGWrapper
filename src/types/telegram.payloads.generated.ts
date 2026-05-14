@@ -32,6 +32,7 @@ export type StrictTelegramApiMethodName = keyof StrictTelegramApiMethodPayloads;
 
 export type TelegramApiMethodPayloads = {
   answerCallbackQuery: StrictTelegramApiMethodPayloads['answerCallbackQuery'];
+  answerGuestQuery: UnknownPayload;
   answerInlineQuery: StrictTelegramApiMethodPayloads['answerInlineQuery'];
   answerPreCheckoutQuery: UnknownPayload;
   answerShippingQuery: UnknownPayload;
@@ -53,11 +54,13 @@ export type TelegramApiMethodPayloads = {
   createNewStickerSet: UnknownPayload;
   declineChatJoinRequest: UnknownPayload;
   declineSuggestedPost: UnknownPayload;
+  deleteAllMessageReactions: UnknownPayload;
   deleteBusinessMessages: UnknownPayload;
   deleteChatPhoto: UnknownPayload;
   deleteChatStickerSet: UnknownPayload;
   deleteForumTopic: UnknownPayload;
   deleteMessage: StrictTelegramApiMethodPayloads['deleteMessage'];
+  deleteMessageReaction: UnknownPayload;
   deleteMessages: UnknownPayload;
   deleteMyCommands: UnknownPayload;
   deleteStickerFromSet: UnknownPayload;
@@ -93,6 +96,8 @@ export type TelegramApiMethodPayloads = {
   getFile: UnknownPayload;
   getForumTopicIconStickers: UnknownPayload;
   getGameHighScores: UnknownPayload;
+  getManagedBotAccessSettings: UnknownPayload;
+  getManagedBotToken: UnknownPayload;
   getMe: UnknownPayload;
   getMyCommands: UnknownPayload;
   getMyDefaultAdministratorRights: UnknownPayload;
@@ -105,6 +110,7 @@ export type TelegramApiMethodPayloads = {
   getUpdates: StrictTelegramApiMethodPayloads['getUpdates'];
   getUserChatBoosts: UnknownPayload;
   getUserGifts: UnknownPayload;
+  getUserPersonalChatMessages: UnknownPayload;
   getUserProfileAudios: UnknownPayload;
   getUserProfilePhotos: UnknownPayload;
   getWebhookInfo: StrictTelegramApiMethodPayloads['getWebhookInfo'];
@@ -123,10 +129,12 @@ export type TelegramApiMethodPayloads = {
   removeUserVerification: UnknownPayload;
   reopenForumTopic: UnknownPayload;
   reopenGeneralForumTopic: UnknownPayload;
+  replaceManagedBotToken: UnknownPayload;
   replaceStickerInSet: UnknownPayload;
   restrictChatMember: UnknownPayload;
   revokeChatInviteLink: UnknownPayload;
   savePreparedInlineMessage: UnknownPayload;
+  savePreparedKeyboardButton: UnknownPayload;
   sendAnimation: UnknownPayload;
   sendAudio: UnknownPayload;
   sendChatAction: UnknownPayload;
@@ -137,6 +145,7 @@ export type TelegramApiMethodPayloads = {
   sendGame: UnknownPayload;
   sendGift: UnknownPayload;
   sendInvoice: StrictTelegramApiMethodPayloads['sendInvoice'];
+  sendLivePhoto: UnknownPayload;
   sendLocation: UnknownPayload;
   sendMediaGroup: StrictTelegramApiMethodPayloads['sendMediaGroup'];
   sendMessage: StrictTelegramApiMethodPayloads['sendMessage'];
@@ -156,6 +165,7 @@ export type TelegramApiMethodPayloads = {
   setBusinessAccountUsername: UnknownPayload;
   setChatAdministratorCustomTitle: UnknownPayload;
   setChatDescription: UnknownPayload;
+  setChatMemberTag: UnknownPayload;
   setChatMenuButton: UnknownPayload;
   setChatPermissions: UnknownPayload;
   setChatPhoto: UnknownPayload;
@@ -163,6 +173,7 @@ export type TelegramApiMethodPayloads = {
   setChatTitle: UnknownPayload;
   setCustomEmojiStickerSetThumbnail: UnknownPayload;
   setGameScore: StrictTelegramApiMethodPayloads['setGameScore'];
+  setManagedBotAccessSettings: UnknownPayload;
   setMessageReaction: StrictTelegramApiMethodPayloads['setMessageReaction'];
   setMyCommands: UnknownPayload;
   setMyDefaultAdministratorRights: UnknownPayload;

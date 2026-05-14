@@ -1,8 +1,8 @@
-# Telegram Bot API Compatibility (Target: 9.4+)
+# Telegram Bot API Compatibility (Target: 10.0+)
 
 ## Compatibility Target
 
-- Target baseline: **Telegram Bot API 9.4+**
+- Target baseline: **Telegram Bot API 10.0+**
 - Local type source: `src/types/telegram.ts`
 - Baseline file: `docs/telegram-api-baseline.json`
 
@@ -31,6 +31,7 @@ Compatibility is release-gated by type checks, contract tests, schema checks, an
   - `removed_chat_boost`
   - `chat_boost`
   - `purchased_paid_media`
+  - `guest_message`
   - `poll_answer.voter_chat`
 
 ## Limited

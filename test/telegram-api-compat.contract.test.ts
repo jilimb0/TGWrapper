@@ -38,6 +38,14 @@ describe('Telegram API compatibility contract', () => {
       purchased_paid_media: {
         from: { id: 42, is_bot: false, first_name: 'Alice' },
         paid_media_payload: 'media-token-v2'
+      },
+      guest_message: {
+        message_id: 2,
+        date: Math.floor(Date.now() / 1000),
+        chat: { id: 42, type: 'private' },
+        from: { id: 42, is_bot: false, first_name: 'Alice' },
+        guest_query_id: 'gq_2',
+        guest_bot_caller_user: { id: 100, is_bot: true, first_name: 'caller' }
       }
     } as unknown;
 
@@ -114,5 +122,21 @@ describe('Telegram API compatibility contract', () => {
     await client.callApi(method, { user_id: 1, custom_description: 'compat-check' });
 
     expect(calls).toContain('verifyUser');
+  });
+
+  it('supports calling guest-query response method', async () => {
+    const calls: string[] = [];
+    const client = new ApiClient({
+      token: 'TEST_TOKEN',
+      mockResponder: async (method) => {
+        calls.push(method);
+        return { ok: true };
+      }
+    });
+
+    const method: keyof ApiMethods = 'answerGuestQuery';
+    await client.callApi(method, { guest_query_id: 'gq_2', text: 'ack' });
+
+    expect(calls).toContain('answerGuestQuery');
   });
 });

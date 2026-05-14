@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper-observability
 
+## 0.5.5
+
+### Patch Changes
+
+- 497805e: Update to 10.0 Telegram Bot API
+
 ## 0.5.4
 
 ### Patch Changes

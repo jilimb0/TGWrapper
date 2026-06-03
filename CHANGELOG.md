@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper
 
+## 0.13.1
+
+### Patch Changes
+
+- c10bde0: Improvements after audit
+
 ## 0.13.0
 
 ### Minor Changes

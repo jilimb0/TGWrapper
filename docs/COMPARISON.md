@@ -1,35 +1,30 @@
 # TGWrapper Comparison Matrix & Positioning
 
-TGWrapper is built for teams running production-grade, distributed, or serverless Telegram bots in TypeScript where observability, uptime, and strict API compatibility matter.
+TGWrapper is built for teams designing serverless, edge-native, or distributed Telegram bots in TypeScript where structured logging, request trace correlation, and type validation are priority requirements.
 
 ---
 
-## 📊 Comparison Table
+## 📊 Comparison Matrix
 
 | Feature / Metric | **TGWrapper** | **grammY** | **Telegraf** |
 | :--- | :--- | :--- | :--- |
-| **Primary Niche** | AI-Native, Distributed, & Serverless Production Bots | General ergonomics, large plugin ecosystem | Legacy codebase maintenance, legacy setups |
-| **Serverless Cold Starts** | **Extremely Low** (Fetch-first, zero dependency runtime) | Moderate (Requires adapter shims) | High (Heavy HTTP/CJS abstractions) |
-| **API Drift Guardrail** | **Strict CI Baseline Checks** (Schema-drift gates) | None (Manual type updates on release) | None (Manual updates) |
-| **First-Party Redis Storage** | **Native versioned sessions (CAS) & Rate limiter** | External community plugins | External plugins |
-| **Trace Correlation** | **Built-in AsyncLocalStorage tracing spans** | Manual middleware logging | Manual tracking |
-| **Multi-instance locking** | **Compare-And-Swap (CAS)** (No state overwriting) | None (Last write wins) | None (Last write wins) |
+| **Primary Focus** | Distributed scaling, serverless layouts, and telemetry | General developer ergonomics & extensive plugins | General-purpose setups, legacy JS/TS codebases |
+| **Serverless Cold Starts** | **Low** (Built on native fetch APIs) | Moderate (Requires adapter translation shims) | Moderate (Includes standard Node.js server dependencies) |
+| **API Type Updates** | Checked against Telegram schemas | Handled manually on major releases | Handled manually |
+| **Redis Session Protection** | **Compare-And-Swap (CAS)** (Prevents state overwrite) | Default key overrides (Last write wins) | Default key overrides (Last write wins) |
+| **Trace Propagation** | **Built-in AsyncLocalStorage contexts** | Requires manual middleware setup | Requires manual middleware setup |
 
 ---
 
-## 🎯 Architectural Wedges (Why Switch?)
+## 🎯 Key Architectural Differences
 
-### 1. No More Stale State Overwrites (Compare-and-Swap Sessions)
-- **Traditional Frameworks:** When two Telegram updates arrive simultaneously for the same user, standard Redis session plugins retrieve, update, and write back the session. The second write completely overwrites the changes of the first write (lost update problem).
-- **TGWrapper Solution:** The `@jilimb0/tgwrapper-adapter-redis` package enforces **optimistic concurrency control** via version matching (`compareAndSet`). If a write conflict is detected, the transaction fails safely rather than silently corrupting user session data.
+### 1. Concurrency Safety in User Sessions
+* **Standard Plugins:** When concurrent Telegram updates arrive for the same user, standard Redis session managers read, modify, and write the session key sequentially. Under high button-press rates (e.g. FSM flows), the latter write overwrites previous state updates (stale write condition).
+* **TGWrapper Solution:** The `@jilimb0/tgwrapper-adapter-redis` module offers **optimistic concurrency control** using version matching (`compareAndSet`). If a write conflict is encountered, developers can catch the event and retry rather than silently losing user inputs.
 
-### 2. Built-in Observability
-- **Traditional Frameworks:** Logging and metrics require custom middleware loops wrapping request blocks.
-- **TGWrapper Solution:** Deep integration with AsyncLocalStorage ties all logs, database calls, rate limiter checks, and AI completions to a single request correlation ID (`traceparent` format). Out-of-the-box Prometheus exports make monitoring trivial.
-
-### 3. Serverless Edge Compatibility
-- **Traditional Frameworks:** Heavily bound to standard Node.js server paradigms (like `http.IncomingMessage`). Running on AWS Lambda or Cloudflare Workers requires complex adapter translation blocks.
-- **TGWrapper Solution:** Designed fetch-first. Can ingest native requests and execute inside isolate sandboxes with negligible memory overhead.
+### 2. Built-in Telemetry Contexts
+* **Standard Frameworks:** Logging request paths or metrics requires custom wrapper middleware.
+* **TGWrapper Solution:** Tracing utilities correlate operations (rate limits, database checks, API requests) to a standard correlation context (`traceparent` formatting), making production monitoring simpler.
 
 ---
 
@@ -37,4 +32,4 @@ TGWrapper is built for teams running production-grade, distributed, or serverles
 
 - [Migration from grammY](./MIGRATION_FROM_GRMMY.md)
 - [Migration from Telegraf](./MIGRATION_FROM_TELEGRAF.md)
-- [Migration from node-telegram-bot-api](./MIGRATION_FROM_NODE_TELEGRAM_BOT_API.md)
+- [Migration from Node Telegram Bot API](./MIGRATION_FROM_NODE_TELEGRAM_BOT_API.md)

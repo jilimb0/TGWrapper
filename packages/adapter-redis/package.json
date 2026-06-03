@@ -1,10 +1,29 @@
 {
   "name": "@jilimb0/tgwrapper-adapter-redis",
   "version": "0.4.4",
+  "description": "Redis storage adapter for TGWrapper providing distributed sessions, caching namespaces, and rate limiters",
   "repository": {
     "type": "git",
     "url": "https://github.com/jilimb0/TGWrapper"
   },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/packages/adapter-redis#readme",
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/jilimb0"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "redis",
+    "ratelimit",
+    "session",
+    "fsm",
+    "tgwrapper"
+  ],
   "type": "module",
   "main": "./dist-cjs/index.js",
   "types": "./dist/index.d.ts",
@@ -33,7 +52,8 @@
   "files": [
     "dist/**/*.js",
     "dist/**/*.d.ts",
-    "dist-cjs/**/*.js"
+    "dist-cjs/**/*.js",
+    "README.md"
   ],
   "publishConfig": {
     "access": "public"

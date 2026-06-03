@@ -7,6 +7,14 @@
     "url": "https://github.com/jilimb0/TGWrapper"
   },
   "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper#readme",
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/jilimb0"
+  },
   "type": "module",
   "main": "./dist-cjs/index.js",
   "types": "./dist/index.d.ts",

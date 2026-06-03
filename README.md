@@ -1,18 +1,45 @@
 # TGWrapper
 
-Production-grade Telegram bot framework focused on reliability, typed API contracts, and serverless/runtime portability.
+> Production-grade, serverless-first Telegram bot framework for TypeScript focused on resilience, type safety, and deep observability.
 
-## Quick Start (5 minutes)
+[![npm version](https://img.shields.io/npm/v/@jilimb0/tgwrapper.svg)](https://www.npmjs.com/package/@jilimb0/tgwrapper)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-Install:
+TGWrapper is engineered for teams shipping serious Telegram applications where uptime, multi-runtime compatibility, and execution tracing matter more than basic scripts.
 
-```bash
-pnpm add @jilimb0/tgwrapper
-```
+---
 
-Create `src/bot.ts`:
+## 📦 Packages
 
-```ts
+The TGWrapper ecosystem is modular and built to scale from local development to distributed clouds:
+
+| Package | Purpose | Stability |
+| :--- | :--- | :--- |
+| [**`@jilimb0/tgwrapper`**](./README.md) (Core) | Core client, router, FSM, and transport engine. | `Stable` |
+| [**`@jilimb0/tgwrapper-adapter-redis`**](./packages/adapter-redis/README.md) | Distributed sessions, namespaces, and rate limiters. | `Stable` |
+| [**`@jilimb0/tgwrapper-observability`**](./packages/observability/README.md) | Telemetry, async request tracing, metrics, and structured logs. | `Stable` |
+
+---
+
+## 🚀 The Golden Path Onboarding (10-15 Minutes)
+
+Deploying a production-ready Telegram bot follows a single, non-branching workflow:
+
+1. **Install Core & Initialize:** Install the core package.
+2. **Develop with Polling:** Create your bot using polling mode for rapid local iteration.
+3. **Add State & Caching (Redis):** Plug in the Redis adapter for multi-instance persistence.
+4. **Attach Telemetry:** Plug in observability to trace errors and metrics.
+5. **Switch to Webhook & Deploy:** Toggle mode to `webhook` and export to serverless runtimes.
+
+---
+
+## ⚡ Quick Starts
+
+Choose the canonical template that fits your project architecture:
+
+### 1. Polling Bot (Best for Local Dev / Simple Bots)
+
+```typescript
 import { createBotClient } from '@jilimb0/tgwrapper';
 
 const bot = createBotClient({
@@ -21,33 +48,31 @@ const bot = createBotClient({
   polling: { timeoutSeconds: 30, limit: 100 }
 });
 
+// Message listener
 bot.on('message', async (message) => {
   if (!('text' in message) || typeof message.text !== 'string') return;
 
   if (message.text === '/start') {
-    await bot.sendMessage(message.chat.id, 'TGWrapper bot is ready.');
+    await bot.sendMessage(message.chat.id, 'Welcome to TGWrapper!');
     return;
   }
 
   await bot.sendMessage(message.chat.id, `Echo: ${message.text}`);
 });
 
-bot.on('error', (error) => {
-  console.error('Bot runtime error', error);
-});
+bot.on('error', (err) => console.error('Bot Error:', err));
 
+// Start Polling Loop
 await bot.start();
 ```
 
-Run:
+---
 
-```bash
-BOT_TOKEN="<your_bot_token>" node --import tsx src/bot.ts
-```
+### 2. Webhook Bot (Best for Serverless & Production)
 
-## Webhook Example
+Run on AWS Lambda, Cloudflare Workers, or standard Node HTTP servers.
 
-```ts
+```typescript
 import { createBotClient } from '@jilimb0/tgwrapper';
 
 const bot = createBotClient({
@@ -57,14 +82,58 @@ const bot = createBotClient({
 
 await bot.start();
 
+// Standard serverless entrypoint
 export async function handleWebhook(update: unknown): Promise<void> {
-  bot.ingest(update);
+  await bot.ingest(update);
 }
 ```
 
-## Production Rate Limiter (Redis)
+*For platform-specific deployment templates, see:*
+- Node HTTP Server: [`examples/node-http`](./examples/node-http)
+- AWS Lambda Handler: [`examples/aws-lambda`](./examples/aws-lambda)
+- Cloudflare Workers: [`examples/cloudflare-worker`](./examples/cloudflare-worker)
 
-```ts
+---
+
+### 3. AI Bot (Best for LLM & Conversational Assistants)
+
+Use the built-in FSM state handling and observability to trace model interactions.
+
+```typescript
+import { createBotClient } from '@jilimb0/tgwrapper';
+
+const bot = createBotClient({
+  token: process.env.BOT_TOKEN!,
+  mode: 'polling'
+});
+
+bot.on('message', async (message) => {
+  if (!('text' in message) || typeof message.text !== 'string') return;
+
+  // Simulate LLM Call with Context tracing
+  const reply = await mockLLMCall(message.text);
+  await bot.sendMessage(message.chat.id, reply);
+});
+
+async function mockLLMCall(prompt: string): Promise<string> {
+  return `AI Assistant received: "${prompt}"`;
+}
+
+await bot.start();
+```
+
+*For a full conversational AI flow with token tracking and OpenTelemetry spans, see the [`examples/ai-bot-starter`](./examples/ai-bot-starter).*
+
+---
+
+## 🛡️ Production Rate Limiting
+
+> [!WARNING]
+> The default `TokenBucketRateLimiter` included in the core package operates **in-memory**. It is designed solely for local development and single-instance applications.
+>
+> In multi-instance, scaled, or serverless deployments (where multiple handler instances spin up), **you must use the distributed rate limiter** via the Redis adapter:
+
+```typescript
 import { RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
 
 const kv = new RedisKvStore({
@@ -73,97 +142,54 @@ const kv = new RedisKvStore({
 });
 
 const limiter = createRateLimiter(kv, {
-  namespace: 'spam',
+  namespace: 'spam-protection',
   windowMs: 60_000,
   limit: 20,
-  blockDurationMs: 30_000
+  blockDurationMs: 30_000 // Block for 30s if exceeded
 });
 
-const state = await limiter.check('user:123');
+const state = await limiter.check('user:12345');
 if (!state.allowed) {
-  console.log('Rate limited. Retry after:', state.retryAfter);
+  console.log(`Rate limited! Retry in ${state.retryAfter} seconds.`);
 }
 ```
 
-## Packages
+---
 
-- `@jilimb0/tgwrapper` - core runtime, typed BotClient facade, router, FSM, transports, adapters
-- `@jilimb0/tgwrapper-adapter-redis` - Redis sessions, cache namespaces, and distributed rate limiter
-- `@jilimb0/tgwrapper-observability` - logging, metrics, runtime binding, and snapshot helpers
+## 📊 Compatibility & Stability Matrix
 
-## Telegram API Baseline
+| Environment Element | Supported Versions / Targets | Notes |
+| :--- | :--- | :--- |
+| **Node.js Runtime** | `>= 18.0.0` | Relies on standard fetch and AsyncLocalStorage. |
+| **Telegram Bot API** | `9.4` | Enforced by type-drift checking validation. |
+| **Redis Server** | `>= 6.2.0` | Required for Redis Adapter (eval scripts support). |
+| **Edge Runtimes** | Cloudflare Workers, AWS Lambda | Fully compatible due to fetch-first transport. |
 
-- Target compatibility baseline: **Telegram Bot API 9.4**
-- Baseline file: `docs/telegram-api-baseline.json`
-- Compatibility contract: `docs/TELEGRAM_API_COMPATIBILITY.md`
+---
 
-## Rate Limiting Note
+## 🔒 Trust Layer & Release Quality Gates
 
-- `TokenBucketRateLimiter` from core is in-memory and intended for single-instance/dev usage.
-- For production multi-instance/serverless deployments, use distributed limiter from `@jilimb0/tgwrapper-adapter-redis` (`createRateLimiter(...)`).
+We enforce high production standards through the following CI gates on every commit:
+- **Type-drift baseline check:** Automated comparison against the upstream Telegram API schema.
+- **Size budgeting:** Enforcing bundle-size constraints to ensure lightweight serverless cold starts.
+- **Changesets Integration:** All package versions are tracked via GitHub actions to guarantee provenance.
 
-## Quick Project Validation
-
+Run validations locally:
 ```bash
 pnpm install
-pnpm test
 pnpm build
+pnpm test
 pnpm verify:release
 ```
 
-For release-grade validation:
+---
 
-```bash
-pnpm verify:1.0
-```
+## 📑 Core Documentation Index
 
-## Build a Bot
-
-Start here:
-
-- Full step-by-step guide: `docs/BOT_DEVELOPMENT_GUIDE.md`
-- Template bot: `examples/template-bot`
-- Canonical starters:
-  - `examples/polling-starter`
-  - `examples/serverless-webhook-starter`
-  - `examples/ai-bot-starter`
-
-## Examples
-
-- Polling starter: `examples/polling-bot.ts`
-- Node HTTP webhook: `examples/node-http`
-- AWS Lambda webhook: `examples/aws-lambda`
-- Cloudflare Worker webhook: `examples/cloudflare-worker`
-- Full template (polling + webhook): `examples/template-bot`
-
-## Documentation
-
-- Documentation index: `docs/DOCUMENTATION.md`
-- Why TGWrapper: `docs/WHY_TGWRAPPER.md`
-- Framework comparison: `docs/COMPARISON.md`
-- Migration from grammY: `docs/MIGRATION_FROM_GRMMY.md`
-- 1.0 release definition of done: `docs/DEFINITION_OF_DONE_1.0.0.md`
-- 1.0 release plan: `docs/RELEASE_1.0.0_PLAN.md`
-- Production checklist: `docs/PRODUCTION_CHECKLIST.md`
-- Release policy: `docs/RELEASE_POLICY.md`
-- Operations runbook: `docs/OPERATIONS_RUNBOOK.md`
-- Observability contract: `docs/OBSERVABILITY_CONTRACT.md`
-- Production stack recipe: `docs/PRODUCTION_STACK_RECIPE.md`
-- 0.11.0 execution plan: `docs/EXECUTION_PLAN_0_11_0.md`
-
-## Open Source
-
-- License: `Apache-2.0` ([LICENSE](./LICENSE))
-- Contributing guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
-- Security policy: [SECURITY.md](./SECURITY.md)
-- Code of conduct: [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)
-
-## Release Policy
-
-Releases are CI-gated via Changesets and GitHub Actions.
-Manual local publish is not the supported path.
-
-Use:
-
-- `docs/RELEASE_POLICY.md`
-- `docs/RELEASE_CHECKLIST_1.0.0.md`
+- [Why TGWrapper?](./docs/WHY_TGWRAPPER.md) - Deep dive on value proposition.
+- [Comparison Matrix](./docs/COMPARISON.md) - TGWrapper vs. grammY vs. Telegraf.
+- [Development Guide](./docs/BOT_DEVELOPMENT_GUIDE.md) - Bot architecture, middleware, routing.
+- [Production Checklist](./docs/PRODUCTION_CHECKLIST.md) - Ensure reliability before launching.
+- [Observability Guide](./docs/OBSERVABILITY_CONTRACT.md) - Monitoring best practices.
+- [Migration Guide from grammY](./docs/MIGRATION_FROM_GRMMY.md) - Smooth codebase porting.
+- [Migration Guide from Telegraf](./docs/MIGRATION_FROM_TELEGRAF.md) - Switch guidelines.

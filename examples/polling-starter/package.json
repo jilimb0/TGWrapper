@@ -3,12 +3,14 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node --import tsx bot.ts"
+    "start": "node --import tsx bot.ts",
+    "test": "tsc --noEmit"
   },
   "dependencies": {
-    "@jilimb0/tgwrapper": "workspace:*"
+    "@jilimb0/tgwrapper": "^0.13.1"
   },
   "devDependencies": {
-    "tsx": "^4.20.6"
+    "tsx": "^4.20.6",
+    "typescript": "6.0.3"
   }
 }

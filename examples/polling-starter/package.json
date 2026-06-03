@@ -7,7 +7,7 @@
     "test": "tsc --noEmit"
   },
   "dependencies": {
-    "@jilimb0/tgwrapper": "workspace:*"
+    "@jilimb0/tgwrapper": "^0.13.1"
   },
   "devDependencies": {
     "tsx": "^4.20.6",

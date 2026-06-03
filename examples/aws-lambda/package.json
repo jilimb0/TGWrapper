@@ -7,7 +7,7 @@
     "remove": "serverless remove"
   },
   "dependencies": {
-    "@jilimb0/tgwrapper": "^0.7.0"
+    "@jilimb0/tgwrapper": "^0.13.1"
   },
   "devDependencies": {
     "serverless": "^4.6.2",

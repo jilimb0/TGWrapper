@@ -30,18 +30,21 @@ importers:
   examples/ai-bot-starter:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: workspace:*
-        version: link:../..
+        specifier: ^0.13.1
+        version: 0.13.1
     devDependencies:
       tsx:
         specifier: ^4.20.6
         version: 4.22.4
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
   examples/aws-lambda:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^0.13.1
+        version: 0.13.1
     devDependencies:
       serverless:
         specifier: ^4.6.2
@@ -53,8 +56,8 @@ importers:
   examples/cloudflare-worker:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^0.13.1
+        version: 0.13.1
     devDependencies:
       wrangler:
         specifier: ^4.2.0
@@ -63,14 +66,14 @@ importers:
   examples/multi-instance-redis-starter:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: workspace:*
-        version: link:../..
+        specifier: ^0.13.1
+        version: 0.13.1
       '@jilimb0/tgwrapper-adapter-redis':
-        specifier: workspace:*
-        version: link:../../packages/adapter-redis
+        specifier: ^0.5.1
+        version: 0.5.1
       '@jilimb0/tgwrapper-observability':
-        specifier: workspace:*
-        version: link:../../packages/observability
+        specifier: ^0.6.1
+        version: 0.6.1
       ioredis:
         specifier: ^5.6.1
         version: 5.11.0
@@ -85,8 +88,8 @@ importers:
   examples/node-http:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^0.13.1
+        version: 0.13.1
     devDependencies:
       tsx:
         specifier: ^4.19.2
@@ -95,28 +98,34 @@ importers:
   examples/polling-starter:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: workspace:*
-        version: link:../..
+        specifier: ^0.13.1
+        version: 0.13.1
     devDependencies:
       tsx:
         specifier: ^4.20.6
         version: 4.22.4
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
   examples/serverless-webhook-starter:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: workspace:*
-        version: link:../..
+        specifier: ^0.13.1
+        version: 0.13.1
     devDependencies:
       tsx:
         specifier: ^4.20.6
         version: 4.22.4
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
   examples/template-bot:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^0.13.1
+        version: 0.13.1
     devDependencies:
       tsx:
         specifier: ^4.19.2
@@ -753,8 +762,14 @@ packages:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
 
-  '@jilimb0/tgwrapper@0.7.0':
-    resolution: {integrity: sha512-VSWVrwIg2jpkglsc8F7KLa+3uF33eeHrXK4WuGEI4NH7ngYMmUKSm75JxzX5iC+W1ydrVQxid5LHg3w1CuSP/g==}
+  '@jilimb0/tgwrapper-adapter-redis@0.5.1':
+    resolution: {integrity: sha512-i0nAa2IDD1iOODgMYaPZNQVAQ2SYGGniLKnFfSIudr7qeNkygrplflCH7XBJZt6Sr4C/mrlcSK7UmO5+jytFHA==}
+
+  '@jilimb0/tgwrapper-observability@0.6.1':
+    resolution: {integrity: sha512-knUT1B/ZaYRnxV5P4F3qkhUBUPK8UAuVYW32tgZCoA7RNyjjyC5VKIeDEC75jcVoeRvxDS7LhtqBU/GKSqk63Q==}
+
+  '@jilimb0/tgwrapper@0.13.1':
+    resolution: {integrity: sha512-mikINI+lm8n05FaLKcFJruIS54PHYQbXflGGyqVI2silSD899E8dCRuAKJqrmlQ8otqxOTDtM5zOxwUzK52Lew==}
     engines: {node: '>=18'}
 
   '@jridgewell/resolve-uri@3.1.2':
@@ -2841,7 +2856,15 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@jilimb0/tgwrapper@0.7.0': {}
+  '@jilimb0/tgwrapper-adapter-redis@0.5.1':
+    dependencies:
+      ioredis: 5.11.0
+    transitivePeerDependencies:
+      - supports-color
+
+  '@jilimb0/tgwrapper-observability@0.6.1': {}
+
+  '@jilimb0/tgwrapper@0.13.1': {}
 
   '@jridgewell/resolve-uri@3.1.2': {}
 

@@ -128,11 +128,11 @@ jobs:
             echo "Artifacts: package metadata, npm visibility, pack manifests, OIDC claims."
           } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7.0.1
-        if: always() && hashFiles('.artifacts/**') != ''
+        if: always()
         with:
           name: release-diagnostics
           path: .artifacts
-          if-no-files-found: error
+          if-no-files-found: ignore
       - uses: changesets/action@v1
         with:
           publish: pnpm -r publish --access public --no-git-checks

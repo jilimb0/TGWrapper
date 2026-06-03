@@ -4,6 +4,7 @@ on:
   workflow_dispatch:
   push:
     tags:
+      - "v*"
 
 permissions:
   contents: read
@@ -35,6 +36,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .artifacts
+          rm -f .artifacts/failure-summary.md .artifacts/error.log || true
           if ! (
             if [ "${NPM_PUBLISH_PROVENANCE}" = "true" ]; then
               echo "Unsupported publish mode for private repository: provenance=true."
@@ -86,6 +88,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .artifacts
+          rm -f .artifacts/failure-summary.md .artifacts/error.log || true
           if ! (
             for run in 1 2 3; do
               echo "Go/No-Go reliability repetition #${run}: load"
@@ -123,7 +126,7 @@ jobs:
       - uses: actions/download-artifact@v6
         if: always()
         with:
-          path: .artifacts
+          path: .artifacts-upload
           pattern: go-no-go-*
           merge-multiple: true
       - name: Publish decision
@@ -152,11 +155,11 @@ jobs:
             echo ""
           } >> "${GITHUB_STEP_SUMMARY}"
 
-          if find .artifacts -name 'failure-summary.md' -print -quit >/dev/null 2>&1; then
+          if find .artifacts-upload -name 'failure-summary.md' -print -quit >/dev/null 2>&1; then
             while IFS= read -r file; do
               cat "$file" >> "$GITHUB_STEP_SUMMARY"
               echo "" >> "$GITHUB_STEP_SUMMARY"
-            done < <(find .artifacts -name 'failure-summary.md' | sort)
+            done < <(find .artifacts-upload -name 'failure-summary.md' | sort)
           else
             echo "No failure digests were produced." >> "$GITHUB_STEP_SUMMARY"
           fi

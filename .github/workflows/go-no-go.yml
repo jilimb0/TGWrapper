@@ -33,10 +33,12 @@ jobs:
           npm -v
       - run: pnpm install --frozen-lockfile
       - name: Release gates
+        id: run_release_gates
+        continue-on-error: true
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          if ! (
+          (
             if [ "${NPM_PUBLISH_PROVENANCE}" = "true" ]; then
               echo "Unsupported publish mode for private repository: provenance=true."
               echo "Use NPM_PUBLISH_PROVENANCE=false or migrate to supported public provenance flow."
@@ -44,22 +46,28 @@ jobs:
             fi
             pnpm verify:release
             CHANGESETS_RELEASE="1" pnpm -r publish --dry-run --no-git-checks
-          ) > .artifacts/error.log 2>&1; then
-            {
-              echo "### release-gates"
-              echo ""
-              echo '```text'
-              tail -n 120 .artifacts/error.log
-              echo '```'
-            } > .artifacts/failure-summary.md
-            exit 1
-          fi
+          ) > .artifacts/error.log 2>&1
+      - name: Write failure digest
+        if: steps.run_release_gates.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          {
+            echo "### release-gates"
+            echo ""
+            echo '```text'
+            tail -n 120 .artifacts/error.log
+            echo '```'
+          } > .artifacts/failure-summary.md
       - uses: actions/upload-artifact@v7
-        if: always() && hashFiles('.artifacts/failure-summary.md') != ''
+        if: steps.run_release_gates.outcome == 'failure'
         with:
           name: go-no-go-release-gates
           path: .artifacts/failure-summary.md
           if-no-files-found: error
+      - name: Fail job if gate failed
+        if: steps.run_release_gates.outcome == 'failure'
+        run: exit 1
 
   reliability-gates:
     runs-on: ubuntu-latest
@@ -84,10 +92,12 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Reliability gates
+        id: run_reliability_gates
+        continue-on-error: true
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          if ! (
+          (
             for run in 1 2 3; do
               echo "Go/No-Go reliability repetition #${run}: load"
               pnpm test:load
@@ -95,24 +105,30 @@ jobs:
               pnpm test:chaos
             done
             pnpm test:integration
-          ) > .artifacts/error.log 2>&1; then
-            {
-              echo "### reliability-gates"
-              echo ""
-              echo '```text'
-              tail -n 120 .artifacts/error.log
-              echo '```'
-            } > .artifacts/failure-summary.md
-            exit 1
-          fi
+          ) > .artifacts/error.log 2>&1
         env:
           REDIS_URL: redis://127.0.0.1:6379
+      - name: Write failure digest
+        if: steps.run_reliability_gates.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          {
+            echo "### reliability-gates"
+            echo ""
+            echo '```text'
+            tail -n 120 .artifacts/error.log
+            echo '```'
+          } > .artifacts/failure-summary.md
       - uses: actions/upload-artifact@v7
-        if: always() && hashFiles('.artifacts/failure-summary.md') != ''
+        if: steps.run_reliability_gates.outcome == 'failure'
         with:
           name: go-no-go-reliability-gates
           path: .artifacts/failure-summary.md
           if-no-files-found: error
+      - name: Fail job if gate failed
+        if: steps.run_reliability_gates.outcome == 'failure'
+        run: exit 1
 
   go-no-go-summary:
     runs-on: ubuntu-latest
@@ -168,7 +184,7 @@ jobs:
             {
               echo "No failure digests were collected."
               echo ""
-              echo "Failed gates likely exited before publishing artifacts or no job-specific digest matched the download pattern."
+              echo "A gate failed before its digest was uploaded, or no digest artifact matched the download pattern."
               echo ""
             } >> "$GITHUB_STEP_SUMMARY"
           fi

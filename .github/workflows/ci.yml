@@ -31,25 +31,33 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Check changeset requirement
+        id: run_check
+        continue-on-error: true
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          if ! node scripts/check-changeset-required.mjs > .artifacts/error.log 2>&1; then
-            {
-              echo "### changeset-required"
-              echo ""
-              echo '```text'
-              tail -n 80 .artifacts/error.log
-              echo '```'
-            } > .artifacts/failure-summary.md
-            exit 1
-          fi
+          node scripts/check-changeset-required.mjs > .artifacts/error.log 2>&1
+      - name: Write failure digest
+        if: steps.run_check.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          {
+            echo "### changeset-required"
+            echo ""
+            echo '```text'
+            tail -n 80 .artifacts/error.log
+            echo '```'
+          } > .artifacts/failure-summary.md
       - uses: actions/upload-artifact@v7
-        if: always() && hashFiles('.artifacts/failure-summary.md') != ''
+        if: steps.run_check.outcome == 'failure'
         with:
           name: ci-changeset-required
           path: .artifacts/failure-summary.md
           if-no-files-found: error
+      - name: Fail job if gate failed
+        if: steps.run_check.outcome == 'failure'
+        run: exit 1
 
   verify:
     strategy:
@@ -68,30 +76,38 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Verify toolchain
+        id: run_verify
+        continue-on-error: true
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          if ! (
+          (
             pnpm typecheck:compat &&
             pnpm typecheck &&
             pnpm build &&
             pnpm test
-          ) > .artifacts/error.log 2>&1; then
-            {
-              echo "### verify (node ${{ matrix.node-version }})"
-              echo ""
-              echo '```text'
-              tail -n 120 .artifacts/error.log
-              echo '```'
-            } > .artifacts/failure-summary.md
-            exit 1
-          fi
+          ) > .artifacts/error.log 2>&1
+      - name: Write failure digest
+        if: steps.run_verify.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          {
+            echo "### verify (node ${{ matrix.node-version }})"
+            echo ""
+            echo '```text'
+            tail -n 120 .artifacts/error.log
+            echo '```'
+          } > .artifacts/failure-summary.md
       - uses: actions/upload-artifact@v7
-        if: always() && hashFiles('.artifacts/failure-summary.md') != ''
+        if: steps.run_verify.outcome == 'failure'
         with:
           name: ci-verify-node-${{ matrix.node-version }}
           path: .artifacts/failure-summary.md
           if-no-files-found: error
+      - name: Fail job if gate failed
+        if: steps.run_verify.outcome == 'failure'
+        run: exit 1
 
   release-integrity:
     runs-on: ubuntu-latest
@@ -106,10 +122,12 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Release integrity checks
+        id: run_release_integrity
+        continue-on-error: true
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          if ! (
+          (
             pnpm telegram:baseline:check &&
             pnpm telegram:schema:fetch:ci &&
             pnpm telegram:schema:completeness:check &&
@@ -117,22 +135,28 @@ jobs:
             pnpm api:snapshot:check &&
             pnpm pack:size &&
             pnpm -r build
-          ) > .artifacts/error.log 2>&1; then
-            {
-              echo "### release-integrity"
-              echo ""
-              echo '```text'
-              tail -n 120 .artifacts/error.log
-              echo '```'
-            } > .artifacts/failure-summary.md
-            exit 1
-          fi
+          ) > .artifacts/error.log 2>&1
+      - name: Write failure digest
+        if: steps.run_release_integrity.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          {
+            echo "### release-integrity"
+            echo ""
+            echo '```text'
+            tail -n 120 .artifacts/error.log
+            echo '```'
+          } > .artifacts/failure-summary.md
       - uses: actions/upload-artifact@v7
-        if: always() && hashFiles('.artifacts/failure-summary.md') != ''
+        if: steps.run_release_integrity.outcome == 'failure'
         with:
           name: ci-release-integrity
           path: .artifacts/failure-summary.md
           if-no-files-found: error
+      - name: Fail job if gate failed
+        if: steps.run_release_integrity.outcome == 'failure'
+        run: exit 1
 
   redis-integration:
     runs-on: ubuntu-latest
@@ -157,27 +181,35 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - name: Redis integration tests
+        id: run_redis_integration
+        continue-on-error: true
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          if ! pnpm --filter @jilimb0/tgwrapper-adapter-redis test:integration > .artifacts/error.log 2>&1; then
-            {
-              echo "### redis-integration"
-              echo ""
-              echo '```text'
-              tail -n 120 .artifacts/error.log
-              echo '```'
-            } > .artifacts/failure-summary.md
-            exit 1
-          fi
+          pnpm --filter @jilimb0/tgwrapper-adapter-redis test:integration > .artifacts/error.log 2>&1
         env:
           REDIS_URL: redis://127.0.0.1:6379
+      - name: Write failure digest
+        if: steps.run_redis_integration.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          {
+            echo "### redis-integration"
+            echo ""
+            echo '```text'
+            tail -n 120 .artifacts/error.log
+            echo '```'
+          } > .artifacts/failure-summary.md
       - uses: actions/upload-artifact@v7
-        if: always() && hashFiles('.artifacts/failure-summary.md') != ''
+        if: steps.run_redis_integration.outcome == 'failure'
         with:
           name: ci-redis-integration
           path: .artifacts/failure-summary.md
           if-no-files-found: error
+      - name: Fail job if gate failed
+        if: steps.run_redis_integration.outcome == 'failure'
+        run: exit 1
 
   summary:
     runs-on: ubuntu-latest
@@ -230,9 +262,9 @@ jobs:
 
           if [ "$FOUND" -eq 0 ]; then
             {
-              echo "No failure digests were collected." 
+              echo "No failure digests were collected."
               echo ""
-              echo "Failed jobs likely exited before publishing artifacts or no job-specific digest matched the download pattern."
+              echo "A gate failed before its digest was uploaded, or no digest artifact matched the download pattern."
               echo ""
             } >> "$GITHUB_STEP_SUMMARY"
           fi

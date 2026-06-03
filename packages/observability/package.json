@@ -1,6 +1,6 @@
 {
   "name": "@jilimb0/tgwrapper-observability",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "First-party telemetry, logging, metrics, and trace correlation for TGWrapper",
   "repository": {
     "type": "git",

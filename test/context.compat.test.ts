@@ -134,4 +134,26 @@ describe('Context compatibility fallbacks', () => {
     expect(calls.at(0)?.method).toBe('sendMessage');
     expect(calls.at(0)?.payload.chat_id).toBe(707);
   });
+
+  it('treats guest_message as primary message for fromId/chatId/reply', async () => {
+    const calls: Array<{ method: string; payload: Record<string, unknown> }> = [];
+    const update = {
+      update_id: 6,
+      guest_message: {
+        message_id: 700,
+        date: 1,
+        chat: { id: 909, type: 'private' },
+        from: { id: 111, is_bot: false, first_name: 'guest' },
+        guest_query_id: 'gq_6'
+      }
+    } as unknown as Update;
+
+    const ctx = makeContext(update, calls);
+    expect(ctx.fromId).toBe(111);
+    expect(ctx.chatId).toBe(909);
+
+    await ctx.reply('guest-reply');
+    expect(calls.at(0)?.method).toBe('sendMessage');
+    expect(calls.at(0)?.payload.chat_id).toBe(909);
+  });
 });

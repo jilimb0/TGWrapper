@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper-adapter-redis
 
+## 0.4.4
+
+### Patch Changes
+
+- 497805e: Update to 10.0 Telegram Bot API
+
 ## 0.4.3
 
 ### Patch Changes

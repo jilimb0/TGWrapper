@@ -141,7 +141,7 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7.0.1
-        if: always()
+        if: always() && hashFiles('baseline-watchdog.log') != ''
         with:
           name: telegram-api-watchdog-log
           path: baseline-watchdog.log

@@ -71,7 +71,7 @@ jobs:
             fi
           } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7.0.1
-        if: always()
+        if: always() && hashFiles('baseline-followup.log') != ''
         with:
           name: baseline-followup-log
           path: baseline-followup.log

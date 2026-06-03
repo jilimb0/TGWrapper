@@ -1,0 +1,11 @@
+{
+  "iss": "https://token.actions.githubusercontent.com",
+  "aud": "npm:registry.npmjs.org",
+  "sub": "repo:jilimb0/TGWrapper:ref:refs/heads/main",
+  "repository": "jilimb0/TGWrapper",
+  "repository_owner": "jilimb0",
+  "ref": "refs/heads/main",
+  "job_workflow_ref": "jilimb0/TGWrapper/.github/workflows/release.yml@refs/heads/main",
+  "workflow_ref": "jilimb0/TGWrapper/.github/workflows/release.yml@refs/heads/main",
+  "actor": "jilimb0"
+}

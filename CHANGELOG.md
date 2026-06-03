@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper
 
+## 0.14.0
+
+### Minor Changes
+
+- c97e4f5: Project upgrade
+
 ## 0.13.1
 
 ### Patch Changes

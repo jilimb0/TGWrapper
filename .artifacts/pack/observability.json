@@ -1,0 +1,56 @@
+[
+  {
+    "id": "@jilimb0/tgwrapper-observability@0.6.1",
+    "name": "@jilimb0/tgwrapper-observability",
+    "version": "0.6.1",
+    "size": 23491,
+    "unpackedSize": 108373,
+    "shasum": "232fb702e72288c68766832b031ce86baae0213c",
+    "integrity": "sha512-JLRC2Z3rMOa0ifUzwIzbzWc/KD0+IYWkhYZFxFBEplx2wx2Vi8y+ze5kmXpPMm2C5kdErvtv8V950cP+V4OiIA==",
+    "filename": "jilimb0-tgwrapper-observability-0.6.1.tgz",
+    "files": [
+      {
+        "path": "README.md",
+        "size": 2937,
+        "mode": 420
+      },
+      {
+        "path": "dist-cjs/index.js",
+        "size": 44886,
+        "mode": 420
+      },
+      {
+        "path": "dist-cjs/otel.js",
+        "size": 1157,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.d.ts",
+        "size": 13717,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js",
+        "size": 42439,
+        "mode": 420
+      },
+      {
+        "path": "dist/otel.d.ts",
+        "size": 668,
+        "mode": 420
+      },
+      {
+        "path": "dist/otel.js",
+        "size": 1070,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 1499,
+        "mode": 420
+      }
+    ],
+    "entryCount": 8,
+    "bundled": []
+  }
+]

@@ -1,0 +1,417 @@
+{
+  "_id": "@jilimb0/tgwrapper@0.13.1",
+  "_rev": "16-e02b90e01be31bc5db780a297d0deffc",
+  "name": "@jilimb0/tgwrapper",
+  "dist-tags": {
+    "latest": "0.13.1"
+  },
+  "versions": [
+    "0.4.0",
+    "0.5.0",
+    "0.5.1",
+    "0.5.2",
+    "0.6.0",
+    "0.7.0",
+    "0.8.0",
+    "0.9.0",
+    "0.10.0",
+    "0.10.1",
+    "0.10.2",
+    "0.10.3",
+    "0.11.0",
+    "0.12.0",
+    "0.13.0",
+    "0.13.1"
+  ],
+  "time": {
+    "created": "2026-02-14T06:24:13.651Z",
+    "modified": "2026-06-03T13:21:30.185Z",
+    "0.4.0": "2026-02-14T06:24:13.906Z",
+    "0.5.0": "2026-02-14T18:59:49.433Z",
+    "0.5.1": "2026-02-14T19:31:08.947Z",
+    "0.5.2": "2026-02-14T20:06:39.698Z",
+    "0.6.0": "2026-02-15T07:34:38.767Z",
+    "0.7.0": "2026-02-15T11:06:39.772Z",
+    "0.8.0": "2026-02-16T08:57:08.114Z",
+    "0.9.0": "2026-02-22T12:34:47.626Z",
+    "0.10.0": "2026-02-22T17:55:21.365Z",
+    "0.10.1": "2026-05-03T22:44:49.882Z",
+    "0.10.2": "2026-05-06T14:27:43.139Z",
+    "0.10.3": "2026-05-06T15:52:03.129Z",
+    "0.11.0": "2026-05-06T17:08:20.379Z",
+    "0.12.0": "2026-05-14T21:02:57.245Z",
+    "0.13.0": "2026-06-03T12:45:57.419Z",
+    "0.13.1": "2026-06-03T13:21:29.897Z"
+  },
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper#readme",
+  "keywords": [
+    "telegram",
+    "bot",
+    "framework",
+    "fsm",
+    "serverless"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jilimb0/TGWrapper.git"
+  },
+  "description": "Serverless-first Telegram bot framework without external bot libraries",
+  "maintainers": [
+    "jilimb0 <opanasenko.mo@gmail.com>"
+  ],
+  "readmeFilename": "README.md",
+  "version": "0.13.1",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/jilimb0"
+  },
+  "type": "module",
+  "main": "./dist-cjs/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js"
+    }
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.29.6",
+    "typedoc": "^0.28.19",
+    "typescript": "6.0.3",
+    "vite": "8.0.16",
+    "vitest": "^4.0.18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "pnpm build:esm && pnpm build:cjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck:compat": "tsc -p tsconfig.type-tests.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "pnpm --filter @jilimb0/tgwrapper-adapter-redis test:integration",
+    "test:load": "vitest run test/load/throughput.load.test.ts",
+    "test:chaos": "vitest run test/chaos/multi-tenant.chaos.test.ts",
+    "test:phase4": "pnpm test:load && pnpm test:chaos && pnpm test:integration",
+    "benchmark": "pnpm build && node benchmark/run-benchmark.mjs",
+    "benchmark:trend": "node scripts/check-benchmark-trend.mjs",
+    "pack:size": "node scripts/check-package-size-budget.mjs",
+    "telegram:baseline:check": "node scripts/check-telegram-api-baseline.mjs",
+    "telegram:baseline:latest": "node scripts/sync-telegram-api-baseline.mjs --check",
+    "telegram:baseline:sync": "node scripts/sync-telegram-api-baseline.mjs --write",
+    "telegram:baseline:followup:check": "node scripts/check-baseline-followup.mjs origin/main",
+    "telegram:types:stub": "node scripts/generate-telegram-type-stubs.mjs",
+    "telegram:schema:fetch": "node scripts/fetch-telegram-schema.mjs --out=docs/telegram-api-schema.latest.json",
+    "telegram:schema:fetch:ci": "node scripts/fetch-telegram-schema.mjs --out=docs/telegram-api-schema.latest.json --allow-network-failure",
+    "telegram:schema:fetch:local": "node scripts/fetch-telegram-schema.mjs --from-local --out=docs/telegram-api-schema.latest.json",
+    "telegram:schema:completeness:check": "node scripts/check-telegram-schema-completeness.mjs",
+    "telegram:schema:drift:report": "node scripts/diff-telegram-schema.mjs --latest=docs/telegram-api-schema.latest.json --snapshot=docs/telegram-api-schema.snapshot.json --report=docs/telegram-api-schema.drift-report.json",
+    "telegram:schema:drift:check": "node scripts/diff-telegram-schema.mjs --latest=docs/telegram-api-schema.latest.json --snapshot=docs/telegram-api-schema.snapshot.json --report=docs/telegram-api-schema.drift-report.json --check",
+    "telegram:schema:snapshot:update": "node scripts/promote-telegram-schema-snapshot.mjs",
+    "telegram:schema:types:generate": "node scripts/generate-telegram-schema-types.mjs",
+    "telegram:schema:types:check": "node scripts/check-telegram-schema-types-generated.mjs",
+    "telegram:schema:payloads:generate": "node scripts/generate-telegram-schema-payloads.mjs",
+    "telegram:schema:payloads:check": "node scripts/check-telegram-schema-payloads-generated.mjs",
+    "telegram:schema:results:generate": "node scripts/generate-telegram-schema-results.mjs",
+    "telegram:schema:results:check": "node scripts/check-telegram-schema-results-generated.mjs",
+    "telegram:schema:release:gate": "node scripts/check-telegram-schema-release-gate.mjs",
+    "docs": "typedoc src/index.ts --out docs/api",
+    "api:snapshot:check": "node scripts/check-api-snapshot.mjs",
+    "api:snapshot:update": "node scripts/update-api-snapshot.mjs",
+    "release:status": "changeset status",
+    "changeset:lint": "node scripts/lint-changesets.mjs",
+    "release:version": "changeset version",
+    "release:publish": "changeset publish",
+    "test:published-smoke": "node scripts/published-smoke.mjs",
+    "verify:release": "pnpm changeset:lint && pnpm telegram:baseline:check && pnpm telegram:schema:types:check && pnpm telegram:schema:payloads:check && pnpm telegram:schema:results:check && pnpm test && pnpm typecheck:compat && pnpm -r typecheck && pnpm build && pnpm -r build && pnpm api:snapshot:check && pnpm pack:size",
+    "benchmark:trend:release": "BENCHMARK_MIN_RATIO=0.55 BENCHMARK_MIN_UPS=180000 node scripts/check-benchmark-trend.mjs",
+    "check:1.0:readiness": "node scripts/check-1-0-readiness.mjs",
+    "verify:1.0": "pnpm verify:release && pnpm telegram:schema:completeness:check && pnpm telegram:schema:coverage:full:check && pnpm benchmark && pnpm benchmark:trend:release && pnpm check:1.0:readiness",
+    "telegram:schema:coverage:full:check": "node scripts/check-telegram-schema-full-coverage.mjs",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json"
+  },
+  "_integrity": "sha512-mikINI+lm8n05FaLKcFJruIS54PHYQbXflGGyqVI2silSD899E8dCRuAKJqrmlQ8otqxOTDtM5zOxwUzK52Lew==",
+  "_resolved": "/tmp/737575fa788b080747df138fb41ffd34/jilimb0-tgwrapper-0.13.1.tgz",
+  "_from": "file:jilimb0-tgwrapper-0.13.1.tgz",
+  "_nodeVersion": "20.20.2",
+  "_npmVersion": "11.8.0",
+  "dist": {
+    "integrity": "sha512-mikINI+lm8n05FaLKcFJruIS54PHYQbXflGGyqVI2silSD899E8dCRuAKJqrmlQ8otqxOTDtM5zOxwUzK52Lew==",
+    "shasum": "0c730a3f2de0f053f681d293b52c9bdbb1abb4ab",
+    "tarball": "https://registry.npmjs.org/@jilimb0/tgwrapper/-/tgwrapper-0.13.1.tgz",
+    "fileCount": 105,
+    "unpackedSize": 226088,
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@jilimb0%2ftgwrapper@0.13.1",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "signatures": [
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEQCIHqtMKUmhYXsV1bxyKWuEB3E8WeN4VFhAovxbsG/kOveAiB2SXAZzaUdVMAtLlqHDb7qYQFhz1rN5Bp53E+XjXVTWA=="
+      }
+    ]
+  },
+  "_npmUser": "GitHub Actions <npm-oidc-no-reply@github.com>",
+  "directories": {},
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages-npm-production",
+    "tmp": "tmp/tgwrapper_0.13.1_1780492889683_0.3328516212041974"
+  },
+  "_hasShrinkwrap": false
+}
+{
+  "_id": "@jilimb0/tgwrapper-adapter-redis@0.5.1",
+  "_rev": "10-b84dec7b93bef4738f1a8bec768f3db9",
+  "name": "@jilimb0/tgwrapper-adapter-redis",
+  "dist-tags": {
+    "latest": "0.5.1"
+  },
+  "versions": [
+    "0.2.0",
+    "0.2.1",
+    "0.3.0",
+    "0.4.0",
+    "0.4.1",
+    "0.4.2",
+    "0.4.3",
+    "0.4.4",
+    "0.5.0",
+    "0.5.1"
+  ],
+  "time": {
+    "created": "2026-02-14T06:24:16.286Z",
+    "modified": "2026-06-03T13:21:33.929Z",
+    "0.2.0": "2026-02-14T06:24:16.548Z",
+    "0.2.1": "2026-02-14T13:15:36.266Z",
+    "0.3.0": "2026-02-22T12:34:49.609Z",
+    "0.4.0": "2026-02-22T17:55:23.571Z",
+    "0.4.1": "2026-05-06T14:27:55.001Z",
+    "0.4.2": "2026-05-06T15:52:06.729Z",
+    "0.4.3": "2026-05-06T17:08:23.919Z",
+    "0.4.4": "2026-05-14T21:03:02.464Z",
+    "0.5.0": "2026-06-03T12:46:01.016Z",
+    "0.5.1": "2026-06-03T13:21:33.623Z"
+  },
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/packages/adapter-redis#readme",
+  "keywords": [
+    "telegram",
+    "bot",
+    "redis",
+    "ratelimit",
+    "session",
+    "fsm",
+    "tgwrapper"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jilimb0/TGWrapper.git"
+  },
+  "description": "Redis storage adapter for TGWrapper providing distributed sessions, caching namespaces, and rate limiters",
+  "maintainers": [
+    "jilimb0 <opanasenko.mo@gmail.com>"
+  ],
+  "readmeFilename": "README.md",
+  "version": "0.5.1",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/jilimb0"
+  },
+  "type": "module",
+  "main": "./dist-cjs/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js"
+    }
+  },
+  "dependencies": {
+    "ioredis": "^5.6.1"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "vitest": "^4.0.18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "pnpm build:esm && pnpm build:cjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:integration": "vitest run test/redis.integration.test.ts",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json"
+  },
+  "_integrity": "sha512-i0nAa2IDD1iOODgMYaPZNQVAQ2SYGGniLKnFfSIudr7qeNkygrplflCH7XBJZt6Sr4C/mrlcSK7UmO5+jytFHA==",
+  "_resolved": "/tmp/720a6dddcafba9fc553eadd05b2a3737/jilimb0-tgwrapper-adapter-redis-0.5.1.tgz",
+  "_from": "file:jilimb0-tgwrapper-adapter-redis-0.5.1.tgz",
+  "_nodeVersion": "20.20.2",
+  "_npmVersion": "11.8.0",
+  "dist": {
+    "integrity": "sha512-i0nAa2IDD1iOODgMYaPZNQVAQ2SYGGniLKnFfSIudr7qeNkygrplflCH7XBJZt6Sr4C/mrlcSK7UmO5+jytFHA==",
+    "shasum": "5e9618c1280226f21df8d69794cd2a51575bb087",
+    "tarball": "https://registry.npmjs.org/@jilimb0/tgwrapper-adapter-redis/-/tgwrapper-adapter-redis-0.5.1.tgz",
+    "fileCount": 6,
+    "unpackedSize": 50388,
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@jilimb0%2ftgwrapper-adapter-redis@0.5.1",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "signatures": [
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEYCIQC53WSqK8HPqCiscErXzfcak7tlofLgmf1QMifYdFTM0gIhANHFds2aKToFosCgPl+EH8RPuRakQXhiWJcN68XKtzaG"
+      }
+    ]
+  },
+  "_npmUser": "GitHub Actions <npm-oidc-no-reply@github.com>",
+  "directories": {},
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages-npm-production",
+    "tmp": "tmp/tgwrapper-adapter-redis_0.5.1_1780492893486_0.0822342549124837"
+  },
+  "_hasShrinkwrap": false
+}
+{
+  "_id": "@jilimb0/tgwrapper-observability@0.6.1",
+  "_rev": "13-4915249f858970042b7894a9af5c5b8e",
+  "name": "@jilimb0/tgwrapper-observability",
+  "dist-tags": {
+    "latest": "0.6.1"
+  },
+  "versions": [
+    "0.2.0",
+    "0.2.1",
+    "0.2.2",
+    "0.3.0",
+    "0.4.0",
+    "0.5.0",
+    "0.5.1",
+    "0.5.2",
+    "0.5.3",
+    "0.5.4",
+    "0.5.5",
+    "0.6.0",
+    "0.6.1"
+  ],
+  "time": {
+    "created": "2026-02-14T06:24:18.614Z",
+    "modified": "2026-06-03T13:21:37.627Z",
+    "0.2.0": "2026-02-14T06:24:18.857Z",
+    "0.2.1": "2026-02-14T13:15:38.264Z",
+    "0.2.2": "2026-02-14T18:59:52.232Z",
+    "0.3.0": "2026-02-22T12:34:51.523Z",
+    "0.4.0": "2026-02-22T17:55:25.523Z",
+    "0.5.0": "2026-02-22T18:39:16.192Z",
+    "0.5.1": "2026-02-22T21:49:23.343Z",
+    "0.5.2": "2026-05-06T14:27:58.293Z",
+    "0.5.3": "2026-05-06T15:52:10.375Z",
+    "0.5.4": "2026-05-06T17:08:27.140Z",
+    "0.5.5": "2026-05-14T21:03:06.401Z",
+    "0.6.0": "2026-06-03T12:46:05.021Z",
+    "0.6.1": "2026-06-03T13:21:37.353Z"
+  },
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/packages/observability#readme",
+  "keywords": [
+    "telegram",
+    "bot",
+    "observability",
+    "metrics",
+    "tracing",
+    "opentelemetry",
+    "prometheus",
+    "tgwrapper"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jilimb0/TGWrapper.git"
+  },
+  "description": "First-party telemetry, logging, metrics, and trace correlation for TGWrapper",
+  "maintainers": [
+    "jilimb0 <opanasenko.mo@gmail.com>"
+  ],
+  "readmeFilename": "README.md",
+  "version": "0.6.1",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/jilimb0"
+  },
+  "type": "module",
+  "main": "./dist-cjs/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js"
+    }
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "@types/node": "^25.6.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "pnpm build:esm && pnpm build:cjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json"
+  },
+  "_integrity": "sha512-knUT1B/ZaYRnxV5P4F3qkhUBUPK8UAuVYW32tgZCoA7RNyjjyC5VKIeDEC75jcVoeRvxDS7LhtqBU/GKSqk63Q==",
+  "_resolved": "/tmp/0f99bf9de5ade4ccbd4a7ca5e5e875eb/jilimb0-tgwrapper-observability-0.6.1.tgz",
+  "_from": "file:jilimb0-tgwrapper-observability-0.6.1.tgz",
+  "_nodeVersion": "20.20.2",
+  "_npmVersion": "11.8.0",
+  "dist": {
+    "integrity": "sha512-knUT1B/ZaYRnxV5P4F3qkhUBUPK8UAuVYW32tgZCoA7RNyjjyC5VKIeDEC75jcVoeRvxDS7LhtqBU/GKSqk63Q==",
+    "shasum": "ff2d406fad4d2a2739e6bf897fc0f204d2393f6e",
+    "tarball": "https://registry.npmjs.org/@jilimb0/tgwrapper-observability/-/tgwrapper-observability-0.6.1.tgz",
+    "fileCount": 9,
+    "unpackedSize": 119599,
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@jilimb0%2ftgwrapper-observability@0.6.1",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "signatures": [
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEUCIQDK7huS6QDD6QHTzJAcf8Wf87nP9DqB03D3tqCO4CpeJQIgXxU8JsYmJHBZ57V2nG8gF48cHTMBXIKBp5fDIjOviPA="
+      }
+    ]
+  },
+  "_npmUser": "GitHub Actions <npm-oidc-no-reply@github.com>",
+  "directories": {},
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages-npm-production",
+    "tmp": "tmp/tgwrapper-observability_0.6.1_1780492897202_0.786188196281804"
+  },
+  "_hasShrinkwrap": false
+}

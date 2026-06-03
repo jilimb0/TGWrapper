@@ -1,0 +1,41 @@
+[
+  {
+    "id": "@jilimb0/tgwrapper-adapter-redis@0.5.1",
+    "name": "@jilimb0/tgwrapper-adapter-redis",
+    "version": "0.5.1",
+    "size": 6048,
+    "unpackedSize": 39162,
+    "shasum": "b716c9a753dec0d8a3aa9a47be5b31c0e658527d",
+    "integrity": "sha512-OIw4fLS755tsu+aTvOAOwmfhjatu8vSm0PVYYw4XzqebGRnryNWPTe8lqkLzK9mkRshmiBXXUyzJSa7WYQ6J8w==",
+    "filename": "jilimb0-tgwrapper-adapter-redis-0.5.1.tgz",
+    "files": [
+      {
+        "path": "README.md",
+        "size": 2795,
+        "mode": 420
+      },
+      {
+        "path": "dist-cjs/index.js",
+        "size": 15133,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.d.ts",
+        "size": 4930,
+        "mode": 420
+      },
+      {
+        "path": "dist/index.js",
+        "size": 14697,
+        "mode": 420
+      },
+      {
+        "path": "package.json",
+        "size": 1607,
+        "mode": 420
+      }
+    ],
+    "entryCount": 5,
+    "bundled": []
+  }
+]

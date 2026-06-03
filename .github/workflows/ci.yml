@@ -45,7 +45,7 @@ jobs:
             exit 1
           fi
       - uses: actions/upload-artifact@v7
-        if: failure()
+        if: always() && hashFiles('.artifacts/failure-summary.md') != ''
         with:
           name: ci-changeset-required
           path: .artifacts/failure-summary.md
@@ -87,7 +87,7 @@ jobs:
             exit 1
           fi
       - uses: actions/upload-artifact@v7
-        if: failure()
+        if: always() && hashFiles('.artifacts/failure-summary.md') != ''
         with:
           name: ci-verify-node-${{ matrix.node-version }}
           path: .artifacts/failure-summary.md
@@ -128,7 +128,7 @@ jobs:
             exit 1
           fi
       - uses: actions/upload-artifact@v7
-        if: failure()
+        if: always() && hashFiles('.artifacts/failure-summary.md') != ''
         with:
           name: ci-release-integrity
           path: .artifacts/failure-summary.md
@@ -173,7 +173,7 @@ jobs:
         env:
           REDIS_URL: redis://127.0.0.1:6379
       - uses: actions/upload-artifact@v7
-        if: failure()
+        if: always() && hashFiles('.artifacts/failure-summary.md') != ''
         with:
           name: ci-redis-integration
           path: .artifacts/failure-summary.md

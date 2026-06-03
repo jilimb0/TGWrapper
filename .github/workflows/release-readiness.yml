@@ -75,7 +75,7 @@ jobs:
         env:
           CHANGESETS_RELEASE: "1"
       - uses: actions/upload-artifact@v7
-        if: failure()
+        if: always() && hashFiles('.artifacts/failure-summary.md') != ''
         with:
           name: release-readiness-verify
           path: .artifacts/failure-summary.md
@@ -129,7 +129,7 @@ jobs:
         env:
           REDIS_URL: redis://127.0.0.1:6379
       - uses: actions/upload-artifact@v7
-        if: failure()
+        if: always() && hashFiles('.artifacts/failure-summary.md') != ''
         with:
           name: release-readiness-reliability
           path: .artifacts/failure-summary.md

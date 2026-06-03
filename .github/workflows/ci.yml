@@ -34,7 +34,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          if ! node scripts/check-changeset-required.mjs 2>&1 | tee .artifacts/error.log; then
+          if ! node scripts/check-changeset-required.mjs > .artifacts/error.log 2>&1; then
             {
               echo "### changeset-required"
               echo ""
@@ -76,7 +76,7 @@ jobs:
             pnpm typecheck &&
             pnpm build &&
             pnpm test
-          ) 2>&1 | tee .artifacts/error.log; then
+          ) > .artifacts/error.log 2>&1; then
             {
               echo "### verify (node ${{ matrix.node-version }})"
               echo ""
@@ -117,7 +117,7 @@ jobs:
             pnpm api:snapshot:check &&
             pnpm pack:size &&
             pnpm -r build
-          ) 2>&1 | tee .artifacts/error.log; then
+          ) > .artifacts/error.log 2>&1; then
             {
               echo "### release-integrity"
               echo ""
@@ -160,7 +160,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          if ! pnpm --filter @jilimb0/tgwrapper-adapter-redis test:integration 2>&1 | tee .artifacts/error.log; then
+          if ! pnpm --filter @jilimb0/tgwrapper-adapter-redis test:integration > .artifacts/error.log 2>&1; then
             {
               echo "### redis-integration"
               echo ""
@@ -193,7 +193,7 @@ jobs:
         with:
           path: .artifacts
           pattern: ci-*
-          merge-multiple: false
+          merge-multiple: true
       - name: CI summary
         run: |
           set -euo pipefail

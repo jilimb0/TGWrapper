@@ -48,7 +48,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          if ! pnpm verify:release 2>&1 | tee .artifacts/error.log; then
+          if ! pnpm verify:release > .artifacts/error.log 2>&1; then
             {
               echo "### verify"
               echo ""
@@ -62,7 +62,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          if ! pnpm -r publish --dry-run --no-git-checks 2>&1 | tee -a .artifacts/error.log; then
+          if ! pnpm -r publish --dry-run --no-git-checks >> .artifacts/error.log 2>&1; then
             {
               echo "### verify"
               echo ""
@@ -116,7 +116,7 @@ jobs:
               pnpm test:chaos
             done
             pnpm test:integration
-          ) 2>&1 | tee .artifacts/error.log; then
+          ) > .artifacts/error.log 2>&1; then
             {
               echo "### reliability"
               echo ""
@@ -147,7 +147,7 @@ jobs:
         with:
           path: .artifacts
           pattern: release-readiness-*
-          merge-multiple: false
+          merge-multiple: true
       - name: Readiness summary
         run: |
           set -euo pipefail

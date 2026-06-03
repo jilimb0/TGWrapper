@@ -43,7 +43,7 @@ jobs:
             fi
             pnpm verify:release
             CHANGESETS_RELEASE="1" pnpm -r publish --dry-run --no-git-checks
-          ) 2>&1 | tee .artifacts/error.log; then
+          ) > .artifacts/error.log 2>&1; then
             {
               echo "### release-gates"
               echo ""
@@ -94,7 +94,7 @@ jobs:
               pnpm test:chaos
             done
             pnpm test:integration
-          ) 2>&1 | tee .artifacts/error.log; then
+          ) > .artifacts/error.log 2>&1; then
             {
               echo "### reliability-gates"
               echo ""
@@ -125,7 +125,7 @@ jobs:
         with:
           path: .artifacts
           pattern: go-no-go-*
-          merge-multiple: false
+          merge-multiple: true
       - name: Publish decision
         run: |
           set -euo pipefail

@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper-adapter-redis
 
+## 0.5.0
+
+### Minor Changes
+
+- 52edf00: Product ready improvements
+
 ## 0.4.4
 
 ### Patch Changes

@@ -48,7 +48,6 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          rm -f .artifacts/failure-summary.md .artifacts/error.log || true
           if ! pnpm verify:release > .artifacts/error.log 2>&1; then
             {
               echo "### verify"
@@ -56,52 +55,31 @@ jobs:
               echo '```text'
               tail -n 120 .artifacts/error.log
               echo '```'
-            } | tee .artifacts/failure-summary.md >> "$GITHUB_STEP_SUMMARY"
+            } > .artifacts/failure-summary.md
             exit 1
           fi
       - name: npm publish dry-run (no git checks)
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          rm -f .artifacts/failure-summary.md .artifacts/error.log || true
-          if ! pnpm -r publish --dry-run --no-git-checks >> .artifacts/error.log 2>&1; then
+          if ! pnpm -r publish --dry-run --no-git-checks > .artifacts/error.log 2>&1; then
             {
               echo "### verify"
               echo ""
               echo '```text'
               tail -n 120 .artifacts/error.log
               echo '```'
-            } | tee .artifacts/failure-summary.md >> "$GITHUB_STEP_SUMMARY"
+            } > .artifacts/failure-summary.md
             exit 1
           fi
         env:
           CHANGESETS_RELEASE: "1"
-      - name: Persist failure digest artifact
-        if: failure()
-        run: |
-          set -euo pipefail
-          mkdir -p .artifacts
-          if [ ! -f .artifacts/failure-summary.md ]; then
-            {
-              echo "### failure-digest-fallback"
-              echo ""
-              echo "The job failed before a dedicated failure summary was written."
-              echo ""
-              echo '```text'
-              if [ -f .artifacts/error.log ]; then
-                tail -n 120 .artifacts/error.log
-              else
-                echo "No .artifacts/error.log file was found."
-              fi
-              echo '```'
-            } | tee .artifacts/failure-summary.md >> "$GITHUB_STEP_SUMMARY"
-          fi
       - uses: actions/upload-artifact@v7
-        if: always()
+        if: failure()
         with:
           name: release-readiness-verify
-          path: .artifacts
-          if-no-files-found: ignore
+          path: .artifacts/failure-summary.md
+          if-no-files-found: error
 
   reliability:
     if: ${{ github.event_name == 'workflow_dispatch' && inputs.include_reliability == 'true' }}
@@ -130,7 +108,6 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          rm -f .artifacts/failure-summary.md .artifacts/error.log || true
           if ! (
             for run in 1 2 3; do
               echo "Release-readiness reliability repetition #${run}: load"
@@ -146,37 +123,17 @@ jobs:
               echo '```text'
               tail -n 120 .artifacts/error.log
               echo '```'
-            } | tee .artifacts/failure-summary.md >> "$GITHUB_STEP_SUMMARY"
+            } > .artifacts/failure-summary.md
             exit 1
           fi
         env:
           REDIS_URL: redis://127.0.0.1:6379
-      - name: Persist failure digest artifact
-        if: failure()
-        run: |
-          set -euo pipefail
-          mkdir -p .artifacts
-          if [ ! -f .artifacts/failure-summary.md ]; then
-            {
-              echo "### failure-digest-fallback"
-              echo ""
-              echo "The job failed before a dedicated failure summary was written."
-              echo ""
-              echo '```text'
-              if [ -f .artifacts/error.log ]; then
-                tail -n 120 .artifacts/error.log
-              else
-                echo "No .artifacts/error.log file was found."
-              fi
-              echo '```'
-            } | tee .artifacts/failure-summary.md >> "$GITHUB_STEP_SUMMARY"
-          fi
       - uses: actions/upload-artifact@v7
-        if: always()
+        if: failure()
         with:
           name: release-readiness-reliability
-          path: .artifacts
-          if-no-files-found: ignore
+          path: .artifacts/failure-summary.md
+          if-no-files-found: error
 
   summary:
     runs-on: ubuntu-latest
@@ -185,16 +142,14 @@ jobs:
       - reliability
     if: always()
     steps:
-      - name: Prepare artifact download directory
-        if: always()
-        run: rm -rf .artifacts-upload && mkdir -p .artifacts-upload
-      - uses: actions/download-artifact@v6
+      - name: Download failure digests
+        uses: actions/download-artifact@v6
         if: always()
         continue-on-error: true
         with:
           path: .artifacts-upload
           pattern: release-readiness-*
-          merge-multiple: true
+          merge-multiple: false
       - name: Readiness summary
         run: |
           set -euo pipefail
@@ -218,43 +173,29 @@ jobs:
             echo "| verify + dry-run publish | ${VERIFY_RESULT} |"
             echo "| optional reliability gates | ${RELIABILITY_RESULT} |"
             echo ""
-            echo "## Failure digest"
+            echo "## Failure details"
             echo ""
           } >> "$GITHUB_STEP_SUMMARY"
 
+          FOUND=0
           if [ -d .artifacts-upload ]; then
-            {
-              echo "### Downloaded artifact files"
-              echo ""
-              echo '```text'
-              find .artifacts-upload -maxdepth 3 -type f | sort
-              echo '```'
-              echo ""
-            } >> "$GITHUB_STEP_SUMMARY"
-          else
-            {
-              echo "### Artifact download status"
-              echo ""
-              echo "Artifact download directory was not created."
-              echo ""
-            } >> "$GITHUB_STEP_SUMMARY"
-          fi
-
-          if find .artifacts-upload -name 'failure-summary.md' -print -quit >/dev/null 2>&1; then
             while IFS= read -r file; do
+              FOUND=1
               cat "$file" >> "$GITHUB_STEP_SUMMARY"
               echo "" >> "$GITHUB_STEP_SUMMARY"
             done < <(find .artifacts-upload -name 'failure-summary.md' | sort)
-          else
+          fi
+
+          if [ "$FOUND" -eq 0 ]; then
             {
-              echo "No failure digests were produced."
+              echo "No failure digests were collected."
               echo ""
-              echo "This usually means either the failing job did not create .artifacts/failure-summary.md or download-artifact did not materialize the uploaded files as expected."
+              echo "Failed gates likely exited before publishing artifacts or no job-specific digest matched the download pattern."
+              echo ""
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
           {
-            echo ""
             echo "**Decision: ${DECISION}**"
             echo ""
             echo "If decision is GO, baseline release gates are satisfied."

@@ -5,8 +5,6 @@ on:
   push:
     tags:
       - 'v*'
-      - 'v*'
-      - "v*"
 
 permissions:
   contents: read
@@ -38,7 +36,6 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          rm -f .artifacts/failure-summary.md .artifacts/error.log || true
           if ! (
             if [ "${NPM_PUBLISH_PROVENANCE}" = "true" ]; then
               echo "Unsupported publish mode for private repository: provenance=true."
@@ -54,35 +51,15 @@ jobs:
               echo '```text'
               tail -n 120 .artifacts/error.log
               echo '```'
-            } | tee .artifacts/failure-summary.md >> "$GITHUB_STEP_SUMMARY"
+            } > .artifacts/failure-summary.md
             exit 1
           fi
-      - name: Persist failure digest artifact
-        if: failure()
-        run: |
-          set -euo pipefail
-          mkdir -p .artifacts
-          if [ ! -f .artifacts/failure-summary.md ]; then
-            {
-              echo "### failure-digest-fallback"
-              echo ""
-              echo "The job failed before a dedicated failure summary was written."
-              echo ""
-              echo '```text'
-              if [ -f .artifacts/error.log ]; then
-                tail -n 120 .artifacts/error.log
-              else
-                echo "No .artifacts/error.log file was found."
-              fi
-              echo '```'
-            } | tee .artifacts/failure-summary.md >> "$GITHUB_STEP_SUMMARY"
-          fi
       - uses: actions/upload-artifact@v7
-        if: always()
+        if: failure()
         with:
           name: go-no-go-release-gates
-          path: .artifacts
-          if-no-files-found: ignore
+          path: .artifacts/failure-summary.md
+          if-no-files-found: error
 
   reliability-gates:
     runs-on: ubuntu-latest
@@ -110,7 +87,6 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          rm -f .artifacts/failure-summary.md .artifacts/error.log || true
           if ! (
             for run in 1 2 3; do
               echo "Go/No-Go reliability repetition #${run}: load"
@@ -126,37 +102,17 @@ jobs:
               echo '```text'
               tail -n 120 .artifacts/error.log
               echo '```'
-            } | tee .artifacts/failure-summary.md >> "$GITHUB_STEP_SUMMARY"
+            } > .artifacts/failure-summary.md
             exit 1
           fi
         env:
           REDIS_URL: redis://127.0.0.1:6379
-      - name: Persist failure digest artifact
-        if: failure()
-        run: |
-          set -euo pipefail
-          mkdir -p .artifacts
-          if [ ! -f .artifacts/failure-summary.md ]; then
-            {
-              echo "### failure-digest-fallback"
-              echo ""
-              echo "The job failed before a dedicated failure summary was written."
-              echo ""
-              echo '```text'
-              if [ -f .artifacts/error.log ]; then
-                tail -n 120 .artifacts/error.log
-              else
-                echo "No .artifacts/error.log file was found."
-              fi
-              echo '```'
-            } | tee .artifacts/failure-summary.md >> "$GITHUB_STEP_SUMMARY"
-          fi
       - uses: actions/upload-artifact@v7
-        if: always()
+        if: failure()
         with:
           name: go-no-go-reliability-gates
-          path: .artifacts
-          if-no-files-found: ignore
+          path: .artifacts/failure-summary.md
+          if-no-files-found: error
 
   go-no-go-summary:
     runs-on: ubuntu-latest
@@ -165,16 +121,14 @@ jobs:
       - reliability-gates
     if: always()
     steps:
-      - name: Prepare artifact download directory
-        if: always()
-        run: rm -rf .artifacts-upload && mkdir -p .artifacts-upload
-      - uses: actions/download-artifact@v6
+      - name: Download failure digests
+        uses: actions/download-artifact@v6
         if: always()
         continue-on-error: true
         with:
           path: .artifacts-upload
           pattern: go-no-go-*
-          merge-multiple: true
+          merge-multiple: false
       - name: Publish decision
         run: |
           set -euo pipefail
@@ -197,45 +151,29 @@ jobs:
             echo "| release-gates | ${RELEASE_GATES_RESULT} |"
             echo "| reliability-gates | ${RELIABILITY_GATES_RESULT} |"
             echo ""
-            echo "## Failure digest"
+            echo "## Failure details"
             echo ""
           } >> "$GITHUB_STEP_SUMMARY"
 
-          FILE_LIST=$(find .artifacts-upload -maxdepth 3 -type f | sort || true)
-
-          {
-            echo "### Downloaded artifact files"
-            echo ""
-            echo '```text'
-            if [ -n "$FILE_LIST" ]; then
-              printf '%s\n' "$FILE_LIST"
-            else
-              echo "No files were downloaded into .artifacts-upload."
-              echo "Possible causes: no artifacts matched the pattern, artifact upload was skipped, or the source jobs never reached upload-artifact."
-            fi
-            echo '```'
-            echo ""
-          } >> "$GITHUB_STEP_SUMMARY"
-
-          if find .artifacts-upload -name 'failure-summary.md' -print -quit >/dev/null 2>&1; then
+          FOUND=0
+          if [ -d .artifacts-upload ]; then
             while IFS= read -r file; do
+              FOUND=1
               cat "$file" >> "$GITHUB_STEP_SUMMARY"
               echo "" >> "$GITHUB_STEP_SUMMARY"
             done < <(find .artifacts-upload -name 'failure-summary.md' | sort)
-          else
+          fi
+
+          if [ "$FOUND" -eq 0 ]; then
             {
-              echo "### Failure digest unavailable"
+              echo "No failure digests were collected."
               echo ""
-              echo "No failure-summary.md files were found in downloaded artifacts."
-              echo "This indicates either artifact upload did not include the digest or the failing job never reached digest creation."
+              echo "Failed gates likely exited before publishing artifacts or no job-specific digest matched the download pattern."
               echo ""
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
           {
-            echo ""
-            echo "Target ref: \`${GITHUB_REF}\`"
-            echo ""
             echo "**Decision: ${DECISION}**"
             echo ""
             echo "${MESSAGE}"

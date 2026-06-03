@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper
 
+## 0.13.0
+
+### Minor Changes
+
+- 52edf00: Product ready improvements
+
 ## 0.12.0
 
 ### Minor Changes

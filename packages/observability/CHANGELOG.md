@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper-observability
 
+## 0.6.0
+
+### Minor Changes
+
+- 52edf00: Product ready improvements
+
 ## 0.5.5
 
 ### Patch Changes

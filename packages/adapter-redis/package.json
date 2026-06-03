@@ -1,6 +1,6 @@
 {
   "name": "@jilimb0/tgwrapper-adapter-redis",
-  "version": "0.4.4",
+  "version": "0.5.0",
   "description": "Redis storage adapter for TGWrapper providing distributed sessions, caching namespaces, and rate limiters",
   "repository": {
     "type": "git",

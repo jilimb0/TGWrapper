@@ -53,8 +53,8 @@ jobs:
             echo ""
           } >> "$GITHUB_STEP_SUMMARY"
 
-          if [ -f .artifacts-upload/failure-summary.md ]; then
-            cat .artifacts-upload/failure-summary.md >> "$GITHUB_STEP_SUMMARY"
+          if [ -f .artifacts/failure-summary.md ]; then
+            cat .artifacts/failure-summary.md >> "$GITHUB_STEP_SUMMARY"
             echo "" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "No failure digest was produced." >> "$GITHUB_STEP_SUMMARY"

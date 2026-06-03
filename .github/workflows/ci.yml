@@ -227,7 +227,6 @@ jobs:
         with:
           path: .artifacts-upload
           pattern: ci-*
-          merge-multiple: true
       - name: CI summary
         run: |
           set -euo pipefail
@@ -253,11 +252,14 @@ jobs:
 
           FOUND=0
           if [ -d .artifacts-upload ]; then
-            while IFS= read -r file; do
-              FOUND=1
-              cat "$file" >> "$GITHUB_STEP_SUMMARY"
-              echo "" >> "$GITHUB_STEP_SUMMARY"
-            done < <(find .artifacts-upload -name 'failure-summary.md' | sort)
+            # Safe loop without process substitution
+            for file in $(find .artifacts-upload -name 'failure-summary.md' | sort); do
+              if [ -f "$file" ]; then
+                FOUND=1
+                cat "$file" >> "$GITHUB_STEP_SUMMARY"
+                echo "" >> "$GITHUB_STEP_SUMMARY"
+              fi
+            done
           fi
 
           if [ "$FOUND" -eq 0 ]; then

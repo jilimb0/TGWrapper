@@ -1,10 +1,30 @@
 {
   "name": "@jilimb0/tgwrapper-observability",
   "version": "0.5.4",
+  "description": "First-party telemetry, logging, metrics, and trace correlation for TGWrapper",
   "repository": {
     "type": "git",
     "url": "https://github.com/jilimb0/TGWrapper"
   },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/packages/observability#readme",
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/jilimb0"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "observability",
+    "metrics",
+    "tracing",
+    "opentelemetry",
+    "prometheus",
+    "tgwrapper"
+  ],
   "type": "module",
   "main": "./dist-cjs/index.js",
   "types": "./dist/index.d.ts",
@@ -29,7 +49,8 @@
   "files": [
     "dist/**/*.js",
     "dist/**/*.d.ts",
-    "dist-cjs/**/*.js"
+    "dist-cjs/**/*.js",
+    "README.md"
   ],
   "publishConfig": {
     "access": "public"

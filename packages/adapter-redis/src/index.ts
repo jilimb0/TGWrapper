@@ -19,14 +19,16 @@ export interface SessionStorage<TSession> {
 }
 
 export interface RedisAdapterOptions {
-  redisUrl: string;
+  redisUrl?: string;
+  redis?: Redis;
   tenantId: string;
   botId: string;
   ttlSeconds?: number;
 }
 
 export interface RedisKvOptions {
-  redisUrl: string;
+  redisUrl?: string;
+  redis?: Redis;
   prefix?: string;
   defaultTtlSeconds?: number;
 }
@@ -185,10 +187,16 @@ export class RedisSessionAdapter<TSession extends { version: number }> implement
   private readonly ttlSeconds: number;
 
   public constructor(options: RedisAdapterOptions) {
-    this.redis = new Redis(options.redisUrl, {
-      maxRetriesPerRequest: 1,
-      lazyConnect: false
-    });
+    if (options.redis) {
+      this.redis = options.redis;
+    } else if (options.redisUrl) {
+      this.redis = new Redis(options.redisUrl, {
+        maxRetriesPerRequest: 1,
+        lazyConnect: false
+      });
+    } else {
+      throw new Error('Either redis or redisUrl must be provided to RedisSessionAdapter');
+    }
     this.keyPrefix = `framework:${options.tenantId}:${options.botId}:session`;
     this.ttlSeconds = options.ttlSeconds ?? 0;
   }
@@ -264,10 +272,16 @@ export class RedisKvStore {
   private readonly defaultTtlSeconds: number;
 
   public constructor(options: RedisKvOptions) {
-    this.redis = new Redis(options.redisUrl, {
-      maxRetriesPerRequest: 1,
-      lazyConnect: false
-    });
+    if (options.redis) {
+      this.redis = options.redis;
+    } else if (options.redisUrl) {
+      this.redis = new Redis(options.redisUrl, {
+        maxRetriesPerRequest: 1,
+        lazyConnect: false
+      });
+    } else {
+      throw new Error('Either redis or redisUrl must be provided to RedisKvStore');
+    }
     this.prefix = options.prefix ?? 'framework:kv';
     this.defaultTtlSeconds = options.defaultTtlSeconds ?? 0;
   }

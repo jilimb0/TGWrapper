@@ -1,38 +1,57 @@
-# Documentation Index
+# TGWrapper Documentation Platform Index
 
-## Start Here
+Welcome to the TGWrapper documentation hub. Use the index and FAQ below to navigate the architecture, design policies, and operational runbooks.
 
-- Bot development guide: `docs/BOT_DEVELOPMENT_GUIDE.md`
-- Migration from node-telegram-bot-api: `docs/MIGRATION_FROM_NODE_TELEGRAM_BOT_API.md`
-- Production checklist: `docs/PRODUCTION_CHECKLIST.md`
+---
 
-## Core references
+## ⚡ Decision Matrices
 
-- Observability APM 0.5.1: 
+### 1. Polling vs. Webhook Transport Selection
 
-- Telegram API compatibility target: `docs/TELEGRAM_API_COMPATIBILITY.md`
-- API stability policy for `0.11.x`: `docs/API_STABILITY_POLICY_0_11.md`
-- Migration from grammY: `docs/MIGRATION_FROM_GRMMY.md`
-- Production stack recipe: `docs/PRODUCTION_STACK_RECIPE.md`
-- Reference implementations overview: `docs/REFERENCE_IMPLEMENTATIONS.md`
-- `0.11.0` release notes draft: `docs/RELEASE_NOTES_0_11_0_DRAFT.md`
-- `0.11.0` execution plan: `docs/EXECUTION_PLAN_0_11_0.md`
-- `0.11.0` release checklist: `docs/RELEASE_CHECKLIST_0_11_0.md`
-- Positioning: `docs/WHY_TGWRAPPER.md` and `docs/COMPARISON.md`
-- Observability contract: `docs/OBSERVABILITY_CONTRACT.md`
-- Operations runbook: `docs/OPERATIONS_RUNBOOK.md`
-- Architecture decisions: `docs/ARCHITECTURE_DECISIONS.md`
+| Feature / Factor | **Polling Mode** (`mode: 'polling'`) | **Webhook Mode** (`mode: 'webhook'`) |
+| :--- | :--- | :--- |
+| **Execution Pattern** | Background long-polling loops | Event-driven request ingestion |
+| **Local Development** | Easiest (Zero setup, works behind NAT) | Requires HTTP tunnels (e.g., Ngrok) |
+| **Infrastructure cost** | Requires continuous VM runtime | Scale-to-zero (Pay-per-request) |
+| **Concurrency Scaling** | Hard (Requires single-instance locks) | High (Native HTTP routing scale) |
 
-## Release and quality
+---
 
-- Release policy: `docs/RELEASE_POLICY.md`
-- Definition of Done for 1.0.0: `docs/DEFINITION_OF_DONE_1.0.0.md`
-- 1.0.0 release plan: `docs/RELEASE_1.0.0_PLAN.md`
-- 1.0.0 release checklist: `docs/RELEASE_CHECKLIST_1.0.0.md`
-- Changelog: `docs/CHANGELOG.md`
+## 🙋 Central Platform FAQ
 
-## API artifacts
+### Q1: Is Redis required?
+**No**, Redis is optional. You can build and run fully functional bots using default in-memory setups.
+* **When to add Redis:** As soon as you scale to multiple concurrent server instances or serverless containers. Redis acts as the synchronization layer for distributed rate limits and FSM user sessions (protecting state from concurrent updates).
 
-- Public API snapshot: `docs/api-snapshots/tgwrapper-index.d.ts`
-- Telegram baseline: `docs/telegram-api-baseline.json`
-- Telegram schema snapshot: `docs/telegram-api-schema.snapshot.json`
+### Q2: Is TGWrapper suitable for Serverless environments (AWS Lambda / Cloudflare Workers)?
+**Yes, absolutely.** TGWrapper is built fetch-first with a very light bundle footprint. It contains no heavy legacy node dependencies, enabling minimal serverless cold starts.
+
+### Q3: Why is TGWrapper better for AI-native bots?
+1. **Concurrency Safety:** Multi-turn AI conversations involve delayed model replies. Concurrent buttons presses from users are safely guarded by the Redis Compare-And-Swap (CAS) session adapter, avoiding state overwrites.
+2. **Context Correlation Tracing:** Downstream LLM calls and nested tool spans are mapped automatically to the incoming Telegram message trace ID via `AsyncLocalStorage`.
+
+---
+
+## 📑 Core Documentation Index
+
+### Getting Started & Guides
+- [Why TGWrapper?](./WHY_TGWRAPPER.md) - Positioning and architectural wedge.
+- [Comparison Guide](./COMPARISON.md) - Deep feature comparison vs. grammY and Telegraf.
+- [Bot Development Guide](./BOT_DEVELOPMENT_GUIDE.md) - Client parameters, session shapes, and commands.
+
+### Migration Manuals
+- [Migration from grammY](./MIGRATION_FROM_GRMMY.md) - Direct mapping guides.
+- [Migration from Telegraf](./MIGRATION_FROM_TELEGRAF.md) - Interface mapper.
+- [Migration from Node Telegram Bot API](./MIGRATION_FROM_NODE_TELEGRAM_BOT_API.md) - Legacy transition.
+
+### Operational Runbooks
+- [Production Stack Recipe](./PRODUCTION_STACK_RECIPE.md) - Blueprint stack layouts.
+- [Production Checklist](./PRODUCTION_CHECKLIST.md) - Deployment audit items.
+- [Operations Runbook](./OPERATIONS_RUNBOOK.md) - Debugging, logs, and alerts config.
+- [Observability Contract](./OBSERVABILITY_CONTRACT.md) - Standard performance tags and logs.
+
+### Architecture & Release Policy
+- [Architecture Decision Records](./ARCHITECTURE_DECISIONS.md) - ADR repository log.
+- [Telegram API Compatibility targets](./TELEGRAM_API_COMPATIBILITY.md) - Schema sync protocols.
+- [Release Quality Gates](./RELEASE_POLICY.md) - Changesets validation.
+- [1.0.0 Stable Release Plan](./RELEASE_1.0.0_PLAN.md) - Pre-release checklists.

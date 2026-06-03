@@ -45,9 +45,9 @@ export interface RuntimeHookHandlers {
   onApiCall?: (event: { method: string }) => void;
 }
 
-export interface BotLikeEventTarget {
-  on?: (event: string, handler: (payload: unknown) => void | Promise<void>) => () => void;
-  onError?: (handler: (error: unknown) => void | Promise<void>) => () => void;
+export interface ObservableBot {
+  on(event: string, handler: (payload: any) => void | Promise<void>): () => void;
+  onError(handler: (error: unknown) => void | Promise<void>): () => void;
 }
 
 export interface CorrelationContext {
@@ -1404,7 +1404,7 @@ export function bindRuntimeObservability(target: RuntimeHookTarget, handlers: Ru
   };
 }
 
-export function attachBotObservability(target: BotLikeEventTarget, options: AttachBotObservabilityOptions): () => void {
+export function attachBotObservability(target: ObservableBot, options: AttachBotObservabilityOptions): () => void {
   const unsubscribers: Array<() => void> = [];
   const log = (level: LogLevel, event: string, data?: JsonObject): void => {
     if (!options.logger) {
@@ -1429,35 +1429,32 @@ export function attachBotObservability(target: BotLikeEventTarget, options: Atta
   });
   log('info', 'bot_launch');
 
-  if (target.onError) {
-    const unsubscribeError = target.onError((error) => {
-      const classified = classifyError(error, 'runtime');
-      options.metrics.increment('bot_runtime_error_total', 1, {
-        service: options.serviceName,
-        class: classified.class,
-        code: classified.code
-      });
-      log('error', 'bot_runtime_error', {
-        message: classified.message,
-        class: classified.class,
-        code: classified.code
-      });
+  const unsubscribeError = target.onError((error) => {
+    const classified = classifyError(error, 'runtime');
+    options.metrics.increment('bot_runtime_error_total', 1, {
+      service: options.serviceName,
+      class: classified.class,
+      code: classified.code
     });
-    unsubscribers.push(unsubscribeError);
-  }
+    log('error', 'bot_runtime_error', {
+      message: classified.message,
+      class: classified.class,
+      code: classified.code
+    });
+  });
+  unsubscribers.push(unsubscribeError);
 
-  if (target.on) {
-    unsubscribers.push(
-      target.on('update', (payload) => {
-        const update = payload as Record<string, unknown>;
-        const updateType = Object.keys(update).find((key) => key !== 'update_id' && update[key] !== undefined) ?? 'unknown';
-        options.metrics.increment('bot_update_total', 1, {
-          service: options.serviceName,
-          update_type: updateType
-        });
-      })
-    );
-    unsubscribers.push(
+  unsubscribers.push(
+    target.on('update', (payload) => {
+      const update = payload as Record<string, unknown>;
+      const updateType = Object.keys(update).find((key) => key !== 'update_id' && update[key] !== undefined) ?? 'unknown';
+      options.metrics.increment('bot_update_total', 1, {
+        service: options.serviceName,
+        update_type: updateType
+      });
+    })
+  );
+  unsubscribers.push(
       target.on('api_call', (payload) => {
         const method = (payload as { method?: string }).method ?? 'unknown';
         options.metrics.increment('bot_api_call_total', 1, {
@@ -1528,7 +1525,6 @@ export function attachBotObservability(target: BotLikeEventTarget, options: Atta
         }
       })
     );
-  }
 
   return () => {
     for (const unsubscribe of unsubscribers) {
@@ -1657,3 +1653,5 @@ function maskSensitiveString(input: string): string {
   }
   return `${input.slice(0, 2)}***${input.slice(-2)}`;
 }
+
+export * from './otel.js';

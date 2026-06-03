@@ -227,7 +227,7 @@ jobs:
         with:
           path: .artifacts-upload
           pattern: ci-*
-          merge-multiple: false
+          merge-multiple: true
       - name: CI summary
         run: |
           set -euo pipefail

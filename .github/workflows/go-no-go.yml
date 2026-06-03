@@ -144,7 +144,7 @@ jobs:
         with:
           path: .artifacts-upload
           pattern: go-no-go-*
-          merge-multiple: false
+          merge-multiple: true
       - name: Publish decision
         run: |
           set -euo pipefail

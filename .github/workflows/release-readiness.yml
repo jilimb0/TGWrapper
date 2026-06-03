@@ -159,7 +159,7 @@ jobs:
         with:
           path: .artifacts-upload
           pattern: release-readiness-*
-          merge-multiple: false
+          merge-multiple: true
       - name: Readiness summary
         run: |
           set -euo pipefail

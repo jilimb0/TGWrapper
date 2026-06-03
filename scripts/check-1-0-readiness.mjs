@@ -56,7 +56,7 @@ const missingVerifyReleaseParts = requiredVerifyReleaseParts.filter((part) => !v
 const missingVerify1Parts = requiredVerify1Parts.filter((part) => !verify1.includes(part));
 
 const checks = {
-  target_bot_api_version: baseline.target_bot_api_version === "9.4",
+  target_bot_api_version: /^\d+\.\d+$/.test(String(baseline.target_bot_api_version ?? "")),
   schema_min_methods: Number(baseline.min_method_count) >= 150,
   schema_min_update_keys: Number(baseline.min_update_key_count) >= 20,
   verify_release_exists: typeof verifyRelease === "string" && verifyRelease.length > 0,

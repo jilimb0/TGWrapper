@@ -35,6 +35,10 @@
       "require": "./dist-cjs/index.js"
     }
   },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "build": "pnpm build:esm && pnpm build:cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",

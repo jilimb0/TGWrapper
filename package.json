@@ -25,6 +25,10 @@
       "require": "./dist-cjs/index.js"
     }
   },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "pnpm build:esm && pnpm build:cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
@@ -66,10 +70,9 @@
     "release:version": "changeset version",
     "release:publish": "changeset publish",
     "test:published-smoke": "node scripts/published-smoke.mjs",
-    "verify:release": "pnpm changeset:lint && pnpm telegram:baseline:check && pnpm telegram:schema:types:check && pnpm telegram:schema:payloads:check && pnpm telegram:schema:results:check && pnpm test && pnpm typecheck:compat && pnpm -r typecheck && pnpm build && pnpm -r build && pnpm api:snapshot:check && pnpm pack:size",
+    "verify:release:ci": "pnpm changeset:lint && pnpm telegram:baseline:check && pnpm telegram:schema:types:check && pnpm telegram:schema:payloads:check && pnpm telegram:schema:results:check && pnpm test && pnpm typecheck:compat && pnpm -r typecheck && pnpm build && pnpm -r build && pnpm api:snapshot:check && pnpm pack:size",
+    "verify:release": "node scripts/verify-release.mjs",
     "benchmark:trend:release": "BENCHMARK_MIN_RATIO=0.55 BENCHMARK_MIN_UPS=180000 node scripts/check-benchmark-trend.mjs",
-    "check:1.0:readiness": "node scripts/check-1-0-readiness.mjs",
-    "verify:1.0": "pnpm verify:release && pnpm telegram:schema:completeness:check && pnpm telegram:schema:coverage:full:check && pnpm benchmark && pnpm benchmark:trend:release && pnpm check:1.0:readiness",
     "telegram:schema:coverage:full:check": "node scripts/check-telegram-schema-full-coverage.mjs",
     "build:esm": "tsc -p tsconfig.json",
     "build:cjs": "tsc -p tsconfig.cjs.json"
@@ -81,9 +84,6 @@
     "fsm",
     "serverless"
   ],
-  "engines": {
-    "node": ">=18"
-  },
   "devDependencies": {
     "@changesets/cli": "^2.29.6",
     "typedoc": "^0.28.19",

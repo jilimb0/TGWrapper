@@ -47,5 +47,6 @@ pnpm verify:release
 Optional deep gate:
 
 ```bash
-pnpm verify:1.0
+pnpm benchmark
+pnpm test:published-smoke
 ```

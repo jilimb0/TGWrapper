@@ -54,4 +54,3 @@ Welcome to the TGWrapper documentation hub. Use the index and FAQ below to navig
 - [Architecture Decision Records](./ARCHITECTURE_DECISIONS.md) - ADR repository log.
 - [Telegram API Compatibility targets](./TELEGRAM_API_COMPATIBILITY.md) - Schema sync protocols.
 - [Release Quality Gates](./RELEASE_POLICY.md) - Changesets validation.
-- [1.0.0 Stable Release Plan](./RELEASE_1.0.0_PLAN.md) - Pre-release checklists.

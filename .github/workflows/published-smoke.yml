@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: published-smoke-${{ github.event_name }}-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: true
+
 jobs:
   published-smoke:
     if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository) }}
@@ -20,6 +24,48 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 20
-      - run: node scripts/published-smoke.mjs
+      - name: Run published smoke
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          if ! node scripts/published-smoke.mjs 2>&1 | tee .artifacts/published-smoke.log; then
+            {
+              echo "### published-smoke"
+              echo ""
+              echo '```text'
+              tail -n 120 .artifacts/published-smoke.log
+              echo '```'
+            } > .artifacts/failure-summary.md
+            exit 1
+          fi
         env:
           PUBLISHED_SMOKE_STRICT: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
+      - name: Published smoke summary
+        if: always()
+        run: |
+          {
+            echo "## Published Smoke Summary"
+            echo ""
+            echo "Strict mode: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}"
+            echo ""
+            echo "## Failure digest"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ -f .artifacts/failure-summary.md ]; then
+            cat .artifacts/failure-summary.md >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No failure digest was produced." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          {
+            echo ""
+            echo "Published package smoke validation completed."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: published-smoke-log
+          path: .artifacts
+          if-no-files-found: ignore

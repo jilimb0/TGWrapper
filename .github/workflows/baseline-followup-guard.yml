@@ -4,12 +4,17 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: baseline-followup-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   guard:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
     steps:
       - uses: actions/checkout@v6
         with:
@@ -20,7 +25,7 @@ jobs:
       - name: Run baseline follow-up check
         id: followup_check
         continue-on-error: true
-        run: node scripts/check-baseline-followup.mjs origin/${{ github.base_ref }}
+        run: node scripts/check-baseline-followup.mjs origin/${{ github.base_ref }} | tee baseline-followup.log
       - name: Ensure needs-follow-up label exists
         if: steps.followup_check.outcome == 'failure'
         uses: actions/github-script@v9
@@ -50,6 +55,27 @@ jobs:
               issue_number: context.issue.number,
               labels: ['needs-follow-up']
             });
+      - name: Guard summary
+        if: always()
+        run: |
+          RESULT="${{ steps.followup_check.outcome }}"
+          {
+            echo "## Baseline Follow-up Guard"
+            echo ""
+            echo "Result: ${RESULT}"
+            echo ""
+            if [ "${RESULT}" = "failure" ]; then
+              echo "Baseline changed without the required compatibility follow-up."
+            else
+              echo "Baseline follow-up requirements are satisfied."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: baseline-followup-log
+          path: baseline-followup.log
+          if-no-files-found: error
       - name: Fail guard when follow-up is missing
         if: steps.followup_check.outcome == 'failure'
         run: |

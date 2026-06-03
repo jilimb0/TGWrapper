@@ -5,13 +5,18 @@ on:
   schedule:
     - cron: "0 8 * * 1"
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: telegram-api-watchdog
+  cancel-in-progress: true
+
 jobs:
   baseline-watchdog:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-      issues: write
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
@@ -25,7 +30,7 @@ jobs:
       - name: Check Telegram API changelog drift
         id: baseline_check
         continue-on-error: true
-        run: pnpm telegram:baseline:latest
+        run: pnpm telegram:baseline:latest | tee baseline-watchdog.log
       - name: Sync baseline to latest changelog version
         if: steps.baseline_check.outcome == 'failure'
         run: pnpm telegram:baseline:sync
@@ -120,3 +125,24 @@ jobs:
           labels: |
             dependencies
             documentation
+      - name: Watchdog summary
+        if: always()
+        run: |
+          RESULT="${{ steps.baseline_check.outcome }}"
+          {
+            echo "## Telegram API Watchdog Summary"
+            echo ""
+            echo "Result: ${RESULT}"
+            echo ""
+            if [ "${RESULT}" = "failure" ]; then
+              echo "A newer Telegram Bot API baseline was detected and follow-up automation was triggered."
+            else
+              echo "Telegram Bot API baseline is already up to date."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: telegram-api-watchdog-log
+          path: baseline-watchdog.log
+          if-no-files-found: error

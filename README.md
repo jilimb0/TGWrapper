@@ -31,9 +31,39 @@ Deploying a production-ready Telegram bot follows a single, non-branching workfl
 
 ---
 
-## ⚡ Quick Starts
+## 🧭 Which Path Should You Take?
 
-Choose the canonical template that fits your project architecture:
+Choose the canonical track that matches your deployment target:
+
+| Track | Template | When to use |
+|---|---|---|
+| **1. Polling Starter** | [`examples/polling-starter`](./examples/polling-starter) | Local dev, single-server, VPS, always-on process |
+| **2. Serverless Webhook** | [`examples/serverless-webhook-starter`](./examples/serverless-webhook-starter) | Cloudflare Workers, AWS Lambda, Vercel, any FaaS |
+| **3. Multi-Instance Redis** | [`examples/multi-instance-redis-starter`](./examples/multi-instance-redis-starter) | Multi-node deployments, AI bots, stateful scale-out |
+
+All three tracks use the same `createBotClient` interface. You switch tracks by changing your `mode` config and which adapter packages you install.
+
+---
+
+## ✅ Choose TGWrapper if…
+
+- You need the same bot code to run across **Node.js, Cloudflare Workers, and AWS Lambda** without rewriting.
+- You want **TypeScript-first** API contracts with full inference — no runtime type surprises.
+- You need **distributed rate limiting and session state** that works safely across multiple bot instances.
+- You want **structured observability** (trace IDs, metrics, error events) built in, not patched on.
+- You are building an **AI-native bot** with stateful multi-turn conversations backed by external storage.
+
+## ❌ Don't Choose TGWrapper if…
+
+- You want a **drag-and-drop or visual flow builder** — TGWrapper is code-first.
+- You need a **rich plugin marketplace** with dozens of pre-built integrations — consider grammY.
+- You are building a **small hobby bot** in < 50 lines and don't need distributed state — any library works.
+- You are working outside the **TypeScript / JavaScript** ecosystem.
+- You need **multi-platform support** (Discord + Telegram + Slack in one framework) — TGWrapper is Telegram-only.
+
+---
+
+## ⚡ Quick Starts
 
 ### 1. Polling Bot (Best for Local Dev / Simple Bots)
 
@@ -115,10 +145,21 @@ pnpm test
 
 ## 📑 Core Documentation Index
 
-- [Why TGWrapper?](./docs/WHY_TGWRAPPER.md) - Positioning and architectural wedge.
-- [Comparison Matrix](./docs/COMPARISON.md) - TGWrapper vs. grammY vs. Telegraf.
-- [Development Guide](./docs/BOT_DEVELOPMENT_GUIDE.md) - Bot architecture, middleware, routing.
-- [Production Checklist](./docs/PRODUCTION_CHECKLIST.md) - Ensure reliability before launching.
-- [Observability Guide](./docs/OBSERVABILITY_CONTRACT.md) - Monitoring best practices.
-- [Migration Guide from grammY](./docs/MIGRATION_FROM_GRMMY.md) - Smooth codebase porting.
-- [Migration Guide from Telegraf](./docs/MIGRATION_FROM_TELEGRAF.md) - Switch guidelines.
+**Getting Started**
+- [Why TGWrapper?](./docs/WHY_TGWRAPPER.md) — Positioning and architectural wedge.
+- [Comparison Matrix](./docs/COMPARISON.md) — TGWrapper vs. grammY vs. Telegraf.
+- [Project Doctrine](./docs/DOCTRINE.md) — Identity, non-goals, and contribution boundaries.
+
+**Development**
+- [Development Guide](./docs/BOT_DEVELOPMENT_GUIDE.md) — Bot architecture, middleware, routing.
+- [Migration Guide from grammY](./docs/MIGRATION_FROM_GRMMY.md) — Smooth codebase porting.
+- [Migration Guide from Telegraf](./docs/MIGRATION_FROM_TELEGRAF.md) — Switch guidelines.
+
+**Production Operations**
+- [Production Checklist](./docs/PRODUCTION_CHECKLIST.md) — Ensure reliability before launching.
+- [Redis Runtime Guide](./docs/REDIS_RUNTIME.md) — Topologies, session locking, failure modes.
+- [Telemetry Reference](./docs/TELEMETRY_REFERENCE.md) — Event schemas, metrics, exporters, debugging.
+- [Observability Contract](./docs/OBSERVABILITY_CONTRACT.md) — Monitoring best practices.
+
+**Quality & Evidence**
+- [Proof Layer](./docs/PROOF_LAYER.md) — Test strategy, benchmarks, and failure drills.

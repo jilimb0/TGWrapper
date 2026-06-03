@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node --import tsx src/index.ts"
+    "start": "node --import tsx src/index.ts",
+    "test": "tsc --noEmit"
   },
   "dependencies": {
     "@jilimb0/tgwrapper": "workspace:*",

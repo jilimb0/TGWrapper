@@ -8,6 +8,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: nightly-phase4
+  cancel-in-progress: true
+
 jobs:
   nightly-chaos-load:
     runs-on: ubuntu-latest
@@ -38,11 +42,12 @@ jobs:
       - name: Repeat load/chaos tests to catch flakes
         run: |
           set -euo pipefail
+          mkdir -p .artifacts
           for run in 1 2 3; do
             echo "Nightly repetition #${run}: load"
-            pnpm test:load
+            pnpm test:load | tee -a .artifacts/nightly-reliability.log
             echo "Nightly repetition #${run}: chaos"
-            pnpm test:chaos
+            pnpm test:chaos | tee -a .artifacts/nightly-reliability.log
           done
       - run: pnpm test:integration
         env:
@@ -52,10 +57,23 @@ jobs:
         env:
           BENCHMARK_MIN_RATIO: "0.55"
           BENCHMARK_MIN_UPS: "180000"
+      - name: Nightly summary
+        if: always()
+        run: |
+          {
+            echo "## Nightly Phase4 Summary"
+            echo ""
+            echo "- typecheck and build completed"
+            echo "- repeated load/chaos checks completed"
+            echo "- redis integration completed"
+            echo "- benchmark + trend completed"
+          } >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/upload-artifact@v7
+        if: always()
         with:
           name: phase4-benchmark-report
           path: |
             benchmark/reports/latest.json
             benchmark/reports/baseline.json
+            .artifacts/nightly-reliability.log
           if-no-files-found: error

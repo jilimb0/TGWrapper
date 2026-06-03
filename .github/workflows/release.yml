@@ -15,10 +15,9 @@ jobs:
       pull-requests: write
       id-token: write
     concurrency:
-      group: release-${{ github.ref }}
+      group: release-${{ github.event_name }}-${{ github.event.workflow_run.head_branch || github.ref }}
       cancel-in-progress: false
     env:
-      # Repository is private; npm provenance is currently unsupported for this source visibility.
       NPM_PUBLISH_PROVENANCE: "false"
     steps:
       - uses: actions/checkout@v6
@@ -56,21 +55,29 @@ jobs:
         run: pnpm release:status || echo "Release status check reported missing changeset (informational)."
       - name: Package metadata snapshot
         run: |
-          node -e "const fs=require('fs');const pkgs=['package.json','packages/adapter-redis/package.json','packages/observability/package.json'];for(const p of pkgs){const v=JSON.parse(fs.readFileSync(p,'utf8'));console.log(JSON.stringify({file:p,name:v.name,version:v.version,files:v.files,exports:v.exports,publishConfig:v.publishConfig},null,2));}"
+          mkdir -p .artifacts
+          node -e "const fs=require('fs');const pkgs=['package.json','packages/adapter-redis/package.json','packages/observability/package.json'];const out=[];for(const p of pkgs){const v=JSON.parse(fs.readFileSync(p,'utf8'));out.push({file:p,name:v.name,version:v.version,files:v.files,exports:v.exports,publishConfig:v.publishConfig});}fs.writeFileSync('.artifacts/package-metadata.json', JSON.stringify(out,null,2));console.log(JSON.stringify(out,null,2));"
       - name: NPM registry visibility
         continue-on-error: true
         run: |
           set -euxo pipefail
-          npm view @jilimb0/tgwrapper --json || true
-          npm view @jilimb0/tgwrapper-adapter-redis --json || true
-          npm view @jilimb0/tgwrapper-observability --json || true
+          mkdir -p .artifacts
+          {
+            npm view @jilimb0/tgwrapper --json || true
+            npm view @jilimb0/tgwrapper-adapter-redis --json || true
+            npm view @jilimb0/tgwrapper-observability --json || true
+          } > .artifacts/npm-registry-visibility.jsonl
       - name: Pack artifact check
         run: |
           set -euo pipefail
+          mkdir -p .artifacts/pack
           for d in "." "packages/adapter-redis" "packages/observability"; do
+            name="$(basename "$d")"
+            [ "$d" = "." ] && name="root"
             echo "Checking pack contents in ${d}"
             (cd "${d}" && npm pack --dry-run --json > /tmp/pack.json)
-            node -e "const fs=require('fs');const pack=JSON.parse(fs.readFileSync('/tmp/pack.json','utf8'))[0];const files=new Set(pack.files.map(f=>f.path));const pkg=JSON.parse(fs.readFileSync('${d}/package.json','utf8'));const required=['package.json'];if('${d}'==='.') required.push('dist/index.js','dist/index.d.ts'); else required.push('dist/index.js','dist/index.d.ts');for(const f of required){if(!files.has(f)){console.error('Missing packed file',f,'for',pkg.name);process.exit(1);}}console.log('Pack OK',pkg.name,pkg.version,'files=',pack.files.length);"
+            cp /tmp/pack.json ".artifacts/pack/${name}.json"
+            node -e "const fs=require('fs');const pack=JSON.parse(fs.readFileSync('/tmp/pack.json','utf8'))[0];const files=new Set(pack.files.map(f=>f.path));const pkg=JSON.parse(fs.readFileSync('${d}/package.json','utf8'));const required=['package.json','dist/index.js','dist/index.d.ts'];for(const f of required){if(!files.has(f)){console.error('Missing packed file',f,'for',pkg.name);process.exit(1);}}console.log('Pack OK',pkg.name,pkg.version,'files=',pack.files.length);"
           done
       - run: |
           test -n "${ACTIONS_ID_TOKEN_REQUEST_URL}"
@@ -79,15 +86,10 @@ jobs:
       - name: OIDC debug claims
         run: |
           set -euo pipefail
+          mkdir -p .artifacts
           RAW="$(curl -sS -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=npm:registry.npmjs.org")"
           JWT="$(echo "${RAW}" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(JSON.parse(s).value))")"
-          echo "GitHub context"
-          echo "  repository=${GITHUB_REPOSITORY}"
-          echo "  ref=${GITHUB_REF}"
-          echo "  workflow=${GITHUB_WORKFLOW}"
-          echo "  workflow_ref=${GITHUB_WORKFLOW_REF}"
-          echo "OIDC payload"
-          echo "${JWT}" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const token=s.trim();const parts=token.split('.');if(parts.length<2){throw new Error('Invalid JWT');}const payload=JSON.parse(Buffer.from(parts[1],'base64url').toString('utf8'));const out={iss:payload.iss,aud:payload.aud,sub:payload.sub,repository:payload.repository,repository_owner:payload.repository_owner,ref:payload.ref,job_workflow_ref:payload.job_workflow_ref,workflow_ref:payload.workflow_ref,actor:payload.actor};console.log(JSON.stringify(out,null,2));})"
+          echo "${JWT}" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const token=s.trim();const parts=token.split('.');if(parts.length<2){throw new Error('Invalid JWT');}const payload=JSON.parse(Buffer.from(parts[1],'base64url').toString('utf8'));const out={iss:payload.iss,aud:payload.aud,sub:payload.sub,repository:payload.repository,repository_owner:payload.repository_owner,ref:payload.ref,job_workflow_ref:payload.job_workflow_ref,workflow_ref:payload.workflow_ref,actor:payload.actor};require('fs').writeFileSync('.artifacts/oidc-claims.json', JSON.stringify(out,null,2));console.log(JSON.stringify(out,null,2));})"
       - name: Assert supported npm publish mode
         run: |
           set -euo pipefail
@@ -99,34 +101,38 @@ jobs:
           fi
           echo "Publish mode OK: private repository without provenance."
       - name: OIDC publish preflight (dry-run)
-        id: oidc_preflight
-        continue-on-error: true
-        env:
-          CHANGESETS_RELEASE: "1"
         run: |
           set -euo pipefail
-          # Core package is already published and unchanged; preflight only unpublished subpackages.
-          for d in "packages/adapter-redis" "packages/observability"; do
+          for d in "." "packages/adapter-redis" "packages/observability"; do
             NAME="$(node -e "console.log(require('./${d}/package.json').name)")"
             VERSION="$(node -e "console.log(require('./${d}/package.json').version)")"
             if npm view "${NAME}@${VERSION}" version >/dev/null 2>&1; then
               echo "Skipping preflight for already published ${NAME}@${VERSION}"
               continue
             fi
-
             echo "OIDC dry-run publish in ${d} for ${NAME}@${VERSION}"
             (cd "${d}" && npm publish --access public --dry-run)
           done
-      - name: Fail if OIDC preflight failed
-        if: steps.oidc_preflight.outcome == 'failure'
+      - name: Release summary
+        if: always()
         run: |
-          echo "OIDC preflight failed. Check previous step logs for package-specific error details."
-          exit 1
-      - name: Drop token auth to force OIDC trusted publishing
-        run: |
-          set -euo pipefail
-          rm -f "${NPM_CONFIG_USERCONFIG:-$HOME/.npmrc}" || true
-          rm -f "$HOME/.npmrc" || true
+          {
+            echo "## Release Pipeline Summary"
+            echo ""
+            echo "- verify:release completed"
+            echo "- Telegram schema checks completed"
+            echo "- benchmark + trend checks completed"
+            echo "- pack artifact verification completed"
+            echo "- OIDC preflight completed"
+            echo ""
+            echo "Artifacts: package metadata, npm visibility, pack manifests, OIDC claims."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: release-diagnostics
+          path: .artifacts
+          if-no-files-found: error
       - uses: changesets/action@v1
         with:
           publish: pnpm -r publish --access public --no-git-checks

@@ -1,0 +1,29 @@
+import { spawnSync } from 'node:child_process';
+
+const steps = [
+  'pnpm changeset:lint',
+  'pnpm telegram:baseline:check',
+  'pnpm telegram:schema:types:check',
+  'pnpm telegram:schema:payloads:check',
+  'pnpm telegram:schema:results:check',
+  'pnpm test',
+  'pnpm typecheck:compat',
+  'pnpm -r typecheck',
+  'pnpm build',
+  'pnpm -r build',
+  'pnpm api:snapshot:check',
+  'pnpm pack:size'
+];
+
+for (const step of steps) {
+  console.log(`\n==> ${step}`);
+  const result = spawnSync(step, {
+    shell: true,
+    stdio: 'inherit',
+    env: process.env
+  });
+
+  if (result.status !== 0) {
+    process.exit(result.status ?? 1);
+  }
+}

@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   changeset-required:
     if: ${{ github.event_name == 'pull_request' }}
@@ -29,6 +33,27 @@ jobs:
       - run: node scripts/check-changeset-required.mjs
 
   verify:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [20, 22]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 10.4.1
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck:compat
+      - run: pnpm typecheck
+      - run: pnpm build
+      - run: pnpm test
+
+  release-integrity:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -42,19 +67,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm telegram:baseline:check
       - run: pnpm telegram:schema:fetch:ci
-      - name: Telegram schema completeness check (informational)
-        continue-on-error: true
+      - name: Telegram schema completeness check
         run: pnpm telegram:schema:completeness:check
-      - name: Telegram schema drift check (informational)
-        continue-on-error: true
+      - name: Telegram schema drift check
         run: pnpm telegram:schema:drift:check
-      - run: pnpm typecheck:compat
-      - run: pnpm typecheck
-      - run: pnpm build
       - run: pnpm api:snapshot:check
       - run: pnpm pack:size
       - run: pnpm -r build
-      - run: pnpm test
 
   redis-integration:
     runs-on: ubuntu-latest

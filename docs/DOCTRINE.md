@@ -99,7 +99,6 @@ The following are deliberate non-goals for TGWrapper. If you need these, look el
 
 - TGWrapper follows **Semantic Versioning (SemVer)**.
 - The `0.x` range is explicitly pre-1.0. Breaking changes may occur in minor versions, with migration guidance in `CHANGELOG.md`.
-- The `1.0.0` milestone requires: validated stability of the core API surface, documented test coverage, and at least one reference production deployment.
 - Package-level stability tiers (Experimental / Beta / Early Production / Stable) are independent from the workspace version number.
 
 See [`docs/RELEASE_POLICY.md`](./RELEASE_POLICY.md) for the full release process.

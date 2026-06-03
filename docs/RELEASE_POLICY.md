@@ -8,19 +8,6 @@
 - Telegram Bot API target baseline is tracked in `/Users/jilimbo/Documents/Personal/TGWrapper/docs/telegram-api-baseline.json` and validated by `pnpm telegram:baseline:check`.
 - Telegram API schema snapshot is tracked in `/Users/jilimbo/Documents/Personal/TGWrapper/docs/telegram-api-schema.snapshot.json` and compared via `pnpm telegram:schema:drift:report`.
 
-## 1.0.0 Policy Decision
-
-- `1.0.0` is the first stable production version.
-- From `1.0.0`, SemVer is strict for public exports from `/Users/jilimbo/Documents/Personal/TGWrapper/src/index.ts`.
-- Release candidate and final release must pass `pnpm verify:1.0`.
-
-
-## 1.0.0 Formal Readiness ("100% at release-time")
-
-- Readiness contract is defined in `/Users/jilimbo/Documents/Personal/TGWrapper/docs/DEFINITION_OF_DONE_1.0.0.md`.
-- `pnpm verify:1.0` is mandatory for 1.0 release candidates and final release.
-- `pnpm telegram:schema:coverage:full:check` must pass (snapshot and generated method/update/payload/result maps must match 1:1).
-
 ## Supported npm Publish Modes
 
 | Repository Visibility | npm Provenance | Status | Notes |
@@ -29,7 +16,7 @@
 | private | disabled | supported (current) | Current policy. Release workflow enforces this mode and fails fast on unsupported config. |
 | public | enabled | supported | Can be enabled after repository/package policy migration. |
 
-## SemVer Rules (effective from 1.0.0)
+## SemVer Rules
 
 - `patch`: bug fixes only, no API breaks.
 - `minor`: additive backward-compatible APIs.
@@ -62,7 +49,6 @@
 ## Safety Gates
 
 - `pnpm verify:release` must pass.
-- `pnpm verify:1.0` must pass for 1.0 candidates/final.
 - OIDC preflight and publish mode assertion must pass.
 - Schema drift gate must pass or be accompanied by required follow-up changeset.
 

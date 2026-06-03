@@ -49,7 +49,7 @@ jobs:
             tail -n 80 .artifacts/error.log
             echo '```'
           } > .artifacts/failure-summary.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: steps.run_check.outcome == 'failure'
         with:
           name: ci-changeset-required
@@ -99,7 +99,7 @@ jobs:
             tail -n 120 .artifacts/error.log
             echo '```'
           } > .artifacts/failure-summary.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: steps.run_verify.outcome == 'failure'
         with:
           name: ci-verify-node-${{ matrix.node-version }}
@@ -148,7 +148,7 @@ jobs:
             tail -n 120 .artifacts/error.log
             echo '```'
           } > .artifacts/failure-summary.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: steps.run_release_integrity.outcome == 'failure'
         with:
           name: ci-release-integrity
@@ -201,7 +201,7 @@ jobs:
             tail -n 120 .artifacts/error.log
             echo '```'
           } > .artifacts/failure-summary.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         if: steps.run_redis_integration.outcome == 'failure'
         with:
           name: ci-redis-integration

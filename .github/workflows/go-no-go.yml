@@ -4,10 +4,13 @@ on:
   workflow_dispatch:
   push:
     tags:
-      - "v1.0.0-rc.*"
 
 permissions:
   contents: read
+
+concurrency:
+  group: go-no-go-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   release-gates:
@@ -36,7 +39,7 @@ jobs:
             echo "Use NPM_PUBLISH_PROVENANCE=false or migrate to supported public provenance flow."
             exit 1
           fi
-      - run: pnpm verify:1.0
+      - run: pnpm verify:release
       - run: pnpm -r publish --dry-run --no-git-checks
         env:
           CHANGESETS_RELEASE: "1"
@@ -66,15 +69,22 @@ jobs:
       - name: Repeat load and chaos
         run: |
           set -euo pipefail
+          mkdir -p .artifacts
           for run in 1 2 3; do
             echo "Go/No-Go reliability repetition #${run}: load"
-            pnpm test:load
+            pnpm test:load | tee -a .artifacts/reliability.log
             echo "Go/No-Go reliability repetition #${run}: chaos"
-            pnpm test:chaos
+            pnpm test:chaos | tee -a .artifacts/reliability.log
           done
       - run: pnpm test:integration
         env:
           REDIS_URL: redis://127.0.0.1:6379
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: go-no-go-reliability
+          path: .artifacts
+          if-no-files-found: error
 
   go-no-go-summary:
     runs-on: ubuntu-latest
@@ -91,14 +101,14 @@ jobs:
 
           if [ "${RELEASE_GATES_RESULT}" = "success" ] && [ "${RELIABILITY_GATES_RESULT}" = "success" ]; then
             DECISION="GO"
-            MESSAGE="All 1.0.0 release gates passed."
+            MESSAGE="All release gates passed."
           else
             DECISION="NO-GO"
-            MESSAGE="One or more 1.0.0 release gates failed. Do not tag/publish final 1.0.0."
+            MESSAGE="One or more release gates failed. Do not tag/publish."
           fi
 
           {
-            echo "## 1.0.0 Go/No-Go Decision"
+            echo "## Go/No-Go Decision"
             echo ""
             echo "| Gate | Result |"
             echo "|---|---|"

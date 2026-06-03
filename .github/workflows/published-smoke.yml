@@ -9,6 +9,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: published-smoke-${{ github.event_name }}-${{ github.event.workflow_run.head_sha || github.sha }}
+  cancel-in-progress: true
+
 jobs:
   published-smoke:
     if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository) }}
@@ -20,6 +24,25 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 20
-      - run: node scripts/published-smoke.mjs
+      - name: Run published smoke
+        run: |
+          mkdir -p .artifacts
+          node scripts/published-smoke.mjs 2>&1 | tee .artifacts/published-smoke.log
         env:
           PUBLISHED_SMOKE_STRICT: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}
+      - name: Published smoke summary
+        if: always()
+        run: |
+          {
+            echo "## Published Smoke Summary"
+            echo ""
+            echo "Strict mode: ${{ github.event_name == 'workflow_dispatch' && 'true' || 'false' }}"
+            echo ""
+            echo "Published package smoke validation completed."
+          } >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: published-smoke-log
+          path: .artifacts/published-smoke.log
+          if-no-files-found: error

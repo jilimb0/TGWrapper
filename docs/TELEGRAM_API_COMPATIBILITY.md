@@ -54,7 +54,7 @@ These are still reachable through typed `callApi` contracts.
 - Baseline check: `pnpm telegram:baseline:check`
 - Schema completeness check: `pnpm telegram:schema:completeness:check`
 - Strict full-coverage check: `pnpm telegram:schema:coverage:full:check`
-- Release checks: `pnpm verify:release` and `pnpm verify:1.0`
+- Release checks: `pnpm verify:release`
 
 ## Upgrade Procedure
 
@@ -71,4 +71,3 @@ These are still reachable through typed `callApi` contracts.
 4. Regenerate schema-derived artifacts if required.
 5. Re-run:
    - `pnpm verify:release`
-   - `pnpm verify:1.0`

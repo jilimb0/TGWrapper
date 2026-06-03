@@ -76,6 +76,26 @@ jobs:
           fi
         env:
           CHANGESETS_RELEASE: "1"
+      - name: Persist failure digest artifact
+        if: failure()
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          if [ ! -f .artifacts/failure-summary.md ]; then
+            {
+              echo "### failure-digest-fallback"
+              echo ""
+              echo "The job failed before a dedicated failure summary was written."
+              echo ""
+              echo '```text'
+              if [ -f .artifacts/error.log ]; then
+                tail -n 120 .artifacts/error.log
+              else
+                echo "No .artifacts/error.log file was found."
+              fi
+              echo '```'
+            } > .artifacts/failure-summary.md
+          fi
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -131,6 +151,26 @@ jobs:
           fi
         env:
           REDIS_URL: redis://127.0.0.1:6379
+      - name: Persist failure digest artifact
+        if: failure()
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          if [ ! -f .artifacts/failure-summary.md ]; then
+            {
+              echo "### failure-digest-fallback"
+              echo ""
+              echo "The job failed before a dedicated failure summary was written."
+              echo ""
+              echo '```text'
+              if [ -f .artifacts/error.log ]; then
+                tail -n 120 .artifacts/error.log
+              else
+                echo "No .artifacts/error.log file was found."
+              fi
+              echo '```'
+            } > .artifacts/failure-summary.md
+          fi
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -145,6 +185,9 @@ jobs:
       - reliability
     if: always()
     steps:
+      - name: Prepare artifact download directory
+        if: always()
+        run: rm -rf .artifacts-upload && mkdir -p .artifacts-upload
       - uses: actions/download-artifact@v6
         if: always()
         with:
@@ -176,7 +219,7 @@ jobs:
             echo ""
             echo "## Failure digest"
             echo ""
-          } >> "${GITHUB_STEP_SUMMARY}"
+          } >> "$GITHUB_STEP_SUMMARY"
 
           if [ -d .artifacts-upload ]; then
             {
@@ -186,27 +229,27 @@ jobs:
               find .artifacts-upload -maxdepth 3 -type f | sort
               echo '```'
               echo ""
-            } >> "${GITHUB_STEP_SUMMARY}"
+            } >> "$GITHUB_STEP_SUMMARY"
           else
             {
               echo "### Artifact download status"
               echo ""
               echo "Artifact download directory was not created."
               echo ""
-            } >> "${GITHUB_STEP_SUMMARY}"
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
           if find .artifacts-upload -name 'failure-summary.md' -print -quit >/dev/null 2>&1; then
             while IFS= read -r file; do
-              cat "$file" >> "${GITHUB_STEP_SUMMARY}"
-              echo "" >> "${GITHUB_STEP_SUMMARY}"
+              cat "$file" >> "$GITHUB_STEP_SUMMARY"
+              echo "" >> "$GITHUB_STEP_SUMMARY"
             done < <(find .artifacts-upload -name 'failure-summary.md' | sort)
           else
             {
               echo "No failure digests were produced."
               echo ""
               echo "This usually means either the failing job did not create .artifacts/failure-summary.md or download-artifact did not materialize the uploaded files as expected."
-            } >> "${GITHUB_STEP_SUMMARY}"
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
           {
@@ -214,7 +257,7 @@ jobs:
             echo "**Decision: ${DECISION}**"
             echo ""
             echo "If decision is GO, baseline release gates are satisfied."
-          } >> "${GITHUB_STEP_SUMMARY}"
+          } >> "$GITHUB_STEP_SUMMARY"
 
           if [ "${DECISION}" = "NO-GO" ]; then
             exit 1

@@ -45,6 +45,26 @@ jobs:
             } > .artifacts/failure-summary.md
             exit 1
           fi
+      - name: Persist failure digest artifact
+        if: failure()
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          if [ ! -f .artifacts/failure-summary.md ]; then
+            {
+              echo "### failure-digest-fallback"
+              echo ""
+              echo "The job failed before a dedicated failure summary was written."
+              echo ""
+              echo '```text'
+              if [ -f .artifacts/error.log ]; then
+                tail -n 120 .artifacts/error.log
+              else
+                echo "No .artifacts/error.log file was found."
+              fi
+              echo '```'
+            } > .artifacts/failure-summary.md
+          fi
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -88,6 +108,26 @@ jobs:
             } > .artifacts/failure-summary.md
             exit 1
           fi
+      - name: Persist failure digest artifact
+        if: failure()
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          if [ ! -f .artifacts/failure-summary.md ]; then
+            {
+              echo "### failure-digest-fallback"
+              echo ""
+              echo "The job failed before a dedicated failure summary was written."
+              echo ""
+              echo '```text'
+              if [ -f .artifacts/error.log ]; then
+                tail -n 120 .artifacts/error.log
+              else
+                echo "No .artifacts/error.log file was found."
+              fi
+              echo '```'
+            } > .artifacts/failure-summary.md
+          fi
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -129,6 +169,26 @@ jobs:
               echo '```'
             } > .artifacts/failure-summary.md
             exit 1
+          fi
+      - name: Persist failure digest artifact
+        if: failure()
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          if [ ! -f .artifacts/failure-summary.md ]; then
+            {
+              echo "### failure-digest-fallback"
+              echo ""
+              echo "The job failed before a dedicated failure summary was written."
+              echo ""
+              echo '```text'
+              if [ -f .artifacts/error.log ]; then
+                tail -n 120 .artifacts/error.log
+              else
+                echo "No .artifacts/error.log file was found."
+              fi
+              echo '```'
+            } > .artifacts/failure-summary.md
           fi
       - uses: actions/upload-artifact@v7
         if: always()
@@ -176,6 +236,26 @@ jobs:
           fi
         env:
           REDIS_URL: redis://127.0.0.1:6379
+      - name: Persist failure digest artifact
+        if: failure()
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          if [ ! -f .artifacts/failure-summary.md ]; then
+            {
+              echo "### failure-digest-fallback"
+              echo ""
+              echo "The job failed before a dedicated failure summary was written."
+              echo ""
+              echo '```text'
+              if [ -f .artifacts/error.log ]; then
+                tail -n 120 .artifacts/error.log
+              else
+                echo "No .artifacts/error.log file was found."
+              fi
+              echo '```'
+            } > .artifacts/failure-summary.md
+          fi
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -192,6 +272,9 @@ jobs:
       - redis-integration
     if: always()
     steps:
+      - name: Prepare artifact download directory
+        if: always()
+        run: rm -rf .artifacts-upload && mkdir -p .artifacts-upload
       - uses: actions/download-artifact@v6
         if: always()
         with:
@@ -221,23 +304,20 @@ jobs:
             echo ""
           } >> "$GITHUB_STEP_SUMMARY"
 
-          if [ -d .artifacts-upload ]; then
-            {
-              echo "### Downloaded artifact files"
-              echo ""
-              echo '```text'
-              find .artifacts-upload -maxdepth 3 -type f | sort
-              echo '```'
-              echo ""
-            } >> "$GITHUB_STEP_SUMMARY"
-          else
-            {
-              echo "### Artifact download status"
-              echo ""
-              echo "Artifact download directory was not created."
-              echo ""
-            } >> "$GITHUB_STEP_SUMMARY"
-          fi
+          FILE_LIST=$(find .artifacts-upload -maxdepth 3 -type f | sort || true)
+
+          {
+            echo "### Downloaded artifact files"
+            echo ""
+            echo '```text'
+            if [ -n "$FILE_LIST" ]; then
+              printf '%s\n' "$FILE_LIST"
+            else
+              echo "No files were downloaded into .artifacts-upload."
+            fi
+            echo '```'
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
 
           if find .artifacts-upload -name 'failure-summary.md' -print -quit >/dev/null 2>&1; then
             while IFS= read -r file; do
@@ -246,9 +326,11 @@ jobs:
             done < <(find .artifacts-upload -name 'failure-summary.md' | sort)
           else
             {
-              echo "No failure digests were produced."
+              echo "### Failure digest unavailable"
               echo ""
-              echo "This usually means either the failing job did not create .artifacts/failure-summary.md or download-artifact did not materialize the uploaded files as expected."
+              echo "No failure-summary.md files were found in downloaded artifacts."
+              echo "This indicates either artifact upload did not include the digest or the failing job never reached digest creation."
+              echo ""
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 

@@ -40,9 +40,9 @@ export function toOtelReadableSpan(span: TraceSpan): OtelReadableSpan {
       spanId: span.spanId,
       traceFlags: 1 // Recorded
     }),
-    parentSpanId: span.parentSpanId,
+    ...(span.parentSpanId !== undefined ? { parentSpanId: span.parentSpanId } : {}),
     startTime: [startSec, startNanos],
-    endTime: span.endTime ? [endSec, endNanos] : undefined,
+    ...(span.endTime ? { endTime: [endSec, endNanos] as [number, number] } : {}),
     status: {
       code: span.status === 'ok' ? 1 : span.status === 'error' ? 2 : 0
     },

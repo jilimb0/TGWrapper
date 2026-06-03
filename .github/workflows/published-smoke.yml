@@ -64,7 +64,7 @@ jobs:
             echo ""
             echo "Published package smoke validation completed."
           } >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: published-smoke-log

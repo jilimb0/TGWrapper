@@ -140,7 +140,7 @@ jobs:
               echo "Telegram Bot API baseline is already up to date."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v7
+      - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: telegram-api-watchdog-log

@@ -1,6 +1,6 @@
 # @jilimb0/tgwrapper-observability
 
-> Core telemetry engine for TGWrapper. Instrument your bot runtime with zero-overhead logging, Prometheus metrics, and AsyncLocalStorage trace correlation.
+> A low-overhead telemetry engine for TGWrapper providing metrics registries, log formatting, and trace correlation mappings.
 
 ## 📦 Installation
 
@@ -10,9 +10,15 @@ pnpm add @jilimb0/tgwrapper-observability
 
 ---
 
-## 🚀 Quick Start
+## 📈 Maturity & Support Level
+- **Stability:** `Beta`
+- **Adoption Status:** Used in early developer testing environments.
+- **Runtime Support:** Node.js (relies on standard `AsyncLocalStorage` hooks).
+- **API Stability:** `Evolving` (Trace context structures might experience minor refinements prior to 1.0).
 
-Attach telemetry tracking to any TGWrapper client in one call:
+---
+
+## 🚀 Quick Start
 
 ```typescript
 import { createBotClient } from '@jilimb0/tgwrapper';
@@ -21,139 +27,60 @@ import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-obse
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
 const registry = new MetricsRegistry();
 
-// Bind metrics and logging to bot events
+// Bind loggers and metrics
 const detach = attachBotObservability(bot, {
   metrics: registry,
-  logger: {
-    log: (evt) => console.log(JSON.stringify(evt))
-  },
-  serviceName: 'my-bot-service',
-  tenantId: 'tenant-1',
-  botId: 'production-bot-01'
+  logger: { log: (evt) => console.log(JSON.stringify(evt)) },
+  serviceName: 'bot-service'
 });
-
-await bot.start();
 ```
 
 ---
 
-## 📊 Telemetry Model & Instrumented Metrics
+## 🛠️ Telemetry & Export Recipes
 
-`attachBotObservability` automatically tracks bot execution status.
-
-### Collected Metrics
-- `bot_launch_total` (Counter): Logs bot bootstrap events.
-- `bot_update_total` (Counter, labels: `update_type`): Tracks update types ingested (e.g., `message`, `callback_query`).
-- `bot_runtime_error_total` (Counter, labels: `class`, `code`): Classified runtime errors (e.g., `db`, `api`, `transport`).
-
----
-
-## 🔗 Correlation Trace Context
-
-Observing webhooks and external APIs requires trace correlation. TGWrapper-observability uses Node.js `AsyncLocalStorage` to tie log events to specific incoming updates or users:
-
+### Recipe 1: Prometheus Export
+Expose bot metrics to Prometheus scrapers:
 ```typescript
-import { withCorrelationContext, getCorrelationContext } from '@jilimb0/tgwrapper-observability';
+import { PrometheusExporter } from '@jilimb0/tgwrapper-observability';
+import { createServer } from 'http';
 
-// Inject context in update handler
-export async function handleUpdate(update: any) {
-  const context = {
-    traceId: update.update_id.toString(),
-    userId: update.message?.from?.id?.toString(),
-    chatId: update.message?.chat?.id?.toString()
-  };
+const exporter = new PrometheusExporter(registry);
+createServer((req, res) => {
+  if (req.url === '/metrics') {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.end(exporter.export());
+  }
+}).listen(8080);
+```
 
-  await withCorrelationContext(context, async () => {
-    // Any downstream functions can fetch active trace IDs automatically
-    const current = getCorrelationContext();
-    console.log(`Executing within context of trace: ${current.traceId}`);
+### Recipe 2: AI / LLM Call Tracing
+Track conversational request spans and token metrics:
+```typescript
+import { Tracer } from '@jilimb0/tgwrapper-observability';
+
+const tracer = new Tracer();
+async function handleQuery(prompt: string) {
+  return await tracer.withSpan('ai_generation', async () => {
+    const span = tracer.startSpan('llm_call');
+    const res = await callLLM(prompt);
+    
+    // Log token usage metrics
+    span.attributes['llm.usage.prompt_tokens'] = res.promptTokens;
+    span.attributes['llm.usage.completion_tokens'] = res.completionTokens;
+    
+    tracer.endSpan(span, 'ok');
+    return res.text;
   });
 }
 ```
 
 ---
 
-## 🛠️ Production Recipes
+## 🛑 Limitations & Caveats
 
-### Recipe 1: ECS-Compliant Structured Logging (JSON)
-Perfect for Datadog, ELK, or AWS CloudWatch processing.
+Review these operational boundaries before integrating the observability package:
 
-```typescript
-import { Logger, LogEvent } from '@jilimb0/tgwrapper-observability';
-
-class EcsLogger implements Logger {
-  public log(event: LogEvent): void {
-    console.log(JSON.stringify({
-      '@timestamp': event.timestamp,
-      'log.level': event.level.toUpperCase(),
-      'event.action': event.event,
-      'tg.request_id': event.requestId,
-      ...event.data
-    }));
-  }
-}
-```
-
----
-
-### Recipe 2: Prometheus Metrics & Dashboard Export
-Expose metrics to Prometheus scrapers using standard formatting:
-
-```typescript
-import { MetricsRegistry, PrometheusExporter } from '@jilimb0/tgwrapper-observability';
-import { createServer } from 'http';
-
-const registry = new MetricsRegistry();
-const exporter = new PrometheusExporter(registry);
-
-createServer((req, res) => {
-  if (req.url === '/metrics') {
-    res.writeHead(200, { 'Content-Type': 'text/plain; version=0.0.4' });
-    res.end(exporter.export());
-  } else {
-    res.writeHead(404).end();
-  }
-}).listen(8080);
-```
-
----
-
-### Recipe 3: AI-Telemetry Trace Flow (LLM, Spans, and Tokens)
-Correlate external model spans with incoming Telegram events, tracking token accounting details.
-
-```typescript
-import { Tracer } from '@jilimb0/tgwrapper-observability';
-
-const tracer = new Tracer();
-
-async function handleAIBotQuery(userPrompt: string) {
-  // Trace the overall AI session
-  return await tracer.withSpan('ai_generation', async () => {
-    
-    // Sub-span tracking model response time and token metrics
-    const modelSpan = tracer.startSpan('llm_call', { provider: 'openai', model: 'gpt-4o' });
-    try {
-      const response = await callLLMApi(userPrompt);
-      
-      // Inject token usage accounting
-      modelSpan.attributes['llm.usage.prompt_tokens'] = response.promptTokens;
-      modelSpan.attributes['llm.usage.completion_tokens'] = response.completionTokens;
-      
-      tracer.endSpan(modelSpan, 'ok');
-      return response.text;
-    } catch (err) {
-      tracer.endSpan(modelSpan, 'error');
-      throw err;
-    }
-  }, { user_prompt_length: userPrompt.length });
-}
-
-async function callLLMApi(prompt: string) {
-  // Simulated LLM return payload
-  return {
-    text: "AI Response content.",
-    promptTokens: 15,
-    completionTokens: 25
-  };
-}
-```
+* **No Built-in UI Dashboard:** The package does not ship with visual graphs or web interfaces. It exports raw metrics (Prometheus format or OTLP JSON). You must set up your own Prometheus/Grafana or Datadog collectors.
+* **Node.js Runtime Dependency:** Context correlation utilizes Node's standard `AsyncLocalStorage`. In serverless platforms that do not fully support AsyncLocalStorage hooks, context propagation behaves as a global fallback.
+* **Memory Management:** Spans started manually via `Tracer.startSpan` must be closed manually via `Tracer.endSpan`. Failing to close spans will cause memory usage growth in long-running polling processes.

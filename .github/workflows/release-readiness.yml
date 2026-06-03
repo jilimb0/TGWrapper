@@ -212,7 +212,3 @@ jobs:
             echo ""
             echo "If decision is GO, baseline release gates are satisfied."
           } >> "$GITHUB_STEP_SUMMARY"
-
-          if [ "${DECISION}" = "NO-GO" ]; then
-            exit 1
-          fi

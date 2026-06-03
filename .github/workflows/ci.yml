@@ -30,7 +30,26 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: node scripts/check-changeset-required.mjs
+      - name: Check changeset requirement
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          if ! node scripts/check-changeset-required.mjs 2>&1 | tee .artifacts/error.log; then
+            {
+              echo "### changeset-required"
+              echo ""
+              echo '```text'
+              tail -n 80 .artifacts/error.log
+              echo '```'
+            } > .artifacts/failure-summary.md
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ci-changeset-required
+          path: .artifacts
+          if-no-files-found: ignore
 
   verify:
     strategy:
@@ -48,10 +67,31 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm typecheck:compat
-      - run: pnpm typecheck
-      - run: pnpm build
-      - run: pnpm test
+      - name: Verify toolchain
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          if ! (
+            pnpm typecheck:compat &&
+            pnpm typecheck &&
+            pnpm build &&
+            pnpm test
+          ) 2>&1 | tee .artifacts/error.log; then
+            {
+              echo "### verify (node ${{ matrix.node-version }})"
+              echo ""
+              echo '```text'
+              tail -n 120 .artifacts/error.log
+              echo '```'
+            } > .artifacts/failure-summary.md
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ci-verify-node-${{ matrix.node-version }}
+          path: .artifacts
+          if-no-files-found: ignore
 
   release-integrity:
     runs-on: ubuntu-latest
@@ -65,15 +105,34 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm telegram:baseline:check
-      - run: pnpm telegram:schema:fetch:ci
-      - name: Telegram schema completeness check
-        run: pnpm telegram:schema:completeness:check
-      - name: Telegram schema drift check
-        run: pnpm telegram:schema:drift:check
-      - run: pnpm api:snapshot:check
-      - run: pnpm pack:size
-      - run: pnpm -r build
+      - name: Release integrity checks
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          if ! (
+            pnpm telegram:baseline:check &&
+            pnpm telegram:schema:fetch:ci &&
+            pnpm telegram:schema:completeness:check &&
+            pnpm telegram:schema:drift:check &&
+            pnpm api:snapshot:check &&
+            pnpm pack:size &&
+            pnpm -r build
+          ) 2>&1 | tee .artifacts/error.log; then
+            {
+              echo "### release-integrity"
+              echo ""
+              echo '```text'
+              tail -n 120 .artifacts/error.log
+              echo '```'
+            } > .artifacts/failure-summary.md
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ci-release-integrity
+          path: .artifacts
+          if-no-files-found: ignore
 
   redis-integration:
     runs-on: ubuntu-latest
@@ -97,6 +156,80 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm --filter @jilimb0/tgwrapper-adapter-redis test:integration
+      - name: Redis integration tests
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          if ! pnpm --filter @jilimb0/tgwrapper-adapter-redis test:integration 2>&1 | tee .artifacts/error.log; then
+            {
+              echo "### redis-integration"
+              echo ""
+              echo '```text'
+              tail -n 120 .artifacts/error.log
+              echo '```'
+            } > .artifacts/failure-summary.md
+            exit 1
+          fi
         env:
           REDIS_URL: redis://127.0.0.1:6379
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: ci-redis-integration
+          path: .artifacts
+          if-no-files-found: ignore
+
+  summary:
+    runs-on: ubuntu-latest
+    needs:
+      - changeset-required
+      - verify
+      - release-integrity
+      - redis-integration
+    if: always()
+    steps:
+      - uses: actions/download-artifact@v6
+        if: always()
+        with:
+          path: .artifacts
+          pattern: ci-*
+          merge-multiple: false
+      - name: CI summary
+        run: |
+          set -euo pipefail
+
+          CHANGESET_RESULT="${{ needs.changeset-required.result }}"
+          VERIFY_RESULT="${{ needs.verify.result }}"
+          RELEASE_RESULT="${{ needs.release-integrity.result }}"
+          REDIS_RESULT="${{ needs.redis-integration.result }}"
+
+          {
+            echo "## CI Summary"
+            echo ""
+            echo "| Job | Result |"
+            echo "|---|---|"
+            echo "| changeset-required | ${CHANGESET_RESULT} |"
+            echo "| verify | ${VERIFY_RESULT} |"
+            echo "| release-integrity | ${RELEASE_RESULT} |"
+            echo "| redis-integration | ${REDIS_RESULT} |"
+            echo ""
+            echo "## Failure digest"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          found_failure=0
+          if find .artifacts -name 'failure-summary.md' -print -quit >/dev/null 2>&1; then
+            while IFS= read -r file; do
+              cat "$file" >> "$GITHUB_STEP_SUMMARY"
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              found_failure=1
+            done < <(find .artifacts -name 'failure-summary.md' | sort)
+          else
+            echo "No failure digests were produced." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          for result in "$CHANGESET_RESULT" "$VERIFY_RESULT" "$RELEASE_RESULT" "$REDIS_RESULT"; do
+            if [ "$result" = "failure" ]; then
+              exit 1
+            fi
+          done

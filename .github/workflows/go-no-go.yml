@@ -31,18 +31,34 @@ jobs:
           npm i -g npm@11.8.0
           npm -v
       - run: pnpm install --frozen-lockfile
-      - name: Assert supported npm publish mode
+      - name: Release gates
         run: |
           set -euo pipefail
-          if [ "${NPM_PUBLISH_PROVENANCE}" = "true" ]; then
-            echo "Unsupported publish mode for private repository: provenance=true."
-            echo "Use NPM_PUBLISH_PROVENANCE=false or migrate to supported public provenance flow."
+          mkdir -p .artifacts
+          if ! (
+            if [ "${NPM_PUBLISH_PROVENANCE}" = "true" ]; then
+              echo "Unsupported publish mode for private repository: provenance=true."
+              echo "Use NPM_PUBLISH_PROVENANCE=false or migrate to supported public provenance flow."
+              exit 1
+            fi
+            pnpm verify:release
+            CHANGESETS_RELEASE="1" pnpm -r publish --dry-run --no-git-checks
+          ) 2>&1 | tee .artifacts/error.log; then
+            {
+              echo "### release-gates"
+              echo ""
+              echo '```text'
+              tail -n 120 .artifacts/error.log
+              echo '```'
+            } > .artifacts/failure-summary.md
             exit 1
           fi
-      - run: pnpm verify:release
-      - run: pnpm -r publish --dry-run --no-git-checks
-        env:
-          CHANGESETS_RELEASE: "1"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: go-no-go-release-gates
+          path: .artifacts
+          if-no-files-found: ignore
 
   reliability-gates:
     runs-on: ubuntu-latest
@@ -66,25 +82,36 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Repeat load and chaos
+      - name: Reliability gates
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          for run in 1 2 3; do
-            echo "Go/No-Go reliability repetition #${run}: load"
-            pnpm test:load | tee -a .artifacts/reliability.log
-            echo "Go/No-Go reliability repetition #${run}: chaos"
-            pnpm test:chaos | tee -a .artifacts/reliability.log
-          done
-      - run: pnpm test:integration
+          if ! (
+            for run in 1 2 3; do
+              echo "Go/No-Go reliability repetition #${run}: load"
+              pnpm test:load
+              echo "Go/No-Go reliability repetition #${run}: chaos"
+              pnpm test:chaos
+            done
+            pnpm test:integration
+          ) 2>&1 | tee .artifacts/error.log; then
+            {
+              echo "### reliability-gates"
+              echo ""
+              echo '```text'
+              tail -n 120 .artifacts/error.log
+              echo '```'
+            } > .artifacts/failure-summary.md
+            exit 1
+          fi
         env:
           REDIS_URL: redis://127.0.0.1:6379
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: go-no-go-reliability
+          name: go-no-go-reliability-gates
           path: .artifacts
-          if-no-files-found: error
+          if-no-files-found: ignore
 
   go-no-go-summary:
     runs-on: ubuntu-latest
@@ -93,6 +120,12 @@ jobs:
       - reliability-gates
     if: always()
     steps:
+      - uses: actions/download-artifact@v6
+        if: always()
+        with:
+          path: .artifacts
+          pattern: go-no-go-*
+          merge-multiple: false
       - name: Publish decision
         run: |
           set -euo pipefail
@@ -115,12 +148,27 @@ jobs:
             echo "| release-gates | ${RELEASE_GATES_RESULT} |"
             echo "| reliability-gates | ${RELIABILITY_GATES_RESULT} |"
             echo ""
+            echo "## Failure digest"
+            echo ""
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          if find .artifacts -name 'failure-summary.md' -print -quit >/dev/null 2>&1; then
+            while IFS= read -r file; do
+              cat "$file" >> "$GITHUB_STEP_SUMMARY"
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+            done < <(find .artifacts -name 'failure-summary.md' | sort)
+          else
+            echo "No failure digests were produced." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          {
+            echo ""
             echo "Target ref: \`${GITHUB_REF}\`"
             echo ""
             echo "**Decision: ${DECISION}**"
             echo ""
             echo "${MESSAGE}"
-          } >> "${GITHUB_STEP_SUMMARY}"
+          } >> "$GITHUB_STEP_SUMMARY"
 
           if [ "${DECISION}" = "NO-GO" ]; then
             exit 1

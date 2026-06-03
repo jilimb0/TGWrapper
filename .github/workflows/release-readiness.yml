@@ -178,13 +178,35 @@ jobs:
             echo ""
           } >> "${GITHUB_STEP_SUMMARY}"
 
+          if [ -d .artifacts-upload ]; then
+            {
+              echo "### Downloaded artifact files"
+              echo ""
+              echo '```text'
+              find .artifacts-upload -maxdepth 3 -type f | sort
+              echo '```'
+              echo ""
+            } >> "${GITHUB_STEP_SUMMARY}"
+          else
+            {
+              echo "### Artifact download status"
+              echo ""
+              echo "Artifact download directory was not created."
+              echo ""
+            } >> "${GITHUB_STEP_SUMMARY}"
+          fi
+
           if find .artifacts-upload -name 'failure-summary.md' -print -quit >/dev/null 2>&1; then
             while IFS= read -r file; do
               cat "$file" >> "${GITHUB_STEP_SUMMARY}"
               echo "" >> "${GITHUB_STEP_SUMMARY}"
             done < <(find .artifacts-upload -name 'failure-summary.md' | sort)
           else
-            echo "No failure digests were produced." >> "${GITHUB_STEP_SUMMARY}"
+            {
+              echo "No failure digests were produced."
+              echo ""
+              echo "This usually means either the failing job did not create .artifacts/failure-summary.md or download-artifact did not materialize the uploaded files as expected."
+            } >> "${GITHUB_STEP_SUMMARY}"
           fi
 
           {

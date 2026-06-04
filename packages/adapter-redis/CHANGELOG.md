@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper-adapter-redis
 
+## 0.6.0
+
+### Minor Changes
+
+- c97e4f5: Project upgrade
+
 ## 0.5.1
 
 ### Patch Changes

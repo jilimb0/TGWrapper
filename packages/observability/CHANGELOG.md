@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper-observability
 
+## 0.7.0
+
+### Minor Changes
+
+- c97e4f5: Project upgrade
+
 ## 0.6.1
 
 ### Patch Changes

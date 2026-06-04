@@ -1,0 +1,65 @@
+[
+  {
+    "file": "package.json",
+    "name": "@jilimb0/tgwrapper",
+    "version": "0.13.1",
+    "files": [
+      "dist/**/*.js",
+      "dist/**/*.d.ts",
+      "dist-cjs/**/*.js",
+      "README.md"
+    ],
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "require": "./dist-cjs/index.js"
+      }
+    },
+    "publishConfig": {
+      "access": "public"
+    }
+  },
+  {
+    "file": "packages/adapter-redis/package.json",
+    "name": "@jilimb0/tgwrapper-adapter-redis",
+    "version": "0.5.1",
+    "files": [
+      "dist/**/*.js",
+      "dist/**/*.d.ts",
+      "dist-cjs/**/*.js",
+      "README.md"
+    ],
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "require": "./dist-cjs/index.js"
+      }
+    },
+    "publishConfig": {
+      "access": "public"
+    }
+  },
+  {
+    "file": "packages/observability/package.json",
+    "name": "@jilimb0/tgwrapper-observability",
+    "version": "0.6.1",
+    "files": [
+      "dist/**/*.js",
+      "dist/**/*.d.ts",
+      "dist-cjs/**/*.js",
+      "README.md"
+    ],
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js",
+        "require": "./dist-cjs/index.js"
+      }
+    },
+    "publishConfig": {
+      "access": "public"
+    }
+  }
+]

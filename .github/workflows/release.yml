@@ -135,15 +135,40 @@ jobs:
           name: release-diagnostics
           path: .artifacts
           if-no-files-found: ignore
+      - name: Verify publish readiness
+        run: |
+          set -euo pipefail
+          UNPUBLISHED=0
+          for d in "." "packages/adapter-redis" "packages/observability"; do
+            NAME="$(node -e "console.log(require('./${d}/package.json').name)")"
+            LOCAL="$(node -e "console.log(require('./${d}/package.json').version)")"
+            REMOTE="$(npm view "${NAME}@${LOCAL}" version 2>/dev/null || true)"
+            if [ -z "${REMOTE}" ]; then
+              echo "UNPUBLISHED: ${NAME}@${LOCAL} exists locally but not on npm"
+              UNPUBLISHED=1
+            else
+              echo "OK: ${NAME}@${LOCAL} already published"
+            fi
+          done
+          PENDING="$(find .changeset -name '*.md' ! -name 'README.md' 2>/dev/null | wc -l | tr -d ' ')"
+          if [ "${UNPUBLISHED}" -eq 1 ] && [ "${PENDING}" -eq 0 ]; then
+            echo ""
+            echo "ERROR: Versions were bumped but packages are not published and no pending changesets found."
+            echo "The version PR was merged but publish failed. Re-run this workflow to retry publish."
+            exit 1
+          fi
+          echo "Publish readiness OK (unpublished=${UNPUBLISHED}, pending_changesets=${PENDING})"
       - uses: changesets/action@v1
+        id: changesets
         with:
           publish: pnpm -r publish --access public --no-git-checks
           version: bash scripts/changeset-version.sh
         env:
           CHANGESETS_RELEASE: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ""
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Sync example deps post-publish
+        if: steps.changesets.outputs.published == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

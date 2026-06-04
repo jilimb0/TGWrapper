@@ -164,5 +164,4 @@ jobs:
             --title "chore: sync example deps after release" \
             --body "Automated PR: updates examples to latest published @jilimb0/* versions and regenerates lockfile." \
             --base main \
-            --head "${BRANCH}" \
-            --label "automated"
+            --head "${BRANCH}"

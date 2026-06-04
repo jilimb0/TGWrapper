@@ -75,7 +75,12 @@
     "benchmark:trend:release": "BENCHMARK_MIN_RATIO=0.55 BENCHMARK_MIN_UPS=180000 node scripts/check-benchmark-trend.mjs",
     "telegram:schema:coverage:full:check": "node scripts/check-telegram-schema-full-coverage.mjs",
     "build:esm": "tsc -p tsconfig.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json"
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "verify:precommit": "node scripts/check-precommit-deps.mjs",
+    "hooks:install": "git config core.hooksPath .githooks",
+    "release:versions:check": "node scripts/check-release-versions-latest.mjs",
+    "sync:examples:published": "node scripts/sync-examples.mjs",
+    "sync:examples:npm": "node scripts/sync-examples.mjs --from-npm"
   },
   "keywords": [
     "telegram",
@@ -91,7 +96,7 @@
     "vite": "8.0.16",
     "vitest": "^4.0.18"
   },
-  "packageManager": "pnpm@10.4.1",
+  "packageManager": "pnpm@11.5.1+sha512.93f7b57422ea7068257235b4c16eb60762eb68e1dc23723199cc739043ea9be2c4143274a399d8c6defa2b1176226d9ca1c4b63482d6200c1a8fbaa78c1d1485",
   "files": [
     "dist/**/*.js",
     "dist/**/*.d.ts",
@@ -100,10 +105,5 @@
   ],
   "publishConfig": {
     "access": "public"
-  },
-  "pnpm": {
-    "overrides": {
-      "vite": "8.0.16"
-    }
   }
 }

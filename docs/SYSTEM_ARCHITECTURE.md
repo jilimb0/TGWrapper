@@ -17,11 +17,10 @@ TGWrapper is a layered monorepo. Each layer has a single, explicit responsibilit
                                 │  imports
           ┌─────────────────────┼──────────────────────┐
           ▼                     ▼                        ▼
-┌─────────────────┐  ┌──────────────────────┐  ┌────────────────────────┐
-│  @jilimb0/      │  │  @tgwrapper/core  │  │  @tgwrapper/core   │
-│  tgwrapper      │  │  -adapter-redis       │  │  -observability        │
-│  (Core)         │  │  (Redis Layer)        │  │  (Telemetry Layer)     │
-│                 │  │                       │  │                        │
+┌─────────────────┐  ┌────────────────────────────┐  ┌───────────────────────────┐
+│  @tgwrapper/    │  │  @tgwrapper/adapter-redis  │  │  @tgwrapper/observability │
+│  core           │  │  (Redis Layer)             │  │  (Telemetry Layer)        │
+│  (Core)         │  │                            │  │                           │
 │ • BotRuntime    │  │ • RedisSessionAdapter │  │ • MetricsRegistry      │
 │ • FSM engine    │  │ • RedisRateLimiter    │  │ • Tracer + Spans       │
 │ • Router        │  │ • RedisKvStore        │  │ • PrometheusExporter   │

@@ -13,6 +13,7 @@ if (files.length === 0) {
 }
 
 const invalid = [];
+const supportedScopes = ['@jilimb0/', '@tgwrapper/'];
 
 for (const file of files) {
   const content = readFileSync(resolve(dir, file), 'utf8');
@@ -28,9 +29,20 @@ for (const file of files) {
     continue;
   }
 
-  const hasPackageBump = /"@jilimb0\/[^"]+"\s*:\s*("(major|minor|patch)"|(major|minor|patch))/.test(frontmatter);
+  const hasPackageBump = frontmatter
+    .split('\n')
+    .map((line) => line.trim())
+    .some((line) => {
+      const scopeMatch = line.match(/^"([^\"]+)"\s*:\s*("(major|minor|patch)"|(major|minor|patch))$/);
+      if (!scopeMatch) return false;
+      const packageName = scopeMatch[1];
+      return packageName.startsWith('@')
+        ? supportedScopes.some((scope) => packageName.startsWith(scope))
+        : true;
+    });
+
   if (!hasPackageBump) {
-    invalid.push({ file, reason: 'frontmatter has no package semver bump entries' });
+    invalid.push({ file, reason: 'frontmatter has no supported package semver bump entries' });
   }
 }
 

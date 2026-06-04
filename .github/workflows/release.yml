@@ -66,9 +66,9 @@ jobs:
           set -euxo pipefail
           mkdir -p .artifacts
           {
-            npm view @jilimb0/tgwrapper --json || true
-            npm view @jilimb0/tgwrapper-adapter-redis --json || true
-            npm view @jilimb0/tgwrapper-observability --json || true
+            npm view @tgwrapper/core --json || true
+            npm view @tgwrapper/adapter-redis --json || true
+            npm view @tgwrapper/observability --json || true
           } > .artifacts/npm-registry-visibility.jsonl
       - name: Pack artifact check
         run: |
@@ -204,6 +204,6 @@ jobs:
           git push origin "${BRANCH}"
           gh pr create \
             --title "chore: sync example deps after release" \
-            --body "Automated PR: updates examples to latest published @jilimb0/* versions and regenerates lockfile." \
+            --body "Automated PR: updates examples to latest published @tgwrapper/* versions and regenerates lockfile." \
             --base main \
             --head "${BRANCH}"

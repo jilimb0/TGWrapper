@@ -39,7 +39,10 @@ jobs:
           pnpm -v
           echo "registry=$(npm config get registry)"
           echo "always-auth=$(npm config get always-auth || true)"
-      - run: pnpm install --frozen-lockfile
+      - name: Sync example deps & regenerate lockfile
+        run: |
+          node scripts/sync-examples.mjs
+          pnpm install --no-frozen-lockfile
       - run: pnpm verify:release
       - run: pnpm telegram:schema:fetch:ci
       - run: pnpm telegram:schema:completeness:check

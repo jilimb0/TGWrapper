@@ -39,10 +39,7 @@ jobs:
           pnpm -v
           echo "registry=$(npm config get registry)"
           echo "always-auth=$(npm config get always-auth || true)"
-      - name: Sync example deps & regenerate lockfile
-        run: |
-          node scripts/sync-examples.mjs
-          pnpm install --no-frozen-lockfile
+      - run: pnpm install --frozen-lockfile
       - run: pnpm verify:release
       - run: pnpm telegram:schema:fetch:ci
       - run: pnpm telegram:schema:completeness:check
@@ -144,3 +141,12 @@ jobs:
           CHANGESETS_RELEASE: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ""
+      - name: Sync example deps post-publish
+        run: |
+          node scripts/sync-examples.mjs
+          pnpm install --no-frozen-lockfile
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add examples/*/package.json pnpm-lock.yaml
+          git diff --cached --quiet || git commit -m "chore: sync example deps after release"
+          git push

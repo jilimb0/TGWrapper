@@ -7,9 +7,9 @@
     "test": "tsc --noEmit"
   },
   "dependencies": {
-    "@jilimb0/tgwrapper": "^0.14.0",
-    "@jilimb0/tgwrapper-adapter-redis": "^0.6.0",
-    "@jilimb0/tgwrapper-observability": "^0.7.0",
+    "@jilimb0/tgwrapper": "^0.13.1",
+    "@jilimb0/tgwrapper-adapter-redis": "^0.5.1",
+    "@jilimb0/tgwrapper-observability": "^0.6.1",
     "ioredis": "^5.6.1"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 # Redis Operational Monitoring Reference
 
-This reference details the telemetry metrics to monitor when using the `@jilimb0/tgwrapper-adapter-redis` package, along with diagnostic patterns for common production incidents.
+This reference details the telemetry metrics to monitor when using the `@tgwrapper/adapter-redis` package, along with diagnostic patterns for common production incidents.
 
 ---
 

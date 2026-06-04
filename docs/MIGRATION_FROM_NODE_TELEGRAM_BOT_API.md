@@ -14,7 +14,7 @@ const bot = new TelegramBot(token, { polling: true });
 After:
 
 ```ts
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 const bot = createBotClient({ token, mode: 'polling' });
 await bot.start();
 ```
@@ -74,13 +74,13 @@ TGWrapper packages are dual-mode and support both import styles.
 CJS:
 
 ```js
-const { createBotClient } = require('@jilimb0/tgwrapper');
+const { createBotClient } = require('@tgwrapper/core');
 ```
 
 ESM:
 
 ```ts
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 ```
 
 ## 6) Recommended migration order

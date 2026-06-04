@@ -67,8 +67,8 @@ bot.launch();
 ### TGWrapper
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 const sessionAdapter = new RedisSessionAdapter({
   redisUrl: process.env.REDIS_URL!,

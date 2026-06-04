@@ -193,7 +193,7 @@ export class BotRuntime implements RuntimeLifecycle {
       timestamp: new Date().toISOString(),
       data: {
         recommendation:
-          'Use @jilimb0/tgwrapper-adapter-redis createRateLimiter(...) for distributed multi-instance deployments.'
+          'Use @tgwrapper/adapter-redis createRateLimiter(...) for distributed multi-instance deployments.'
       }
     });
   }

@@ -91,7 +91,7 @@ Manual functional check:
 | Process uptime | Run under `pm2`, `systemd`, or inside a Docker container with `restart: always` |
 | Multiple instances | **Not supported** with polling. Only one instance should poll a given token at a time |
 | Rate limiting | Default in-memory rate limiter is single-process only; switch to Redis adapter for multi-node setups |
-| Observability | Attach `@jilimb0/tgwrapper-observability` to gain structured logs and metrics |
+| Observability | Attach `@tgwrapper/observability` to gain structured logs and metrics |
 | Graceful shutdown | `SIGTERM` will stop the polling loop after the current update batch completes |
 
 ---
@@ -137,6 +137,6 @@ This starter uses **Core only**. It is the entry-level layer of the TGWrapper st
 
 - **Port to Redis Sessions:** Add distributed rate limiting + sessions → [`multi-instance-redis-starter`](../multi-instance-redis-starter)
 - **Scale to Production:** Deploy serverless to Cloudflare / Lambda → [`serverless-webhook-starter`](../serverless-webhook-starter)
-- **Add Telemetry:** Add structured logs + metrics → [`@jilimb0/tgwrapper-observability`](../../packages/observability)
+- **Add Telemetry:** Add structured logs + metrics → [`@tgwrapper/observability`](../../packages/observability)
 - **Convince Your Team:** Share the [Convince Your Team Guide](../../docs/champion/CONVINCE_YOUR_TEAM.md) and [Team Evaluation Checklist](../../docs/champion/TEAM_EVALUATION_CHECKLIST.md) with your architecture team.
 - **Pilot Implementation:** Use the [Internal Pilot Playbook](../../docs/champion/PILOT_PLAYBOOK.md) to migrate your first staging service.

@@ -1,9 +1,9 @@
 # TGWrapper Production Stack Recipe
 
 ## Stack
-- `@jilimb0/tgwrapper` (core runtime)
-- `@jilimb0/tgwrapper-adapter-redis` (sessions/cache/rate-limit)
-- `@jilimb0/tgwrapper-observability` (logs/metrics hooks)
+- `@tgwrapper/core` (core runtime)
+- `@tgwrapper/adapter-redis` (sessions/cache/rate-limit)
+- `@tgwrapper/observability` (logs/metrics hooks)
 
 ## Deployment Patterns
 - Railway/Fly.io: Node HTTP webhook adapter

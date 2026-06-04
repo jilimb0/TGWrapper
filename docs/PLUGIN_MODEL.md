@@ -8,7 +8,7 @@ This document details how to extend TGWrapper's functionality by writing custom 
 
 ## 1. Session Storage Adapters
 
-Session state is persisted using any database that implements the `SessionAdapter` interface exported by `@jilimb0/tgwrapper`.
+Session state is persisted using any database that implements the `SessionAdapter` interface exported by `@tgwrapper/core`.
 
 ### The Interface
 
@@ -36,7 +36,7 @@ export interface SessionAdapter<T = any> {
 Here is a simplified outline of how you would write a MongoDB session adapter:
 
 ```typescript
-import { SessionAdapter } from '@jilimb0/tgwrapper';
+import { SessionAdapter } from '@tgwrapper/core';
 import { Collection } from 'mongodb';
 
 export class MongoSessionAdapter<T extends { version: number }> implements SessionAdapter<T> {
@@ -125,6 +125,6 @@ bot.on('update.processed', (event) => {
 If you build an adapter or rate limiter, please follow these guidelines to make it discoverable and robust:
 
 1. **Package Naming:** Use the naming format `tgwrapper-adapter-[database]` or `tgwrapper-plugin-[name]`.
-2. **Dependencies:** Mark `@jilimb0/tgwrapper` as a `peerDependency` in your `package.json` to prevent bundle duplication.
+2. **Dependencies:** Mark `@tgwrapper/core` as a `peerDependency` in your `package.json` to prevent bundle duplication.
 3. **Typing:** Distribute declaration files (`.d.ts`) alongside your compiled JavaScript.
 4. **Validation:** Implement standard mock integration tests verifying that concurrent database mutations trigger version updates correctly.

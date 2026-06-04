@@ -11,7 +11,7 @@ This guide maps common grammY features to their TGWrapper equivalents, providing
 | **Command Routing** | `bot.command("start", fn)` | `bot.on('message', ...)` with command guards |
 | **Sessions** | `ctx.session.x = y` | `await bot.updateSession(chatId, (s) => s.x = y)` |
 | **State Adapter** | `new RedisAdapter({ client })` | `new RedisSessionAdapter({ redis })` (with CAS protection) |
-| **Telemetry** | Custom middleware wrappers | Attach `@jilimb0/tgwrapper-observability` directly |
+| **Telemetry** | Custom middleware wrappers | Attach `@tgwrapper/observability` directly |
 
 ---
 
@@ -37,7 +37,7 @@ bot.start();
 
 **TGWrapper Translation:**
 ```typescript
-import { createBotClient } from "@jilimb0/tgwrapper";
+import { createBotClient } from "@tgwrapper/core";
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
 bot.on('message', async (message) => {
@@ -79,8 +79,8 @@ bot.on("message", (ctx) => {
 
 **TGWrapper Session:**
 ```typescript
-import { createBotClient } from "@jilimb0/tgwrapper";
-import { RedisSessionAdapter } from "@jilimb0/tgwrapper-adapter-redis";
+import { createBotClient } from "@tgwrapper/core";
+import { RedisSessionAdapter } from "@tgwrapper/adapter-redis";
 
 const sessionAdapter = new RedisSessionAdapter({
   redis: redisInstance,
@@ -155,8 +155,8 @@ bot.start();
 ### TGWrapper (Redis session with CAS)
 
 ```typescript
-import { createBotClient } from "@jilimb0/tgwrapper";
-import { RedisSessionAdapter } from "@jilimb0/tgwrapper-adapter-redis";
+import { createBotClient } from "@tgwrapper/core";
+import { RedisSessionAdapter } from "@tgwrapper/adapter-redis";
 
 interface SessionData {
   version: number;

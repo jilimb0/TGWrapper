@@ -25,7 +25,7 @@ Thank you for contributing to TGWrapper! To maintain platform reliability, we en
 ## 📝 Contribution Policies
 
 - **Strict Type Validation:** All variables and parameters must be explicitly typed. No `any` declarations are allowed on the core request path.
-- **Drift Prevention Gate:** If you make changes to the telemetry system (`@jilimb0/tgwrapper-observability`), you must update the schema contracts inside `docs/TELEMETRY_SCHEMA.md` within the same pull request.
+- **Drift Prevention Gate:** If you make changes to the telemetry system (`@tgwrapper/observability`), you must update the schema contracts inside `docs/TELEMETRY_SCHEMA.md` within the same pull request.
 - **Dual module Delivery:** Code changes must not break CommonJS (CJS) or ES Modules (ESM) dual packaging bundles. Verify by running `pnpm build`.
 - **Changesets Integration:** All PRs containing code changes must run `pnpm changeset` to add a description of the changes.
 
@@ -56,7 +56,7 @@ TGWrapper relies on high-coverage integration and simulation testing:
 
 We encourage community adapters!
 - **Where to place:** Submit new adapters under the `packages/` directory (e.g. `packages/adapter-mongodb`).
-- **Consistency:** Ensure custom session stores implement the `SessionAdapter` interface exported by `@jilimb0/tgwrapper`.
+- **Consistency:** Ensure custom session stores implement the `SessionAdapter` interface exported by `@tgwrapper/core`.
 - **Documentation:** Provide an example usage section and README inside your adapter directory.
 
 ---

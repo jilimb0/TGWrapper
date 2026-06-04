@@ -1,6 +1,6 @@
 # Telemetry Reference
 
-> Package: `@jilimb0/tgwrapper-observability` · Stability: Beta · Last updated: 2026-06
+> Package: `@tgwrapper/observability` · Stability: Beta · Last updated: 2026-06
 
 This document is the authoritative reference for TGWrapper's observability layer. It covers the event schema, all emitted metric names, supported exporter configurations, a debugging cookbook, and known limitations.
 
@@ -32,7 +32,7 @@ TGWrapper's observability layer is built on three primitives:
 The entry point is `attachBotObservability()`, which hooks into the bot's internal event bus and wraps update processing with trace context injection.
 
 ```typescript
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 const metrics = new MetricsRegistry();
 attachBotObservability(bot, {
@@ -196,7 +196,7 @@ The `logger` option accepts any object implementing `{ log(event: TelemetryEvent
 TGWrapper ships an OTEL bridge in `otel.ts` that maps `TelemetryEvent` to OTEL spans:
 
 ```typescript
-import { createOtelLogger } from '@jilimb0/tgwrapper-observability';
+import { createOtelLogger } from '@tgwrapper/observability';
 import { NodeSDK } from '@opentelemetry/sdk-node';
 
 // Initialize your OTEL SDK first

@@ -1,5 +1,5 @@
 {
-  "name": "@jilimb0/tgwrapper-adapter-redis",
+  "name": "@tgwrapper/adapter-redis",
   "version": "0.7.0",
   "description": "Redis storage adapter for TGWrapper providing distributed sessions, caching namespaces, and rate limiters",
   "repository": {

@@ -36,7 +36,7 @@ Are you migrating a live production bot to TGWrapper? We've designed resources t
 ## 💼 Commercial Support & Boundaries
 
 TGWrapper is maintained as a high-quality open-source project. Maintainer bandwidth is focused on:
-1. Fixing bugs in core, `@jilimb0/tgwrapper-adapter-redis`, and `@jilimb0/tgwrapper-observability`.
+1. Fixing bugs in core, `@tgwrapper/adapter-redis`, and `@tgwrapper/observability`.
 2. Validating type definitions against upstream Telegram schema updates.
 3. Keeping edge and serverless runtime cold starts thin.
 

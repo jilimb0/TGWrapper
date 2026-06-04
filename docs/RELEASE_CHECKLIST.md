@@ -35,7 +35,7 @@ To prevent our documentation, compatibility matrix, and upstream schemas from de
 
 ### Telemetry Schema Drift
 - **Mechanism:** Observability structures are declared as a formal contract in `docs/TELEMETRY_SCHEMA.md`.
-- **Policy:** Any pull request modifying logger events, metric registries, or span attributes in `@jilimb0/tgwrapper-observability` **must** include matching updates to the [Telemetry Schema Contract](./TELEMETRY_SCHEMA.md). Release validation fails if telemetry code additions are missing documentation changes.
+- **Policy:** Any pull request modifying logger events, metric registries, or span attributes in `@tgwrapper/observability` **must** include matching updates to the [Telemetry Schema Contract](./TELEMETRY_SCHEMA.md). Release validation fails if telemetry code additions are missing documentation changes.
 
 ### Support Matrix Drift
 - **Mechanism:** The runtime environments support matrix is defined in `SUPPORT.md`.

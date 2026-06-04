@@ -27,7 +27,7 @@ Run two instances behind a load balancer and the failure mode is silent: both in
 
 **What TGWrapper does instead:**
 ```typescript
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 const session = new RedisSessionAdapter({
   redis: redisInstance,
@@ -66,7 +66,7 @@ Which instance handled which update? Were they the same `callback_query` or two 
 
 **With TGWrapper's observability layer:**
 ```typescript
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 const metrics = new MetricsRegistry();
 attachBotObservability(bot, {
@@ -115,7 +115,7 @@ This works on one instance. With two instances, each has its own `Map`. A user g
 
 **TGWrapper's distributed rate limiter:**
 ```typescript
-import { RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
 
 const kv = new RedisKvStore({ redisUrl: process.env.REDIS_URL!, prefix: 'mybot' });
 const limiter = createRateLimiter(kv, {
@@ -136,7 +136,7 @@ You are calling OpenAI from a Telegraf handler. The call takes 3 seconds, consum
 
 **TGWrapper's AI tracing hooks:**
 ```typescript
-import { ContextStore } from '@jilimb0/tgwrapper-observability';
+import { ContextStore } from '@tgwrapper/observability';
 
 bot.on('message', async (message) => {
   const context = ContextStore.getStore();

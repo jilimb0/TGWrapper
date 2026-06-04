@@ -81,13 +81,13 @@ Never hide limitations. The ICP is a senior engineer — they will find the gaps
 
 ```bash
 # Step 1: Install (30 seconds)
-pnpm add @jilimb0/tgwrapper
+pnpm add @tgwrapper/core
 
 # Step 2: Create bot (2 minutes)
 ```
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
 bot.on('message', async (msg) => {

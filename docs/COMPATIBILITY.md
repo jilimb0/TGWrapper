@@ -31,7 +31,7 @@ We compile TGWrapper to run seamlessly in both long-lived server processes and e
 
 ### Edge Runtimes Support Details
 - **No Long-Polling:** Edge and Serverless execution environments enforce rigid request timeouts. Long-polling (`mode: 'polling'`) is strictly blocked in these environments. You must configure `mode: 'webhook'`.
-- **AsyncLocalStorage Fallbacks:** In edge engines where `AsyncLocalStorage` is not fully supported or is disabled, the `@jilimb0/tgwrapper-observability` context propagation behaves as a global fallback trace holder. Spans are still captured but trace propagation through nested async limits may be degraded.
+- **AsyncLocalStorage Fallbacks:** In edge engines where `AsyncLocalStorage` is not fully supported or is disabled, the `@tgwrapper/observability` context propagation behaves as a global fallback trace holder. Spans are still captured but trace propagation through nested async limits may be degraded.
 
 ---
 
@@ -48,7 +48,7 @@ We run automated bundle audits during releases to guarantee correct export entry
 
 ## 🗄️ Redis Infrastructure Compatibility
 
-The `@jilimb0/tgwrapper-adapter-redis` package is tested against official Redis releases:
+The `@tgwrapper/adapter-redis` package is tested against official Redis releases:
 
 | Redis Server Version | Support Level | Notes / Rationale |
 | :--- | :--- | :--- |

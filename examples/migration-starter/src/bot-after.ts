@@ -1,7 +1,7 @@
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
-import Redis from 'ioredis';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
+import { Redis } from 'ioredis';
 
 // Migrated TGWrapper bot with Redis sessions (Compare-and-Swap safe) and tracing.
 // Run this via: pnpm start:after
@@ -33,14 +33,7 @@ const sessionStore = new RedisSessionAdapter<RegistrationSession>({
 // 3. Create client in polling mode (e.g. for development/local running)
 const bot = createBotClient({
   token: process.env.BOT_TOKEN,
-  mode: 'polling',
-  session: {
-    store: sessionStore,
-    initialState: () => ({
-      version: 1,
-      step: 'idle'
-    })
-  }
+  mode: 'polling'
 });
 
 // 4. Attach telemetry (Prometheus metrics & JSON logging with Trace context)
@@ -66,23 +59,37 @@ bot.on('message', async (message) => {
     return;
   }
 
+  // Load session or initialize
+  let session = await sessionStore.get(`chat:${chatId}`);
+  if (!session) {
+    session = { version: 1, step: 'idle' };
+  }
+
   if (text === '/register') {
-    // Atomic session transition
-    await bot.updateSession<RegistrationSession>(chatId, (session) => {
-      session.step = 'awaiting_name';
-    });
+    session.step = 'awaiting_name';
+    const writeResult = await sessionStore.compareAndSet(
+      `chat:${chatId}`,
+      session.version,
+      { ...session, version: session.version + 1 }
+    );
+    if (!writeResult.ok) {
+      console.warn('Session write conflict on /register');
+    }
     await bot.sendMessage(chatId, 'Step 1: Please enter your name:');
     return;
   }
 
-  // Session state handler
-  const session = await bot.getSession<RegistrationSession>(chatId);
-
   if (session.step === 'awaiting_name') {
-    await bot.updateSession<RegistrationSession>(chatId, (s) => {
-      s.name = text;
-      s.step = 'awaiting_email';
-    });
+    session.name = text;
+    session.step = 'awaiting_email';
+    const writeResult = await sessionStore.compareAndSet(
+      `chat:${chatId}`,
+      session.version,
+      { ...session, version: session.version + 1 }
+    );
+    if (!writeResult.ok) {
+      console.warn('Session write conflict on name transition');
+    }
     await bot.sendMessage(chatId, `Thanks, ${text}! Step 2: Please enter your email:`);
     return;
   }
@@ -90,10 +97,16 @@ bot.on('message', async (message) => {
   if (session.step === 'awaiting_email') {
     const name = session.name;
     // Reset session back to idle
-    await bot.updateSession<RegistrationSession>(chatId, (s) => {
-      s.step = 'idle';
-      s.name = undefined;
-    });
+    session.step = 'idle';
+    session.name = undefined;
+    const writeResult = await sessionStore.compareAndSet(
+      `chat:${chatId}`,
+      session.version,
+      { ...session, version: session.version + 1 }
+    );
+    if (!writeResult.ok) {
+      console.warn('Session write conflict on email completion');
+    }
     await bot.sendMessage(chatId, `Registration complete!\nName: ${name}\nEmail: ${text}`);
     return;
   }

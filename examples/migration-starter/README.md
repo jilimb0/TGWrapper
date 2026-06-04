@@ -9,9 +9,9 @@ This starter directory demonstrates the step-by-step process of migrating a stat
 Print or copy this checklist when migrating your production bots:
 
 - [ ] **1. Dependencies setup**
-  - Install core: `pnpm add @jilimb0/tgwrapper`
-  - Install Redis session store: `pnpm add @jilimb0/tgwrapper-adapter-redis`
-  - Install telemetry: `pnpm add @jilimb0/tgwrapper-observability`
+  - Install core: `pnpm add @tgwrapper/core`
+  - Install Redis session store: `pnpm add @tgwrapper/adapter-redis`
+  - Install telemetry: `pnpm add @tgwrapper/observability`
 - [ ] **2. Type definition**
   - Define a strict TypeScript interface for your user/chat session state.
   - Include the required `version: number` property for Compare-and-Swap (CAS) session operations.

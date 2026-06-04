@@ -33,7 +33,7 @@ bot.launch();
 
 **TGWrapper Translation:**
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
 bot.on('message', async (message) => {
@@ -69,7 +69,7 @@ app.listen(3000);
 
 **TGWrapper Webhook Translation:**
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 import { createServer } from 'http';
 
 const bot = createBotClient({
@@ -101,7 +101,7 @@ createServer(async (req, res) => {
 
 1. **Install TGWrapper alongside Telegraf** — both can coexist in `package.json`.
    ```bash
-   pnpm add @jilimb0/tgwrapper @jilimb0/tgwrapper-adapter-redis
+   pnpm add @tgwrapper/core @tgwrapper/adapter-redis
    ```
 
 2. **Port one handler at a time** — start with `/start` or your simplest command. Verify it against the Telegram test chat before touching the next handler.
@@ -158,8 +158,8 @@ bot.launch();
 ### TGWrapper (session-based)
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 const sessionAdapter = new RedisSessionAdapter({
   redisUrl: process.env.REDIS_URL!,

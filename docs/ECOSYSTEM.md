@@ -10,9 +10,9 @@ Official modules maintained in the core monorepo:
 
 | Package | Purpose | Target Runtimes | Status |
 | :--- | :--- | :--- | :--- |
-| [**`@jilimb0/tgwrapper`**](../README.md) | Framework core, client, update router, basic polling & webhook hooks. | Node.js, Cloudflare Workers, AWS Lambda | `Early Production` |
-| [**`@jilimb0/tgwrapper-adapter-redis`**](../packages/adapter-redis/README.md) | Redis CAS session store and sliding window rate limiter. | Redis Server >= 6.2 | `Early Production` |
-| [**`@jilimb0/tgwrapper-observability`**](../packages/observability/README.md) | OpenTelemetry spans, trace propagation, structured logging. | Node.js AsyncLocalStorage | `Beta` |
+| [**`@tgwrapper/core`**](../README.md) | Framework core, client, update router, basic polling & webhook hooks. | Node.js, Cloudflare Workers, AWS Lambda | `Early Production` |
+| [**`@tgwrapper/adapter-redis`**](../packages/adapter-redis/README.md) | Redis CAS session store and sliding window rate limiter. | Redis Server >= 6.2 | `Early Production` |
+| [**`@tgwrapper/observability`**](../packages/observability/README.md) | OpenTelemetry spans, trace propagation, structured logging. | Node.js AsyncLocalStorage | `Beta` |
 
 ---
 

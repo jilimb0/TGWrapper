@@ -8,9 +8,9 @@ overrides:
 
 minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
-  - '@jilimb0/tgwrapper'
-  - '@jilimb0/tgwrapper-adapter-redis'
-  - '@jilimb0/tgwrapper-observability'
+  - '@tgwrapper/core'
+  - '@tgwrapper/adapter-redis'
+  - '@tgwrapper/observability'
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true

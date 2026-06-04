@@ -47,7 +47,7 @@ We track the health of developer adoption across five standard funnel stages:
 - **Goal:** Help teams run internal pilots and migrate production bots.
 - **Metric Definitions:**
   - **Active Migration Help Tickets:** Migration help queries opened in GitHub Discussions or Issues.
-  - **Production Signals:** Production project mentions, use of `@jilimb0/tgwrapper-adapter-redis` in live builds, and case studies.
+  - **Production Signals:** Production project mentions, use of `@tgwrapper/adapter-redis` in live builds, and case studies.
 
 ### 🌟 Stage 5: Advocacy (Flywheel)
 - **Goal:** Turn users into contributors and advocates.

@@ -43,8 +43,8 @@ Not faster hello-world. Not more plugins. The value is in the layer between your
 TGWrapper's `RedisSessionAdapter` uses Compare-and-Swap (CAS) via Lua scripts. Every session carries a `version` field. When you write, the adapter only commits if the version hasn't changed since your read. If another instance wrote first, you get a conflict signal — not a silent overwrite.
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 interface OrderSession {
   version: number;
@@ -93,7 +93,7 @@ bot.on('message', async (message) => {
 Every update processed by TGWrapper gets a correlation context — `trace_id`, `span_id`, `update_id`, `chat_id`, `handler_name` — propagated via `AsyncLocalStorage`. You don't wire this up; it's there when you attach the observability package.
 
 ```typescript
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 const metrics = new MetricsRegistry();
 attachBotObservability(bot, {
@@ -174,9 +174,9 @@ bot.on('message', async (ctx) => {
 ### TGWrapper — same feature set, built in
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisSessionAdapter, RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisSessionAdapter, RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 interface ChatSession { version: number; count: number; }
 

@@ -1,7 +1,7 @@
 {
   "publishedVersions": {
-    "@jilimb0/tgwrapper": "^0.14.1",
-    "@jilimb0/tgwrapper-adapter-redis": "^0.6.1",
-    "@jilimb0/tgwrapper-observability": "^0.7.1"
+    "@tgwrapper/core": "^0.14.1",
+    "@tgwrapper/adapter-redis": "^0.6.1",
+    "@tgwrapper/observability": "^0.7.1"
   }
 }

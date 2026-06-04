@@ -50,7 +50,7 @@ graph TD
 * **Diagnostic Actions:**
   - Check code executing outside default middleware loops (e.g., using `setTimeout` or raw callbacks). Context propagation requires executing callbacks inside `Tracer.withSpan` wrapper boundaries:
     ```typescript
-    import { tracer } from '@jilimb0/tgwrapper-observability';
+    import { tracer } from '@tgwrapper/observability';
 
     // Lost Context:
     setTimeout(() => { doAsyncTask(); }, 1000);

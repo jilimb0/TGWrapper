@@ -1,7 +1,7 @@
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisSessionAdapter, RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
-import Redis from 'ioredis';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisSessionAdapter, RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
+import { Redis } from 'ioredis';
 
 // Verify environment variables
 if (!process.env.BOT_TOKEN) {
@@ -31,14 +31,7 @@ const sessionAdapter = new RedisSessionAdapter<UserSession>({
 // 3. Initialize the TGWrapper Bot Client
 const bot = createBotClient({
   token: process.env.BOT_TOKEN,
-  mode: 'polling', // Polling for dev. In prod swap to 'webhook'
-  session: {
-    store: sessionAdapter,
-    initialState: () => ({
-      version: 1,
-      clickCount: 0
-    })
-  }
+  mode: 'polling' // Polling for dev. In prod swap to 'webhook'
 });
 
 // 4. Attach Observability & Structured JSON Logging
@@ -83,13 +76,26 @@ bot.on('message', async (message) => {
 
   // Route: /click
   if (text === '/click') {
-    // Atomic session write operation
-    await bot.updateSession<UserSession>(chatId, (session) => {
-      session.clickCount++;
-      session.lastMessageTime = Date.now();
-    });
+    // Load session
+    let session = await sessionAdapter.get(`chat:${chatId}`);
+    if (!session) {
+      session = { version: 1, clickCount: 0 };
+    }
 
-    const session = await bot.getSession<UserSession>(chatId);
+    session.clickCount++;
+    session.lastMessageTime = Date.now();
+
+    // Atomic CAS write
+    const writeResult = await sessionAdapter.compareAndSet(
+      `chat:${chatId}`,
+      session.version,
+      { ...session, version: session.version + 1 }
+    );
+
+    if (!writeResult.ok) {
+      console.warn(JSON.stringify({ event: 'session.cas_conflict', chatId }));
+    }
+
     await bot.sendMessage(chatId, `State Clicked: ${session.clickCount} times.`);
     return;
   }

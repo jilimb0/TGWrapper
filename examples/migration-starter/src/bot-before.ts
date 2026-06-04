@@ -26,19 +26,19 @@ bot.command('start', async (ctx) => {
 });
 
 bot.command('register', async (ctx) => {
-  const session = ctx.session as any || {};
+  const session = (ctx as any).session || {};
   session.step = 'awaiting_name';
-  ctx.session = session;
+  (ctx as any).session = session;
   await ctx.reply('Step 1: Please enter your name:');
 });
 
 bot.on('text', async (ctx) => {
-  const session = ctx.session as any;
+  const session = (ctx as any).session;
   
   if (session && session.step === 'awaiting_name') {
     session.name = ctx.message.text;
     session.step = 'awaiting_email';
-    ctx.session = session;
+    (ctx as any).session = session;
     await ctx.reply(`Thanks, ${ctx.message.text}! Step 2: Please enter your email:`);
     return;
   }
@@ -46,7 +46,7 @@ bot.on('text', async (ctx) => {
   if (session && session.step === 'awaiting_email') {
     const name = session.name;
     // Reset state
-    ctx.session = {};
+    (ctx as any).session = {};
     await ctx.reply(`Registration complete!\nName: ${name}\nEmail: ${ctx.message.text}`);
     return;
   }

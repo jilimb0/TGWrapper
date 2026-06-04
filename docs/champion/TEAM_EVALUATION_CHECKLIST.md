@@ -18,7 +18,7 @@ Use this checklist with your engineering team to evaluate if TGWrapper matches y
 
 ### 3. Operations & Infrastructure Impact
 - [ ] **Redis Availability:** Is a Redis cluster >= 6.2 available in your production environments?
-- [ ] **Monitoring Ecosystem:** Do you use Prometheus, Datadog, New Relic, or Grafana Loki? (If yes, `@jilimb0/tgwrapper-observability` parses directly).
+- [ ] **Monitoring Ecosystem:** Do you use Prometheus, Datadog, New Relic, or Grafana Loki? (If yes, `@tgwrapper/observability` parses directly).
 - [ ] **Serverless/Edge Runtimes:** Are you deploying to AWS Lambda or Cloudflare Workers? (If yes, verify webhook configurations).
 
 ### 4. Maintenance Expectations

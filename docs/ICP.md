@@ -91,7 +91,7 @@ Use these signals to identify high-fit prospects in communities, GitHub issues, 
 ```
 
 ```typescript
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 const registry = new MetricsRegistry();
 attachBotObservability(bot, { metrics: registry, serviceName: 'my-bot' });

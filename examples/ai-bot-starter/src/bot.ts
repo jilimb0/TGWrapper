@@ -1,11 +1,11 @@
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisSessionAdapter, RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisSessionAdapter, RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
 import {
   attachBotObservability,
   MetricsRegistry,
   Tracer,
   getCorrelationContext,
-} from '@jilimb0/tgwrapper-observability';
+} from '@tgwrapper/observability';
 
 // ---------------------------------------------------------------------------
 // Types

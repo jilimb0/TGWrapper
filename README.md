@@ -4,7 +4,7 @@
 >
 > When your bot stops being a side project and becomes a core service, TGWrapper is where teams land.
 
-[![npm version](https://img.shields.io/npm/v/@jilimb0/tgwrapper.svg)](https://www.npmjs.com/package/@jilimb0/tgwrapper)
+[![npm version](https://img.shields.io/npm/v/@tgwrapper/core.svg)](https://www.npmjs.com/package/@tgwrapper/core)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 ---
@@ -12,7 +12,7 @@
 ## ⚡ Quick Start
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
 bot.on('message', async (msg) => {
@@ -22,7 +22,7 @@ await bot.start();
 ```
 
 ```bash
-pnpm add @jilimb0/tgwrapper   # install
+pnpm add @tgwrapper/core   # install
 pnpm build && pnpm test       # validate types + tests
 ```
 
@@ -88,7 +88,7 @@ Direct operational evidence backing the framework's reliability:
 
 ### 👥 Early Adopters in Production
 - **FinTech Notification Bot:** Switched from Telegraf to solve message duplicate issues. Runs 3 replicas on Kubernetes using webhook mode and Redis CAS sessions.
-- **AI Coding Companion Bot:** Migrated from Python to track LLM token counts and trace latency per tool-call via `@jilimb0/tgwrapper-observability`.
+- **AI Coding Companion Bot:** Migrated from Python to track LLM token counts and trace latency per tool-call via `@tgwrapper/observability`.
 - Read more detailed case studies in the [Field Notes](./docs/FIELD_NOTES.md).
 
 ---
@@ -121,9 +121,9 @@ Choose the canonical template matching your architecture:
 
 | Package | Current Stability | Adoption / Production Status | Runtime Target | API Stability |
 | :--- | :--- | :--- | :--- | :--- |
-| [**`@jilimb0/tgwrapper`**](./README.md) (Core) | `Early Production` | Used in active pilot apps; open for early testing. | Node.js, Cloudflare Workers, AWS Lambda | Stable core surface; minor enhancements ongoing. |
-| [**`@jilimb0/tgwrapper-adapter-redis`**](./packages/adapter-redis/README.md) | `Early Production` | Tested under simulated high concurrency. | Redis server >= 6.2 | Stable API surface. |
-| [**`@jilimb0/tgwrapper-observability`**](./packages/observability/README.md) | `Beta` | Undergoing active validation; feedback welcome. | Node.js AsyncLocalStorage | Evolving; minor trace schema updates possible. |
+| [**`@tgwrapper/core`**](./README.md) (Core) | `Early Production` | Used in active pilot apps; open for early testing. | Node.js, Cloudflare Workers, AWS Lambda | Stable core surface; minor enhancements ongoing. |
+| [**`@tgwrapper/adapter-redis`**](./packages/adapter-redis/README.md) | `Early Production` | Tested under simulated high concurrency. | Redis server >= 6.2 | Stable API surface. |
+| [**`@tgwrapper/observability`**](./packages/observability/README.md) | `Beta` | Undergoing active validation; feedback welcome. | Node.js AsyncLocalStorage | Evolving; minor trace schema updates possible. |
 
 ---
 
@@ -149,7 +149,7 @@ Check out our comprehensive **[Grow with TGWrapper](./docs/GROW_WITH_TGWRAPPER.m
 > In multi-instance or serverless deployments, **you must switch to the distributed rate limiter** via the Redis adapter:
 
 ```typescript
-import { RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
 
 const kv = new RedisKvStore({ redisUrl: process.env.REDIS_URL!, prefix: 'mybot' });
 const limiter = createRateLimiter(kv, {

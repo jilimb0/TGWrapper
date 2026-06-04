@@ -33,11 +33,11 @@ This guide outlines the progressive integration model for TGWrapper — from a m
 Everything starts as a polling bot with a simple message echo:
 
 ```bash
-pnpm add @jilimb0/tgwrapper
+pnpm add @tgwrapper/core
 ```
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
 bot.on('message', async (msg) => {
@@ -57,11 +57,11 @@ await bot.start();
 When you want visibility into update latencies and errors, attach telemetry in one line:
 
 ```bash
-pnpm add @jilimb0/tgwrapper-observability
+pnpm add @tgwrapper/observability
 ```
 
 ```typescript
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 const registry = new MetricsRegistry();
 attachBotObservability(bot, {
@@ -80,11 +80,11 @@ attachBotObservability(bot, {
 When users need state that survives process restarts:
 
 ```bash
-pnpm add @jilimb0/tgwrapper-adapter-redis ioredis
+pnpm add @tgwrapper/adapter-redis ioredis
 ```
 
 ```typescript
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 const session = new RedisSessionAdapter({
   redisUrl: process.env.REDIS_URL!,
@@ -107,7 +107,7 @@ const bot = createBotClient({
 Add distributed rate limiting and switch to webhook mode:
 
 ```typescript
-import { RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
 
 const kv = new RedisKvStore({ redisUrl: process.env.REDIS_URL! });
 const limiter = createRateLimiter(kv, {

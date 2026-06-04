@@ -11,11 +11,11 @@ Every stage is a natural response to a real need — not a prerequisite you have
 **You need:** a working bot that responds to messages.
 
 ```bash
-pnpm add @jilimb0/tgwrapper
+pnpm add @tgwrapper/core
 ```
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
 
@@ -78,11 +78,11 @@ bot.on('callback_query', async (callback) => {
 **You need:** user state that survives restarts — conversation steps, preferences, counters.
 
 ```bash
-pnpm add @jilimb0/tgwrapper-adapter-redis ioredis
+pnpm add @tgwrapper/adapter-redis ioredis
 ```
 
 ```typescript
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 interface UserSession {
   version: number;
@@ -131,11 +131,11 @@ bot.on('message', async (message) => {
 **You need:** trace IDs in every log line, structured events, metrics — without building it yourself.
 
 ```bash
-pnpm add @jilimb0/tgwrapper-observability
+pnpm add @tgwrapper/observability
 ```
 
 ```typescript
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 const metrics = new MetricsRegistry();
 
@@ -162,7 +162,7 @@ attachBotObservability(bot, {
 **You need:** two or more bot instances sharing state without conflicts.
 
 ```typescript
-import { RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
 
 const kv = new RedisKvStore({ redisUrl: process.env.REDIS_URL!, prefix: 'my-bot' });
 const limiter = createRateLimiter(kv, {

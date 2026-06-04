@@ -1,4 +1,4 @@
-# @jilimb0/tgwrapper-adapter-redis
+# @tgwrapper/adapter-redis
 
 ## 0.7.0
 
@@ -60,20 +60,20 @@
 
 - 7f3f437: Release preparation for the next feature line with production-oriented DX improvements.
 
-  Core (`@jilimb0/tgwrapper`):
+  Core (`@tgwrapper/core`):
 
   - add dual ESM/CJS package exports
   - add `createBotClient` facade with lifecycle and event API
   - expand typed high-level Telegram methods and bot-oriented exported types
   - extend testkit with `MockBotClient`
 
-  Redis adapter (`@jilimb0/tgwrapper-adapter-redis`):
+  Redis adapter (`@tgwrapper/adapter-redis`):
 
   - add `RedisCacheStore` for JSON cache operations and namespace utilities
   - add distributed rate limiter (`createRateLimiter`) with sliding window and block support
   - add namespace factories for app-layer usage
 
-  Observability (`@jilimb0/tgwrapper-observability`):
+  Observability (`@tgwrapper/observability`):
 
   - add `attachBotObservability` helper
   - stabilize metrics snapshot schema with timestamp

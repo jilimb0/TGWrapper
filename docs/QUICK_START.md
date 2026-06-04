@@ -9,7 +9,7 @@ Get a working Telegram bot running in under 5 minutes. No Redis. No observabilit
 ```bash
 mkdir my-bot && cd my-bot
 pnpm init
-pnpm add @jilimb0/tgwrapper
+pnpm add @tgwrapper/core
 pnpm add -D tsx
 ```
 
@@ -22,7 +22,7 @@ Open Telegram, message [@BotFather](https://t.me/BotFather), run `/newbot`, and 
 Create `bot.ts`:
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 
 const bot = createBotClient({
   token: 'YOUR_BOT_TOKEN',  // paste your token here
@@ -95,8 +95,8 @@ Your bot needs to survive restarts, run on multiple instances, or handle real tr
 
 | Step | What you add | Why | Time |
 | :--- | :--- | :--- | :--- |
-| **1. Redis sessions** | `@jilimb0/tgwrapper-adapter-redis` | State survives restarts, shared across instances | 10 min |
-| **2. Observability** | `@jilimb0/tgwrapper-observability` | Trace IDs in every log, structured events, metrics | 5 min |
+| **1. Redis sessions** | `@tgwrapper/adapter-redis` | State survives restarts, shared across instances | 10 min |
+| **2. Observability** | `@tgwrapper/observability` | Trace IDs in every log, structured events, metrics | 5 min |
 | **3. Webhook + deploy** | `mode: 'webhook'` | Serverless-ready, edge-native, scales horizontally | 15 min |
 
 See [Grow with TGWrapper](./GROW_WITH_TGWRAPPER.md) for the full path from first bot to production deployment.

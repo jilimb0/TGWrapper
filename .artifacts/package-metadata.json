@@ -1,7 +1,7 @@
 [
   {
     "file": "package.json",
-    "name": "@jilimb0/tgwrapper",
+    "name": "@tgwrapper/core",
     "version": "0.13.1",
     "files": [
       "dist/**/*.js",
@@ -22,7 +22,7 @@
   },
   {
     "file": "packages/adapter-redis/package.json",
-    "name": "@jilimb0/tgwrapper-adapter-redis",
+    "name": "@tgwrapper/adapter-redis",
     "version": "0.5.1",
     "files": [
       "dist/**/*.js",
@@ -43,7 +43,7 @@
   },
   {
     "file": "packages/observability/package.json",
-    "name": "@jilimb0/tgwrapper-observability",
+    "name": "@tgwrapper/observability",
     "version": "0.6.1",
     "files": [
       "dist/**/*.js",

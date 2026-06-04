@@ -1,6 +1,6 @@
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisKvStore, RedisSessionAdapter, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisKvStore, RedisSessionAdapter, createRateLimiter } from '@tgwrapper/adapter-redis';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 // 1. Initial State Definitions
 interface TicketSession {

@@ -45,7 +45,7 @@ app.listen(3000);
 Ships with native, platform-agnostic request/response handling.
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 import { createServer } from 'http';
 
 const bot = createBotClient({
@@ -116,8 +116,8 @@ bot.on('message', async (ctx) => {
 Uses atomic Compare-and-Swap (CAS) session operations. Fails safely or retries if state changes.
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 interface CounterSession { version: number; count: number; }
 
@@ -196,8 +196,8 @@ bot.use(async (ctx, next) => {
 Built-in structured telemetry and OTel-compatible context propagation.
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { createBotClient } from '@tgwrapper/core';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
 
@@ -246,8 +246,8 @@ bot.use(limit());
 First-class sliding window Redis rate limiter, cluster-safe.
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
 const kv = new RedisKvStore({ redisUrl: process.env.REDIS_URL! });
@@ -318,7 +318,7 @@ bot.on('message:text', async (ctx) => {
 Injects AbortSignals and hooks trace contexts directly into async helper spans.
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 import { OpenAI } from 'openai';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });

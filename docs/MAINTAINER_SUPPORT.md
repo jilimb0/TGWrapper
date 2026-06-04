@@ -9,7 +9,7 @@ This document outlines the operational boundaries, response times, and triage wo
 Maintainer bandwidth is a finite resource. To keep the project sustainable, we maintain strict divisions between **Core Support** (maintainer responsibility) and **Application Support** (community responsibility).
 
 ### What Maintainers Support
-- **Core Bugs:** Regressions or design bugs in `@jilimb0/tgwrapper`, `@jilimb0/tgwrapper-adapter-redis`, and `@jilimb0/tgwrapper-observability`.
+- **Core Bugs:** Regressions or design bugs in `@tgwrapper/core`, `@tgwrapper/adapter-redis`, and `@tgwrapper/observability`.
 - **API Baseline Drift:** Schema updates required due to upstream Telegram Bot API updates.
 - **Critical Security Flaws:** Vulnerabilities discovered in dependencies or runtime engines.
 - **Edge Deployment Compatibility:** Correct ESM/CJS compilation and edge platform initialization scripts.

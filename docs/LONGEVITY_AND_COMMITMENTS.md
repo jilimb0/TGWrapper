@@ -10,7 +10,7 @@ TGWrapper is built as a permanent, reliable piece of infrastructure. We commit t
 
 - **Upstream Synchronization:** We track official Telegram Bot API type schemas. Automated watchdog baseline scripts run weekly to flag type delta adjustments and prevent drift.
 - **Backward Compatibility Horizon:** Critical runtime handler APIs (`createBotClient`, update session signatures, and telemetry contracts) are stable. We avoid API redesign iterations that require code rewrites.
-- **No Hidden Fees / Open Core Boundaries:** All core libraries (`@jilimb0/tgwrapper`, `@jilimb0/tgwrapper-adapter-redis`, and `@jilimb0/tgwrapper-observability`) will remain open-source and free under the Apache 2.0 License.
+- **No Hidden Fees / Open Core Boundaries:** All core libraries (`@tgwrapper/core`, `@tgwrapper/adapter-redis`, and `@tgwrapper/observability`) will remain open-source and free under the Apache 2.0 License.
 
 ---
 

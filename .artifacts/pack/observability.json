@@ -1,7 +1,7 @@
 [
   {
-    "id": "@jilimb0/tgwrapper-observability@0.6.1",
-    "name": "@jilimb0/tgwrapper-observability",
+    "id": "@tgwrapper/observability@0.6.1",
+    "name": "@tgwrapper/observability",
     "version": "0.6.1",
     "size": 23491,
     "unpackedSize": 108373,

@@ -1,7 +1,7 @@
 [
   {
-    "id": "@jilimb0/tgwrapper-adapter-redis@0.5.1",
-    "name": "@jilimb0/tgwrapper-adapter-redis",
+    "id": "@tgwrapper/adapter-redis@0.5.1",
+    "name": "@tgwrapper/adapter-redis",
     "version": "0.5.1",
     "size": 6048,
     "unpackedSize": 39162,

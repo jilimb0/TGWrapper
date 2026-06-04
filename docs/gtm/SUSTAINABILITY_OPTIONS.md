@@ -7,8 +7,8 @@ This memo evaluates long-term sustainability models for TGWrapper, outlining ope
 ## 🛡️ The Open-Core Boundaries
 
 We maintain a strict boundary defining what must remain free and open-source:
-- **Core Engine:** `@jilimb0/tgwrapper` client runtime will always remain fully open-source.
-- **Reference Adapters:** Core Redis sessions (`@jilimb0/tgwrapper-adapter-redis`) and OpenTelemetry hooks (`@jilimb0/tgwrapper-observability`) are first-party and open.
+- **Core Engine:** `@tgwrapper/core` client runtime will always remain fully open-source.
+- **Reference Adapters:** Core Redis sessions (`@tgwrapper/adapter-redis`) and OpenTelemetry hooks (`@tgwrapper/observability`) are first-party and open.
 - **Documentation:** All guides, comparison sheets, and checklists remain open-access.
 
 ---

@@ -28,7 +28,7 @@ A practical migration guide for teams switching from `python-telegram-bot` (PTB)
 | `application.run_polling()` | `await bot.start()` | Async, must be awaited |
 | `application.run_webhook(...)` | `createBotClient({ mode: 'webhook' })` | Config flag, not a method |
 | `JobQueue` (scheduled tasks) | External scheduler (cron, BullMQ) | Not built in — use Node ecosystem |
-| Python `logging` module | `@jilimb0/tgwrapper-observability` | Structured JSON + OTel spans |
+| Python `logging` module | `@tgwrapper/observability` | Structured JSON + OTel spans |
 
 ---
 
@@ -55,7 +55,7 @@ app.run_polling()
 ### TGWrapper (TypeScript)
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
 
@@ -118,8 +118,8 @@ app.run_polling()
 ### TGWrapper (Redis session)
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 interface Session {
   version: number;
@@ -173,7 +173,7 @@ await bot.start();
 ### Install
 
 ```bash
-pnpm add @jilimb0/tgwrapper
+pnpm add @tgwrapper/core
 pnpm add -D typescript @types/node tsx
 ```
 

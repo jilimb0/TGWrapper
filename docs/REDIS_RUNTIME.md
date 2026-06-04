@@ -1,6 +1,6 @@
 # Redis Runtime Guide
 
-> Package: `@jilimb0/tgwrapper-adapter-redis` · Stability: Early Production · Redis requirement: ≥ 6.2
+> Package: `@tgwrapper/adapter-redis` · Stability: Early Production · Redis requirement: ≥ 6.2
 
 This document is the authoritative operational reference for running TGWrapper's Redis adapter in production. It covers supported topologies, session guarantee semantics, rate limiter internals, failure modes, and monitoring.
 
@@ -35,7 +35,7 @@ Both rely on `RedisKvStore` as the underlying key-value abstraction, which wraps
 
 ```typescript
 import { RedisKvStore, createRateLimiter, RedisSessionAdapter }
-  from '@jilimb0/tgwrapper-adapter-redis';
+  from '@tgwrapper/adapter-redis';
 
 const store = new RedisKvStore({ redisUrl: process.env.REDIS_URL!, prefix: 'mybot' });
 const limiter = createRateLimiter(store, { namespace: 'limits', windowMs: 60_000, limit: 20 });
@@ -88,7 +88,7 @@ Pass a custom `ioredis` instance to the adapter:
 
 ```typescript
 import Redis from 'ioredis';
-import { RedisKvStore } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisKvStore } from '@tgwrapper/adapter-redis';
 
 const redis = new Redis({
   sentinels: [

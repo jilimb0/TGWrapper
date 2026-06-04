@@ -66,7 +66,7 @@ bot.on('callback_query', async (cb) => {
 
 **You'll add:**
 ```bash
-pnpm add @jilimb0/tgwrapper-adapter-redis ioredis
+pnpm add @tgwrapper/adapter-redis ioredis
 ```
 
 **Key concept:** Sessions use Compare-and-Swap (CAS) — if another instance modified the session between your read and write, you get `ok: false` instead of silent data loss.
@@ -85,12 +85,12 @@ pnpm add @jilimb0/tgwrapper-adapter-redis ioredis
 
 **You'll add:**
 ```bash
-pnpm add @jilimb0/tgwrapper-observability
+pnpm add @tgwrapper/observability
 ```
 
 **Key pattern:**
 ```typescript
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 const metrics = new MetricsRegistry();
 attachBotObservability(bot, {
@@ -135,7 +135,7 @@ Same handlers. Same session. Same telemetry. One config flag changes the transpo
 
 **Key pattern:**
 ```typescript
-import { RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
 
 const kv = new RedisKvStore({ redisUrl: process.env.REDIS_URL!, prefix: 'my-bot' });
 const limiter = createRateLimiter(kv, {

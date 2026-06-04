@@ -20,13 +20,13 @@ Validate the basic update processing and loop in less than 15 minutes.
    ```bash
    mkdir tgwrapper-poc && cd tgwrapper-poc
    pnpm init
-   pnpm add @jilimb0/tgwrapper
+   pnpm add @tgwrapper/core
    pnpm add -D typescript @types/node tsx
    npx tsc --init
    ```
 2. **Create Entrypoint (`src/bot.ts`):**
    ```typescript
-   import { createBotClient } from '@jilimb0/tgwrapper';
+   import { createBotClient } from '@tgwrapper/core';
    
    const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
    bot.on('message', async (msg) => {
@@ -48,11 +48,11 @@ Port your most critical conversational path (e.g. register, inputs collection).
 
 1. **Attach Redis Session Storage:**
    ```bash
-   pnpm add @jilimb0/tgwrapper-adapter-redis ioredis
+   pnpm add @tgwrapper/adapter-redis ioredis
    ```
 2. **Implement State Transition Route:**
    ```typescript
-   import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+   import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
    import Redis from 'ioredis';
    
    interface UserState { version: number; stage: 'idle' | 'input'; text?: string; }
@@ -76,11 +76,11 @@ Test concurrent request state safety and structured log visibility.
 
 1. **Plug in Telemetry:**
    ```bash
-   pnpm add @jilimb0/tgwrapper-observability
+   pnpm add @tgwrapper/observability
    ```
 2. **Attach Observability Hooks:**
    ```typescript
-   import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+   import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
    attachBotObservability(bot, {
      metrics: new MetricsRegistry(),
      logger: { log: (e) => console.log(JSON.stringify(e)) },

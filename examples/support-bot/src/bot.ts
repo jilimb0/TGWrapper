@@ -1,7 +1,7 @@
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
-import Redis from 'ioredis';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
+import { Redis } from 'ioredis';
 
 if (!process.env.BOT_TOKEN) {
   console.error('BOT_TOKEN is required.');
@@ -24,11 +24,7 @@ const sessionStore = new RedisSessionAdapter<SupportSession>({
 
 const bot = createBotClient({
   token: process.env.BOT_TOKEN,
-  mode: 'polling',
-  session: {
-    store: sessionStore,
-    initialState: () => ({ version: 1, status: 'idle' })
-  }
+  mode: 'polling'
 });
 
 // Telemetry
@@ -46,13 +42,23 @@ bot.on('message', async (message) => {
   const chatId = message.chat.id;
   const text = message.text;
 
-  const session = await bot.getSession<SupportSession>(chatId);
+  // Load session
+  let session = await sessionStore.get(`chat:${chatId}`);
+  if (!session) {
+    session = { version: 1, status: 'idle' };
+  }
 
   // Command: Start a support ticket
   if (text === '/support') {
-    await bot.updateSession<SupportSession>(chatId, (s) => {
-      s.status = 'waiting_queue';
-    });
+    session.status = 'waiting_queue';
+    const writeResult = await sessionStore.compareAndSet(
+      `chat:${chatId}`,
+      session.version,
+      { ...session, version: session.version + 1 }
+    );
+    if (!writeResult.ok) {
+      console.warn('Session write conflict on /support');
+    }
     await bot.sendMessage(chatId, 'Connecting you to an agent. Please write your question below:');
     return;
   }
@@ -61,10 +67,17 @@ bot.on('message', async (message) => {
   if (session.status === 'waiting_queue') {
     // Select agent and update session atomically (CAS)
     const agentId = AVAILABLE_AGENTS[Math.floor(Math.random() * AVAILABLE_AGENTS.length)];
-    await bot.updateSession<SupportSession>(chatId, (s) => {
-      s.status = 'in_chat';
-      s.assignedAgentId = agentId;
-    });
+    session.status = 'in_chat';
+    session.assignedAgentId = agentId;
+
+    const writeResult = await sessionStore.compareAndSet(
+      `chat:${chatId}`,
+      session.version,
+      { ...session, version: session.version + 1 }
+    );
+    if (!writeResult.ok) {
+      console.warn('Session write conflict on queue connection');
+    }
 
     await bot.sendMessage(chatId, `You are now connected to Agent #${agentId}. How can they help you?`);
     return;

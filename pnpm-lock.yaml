@@ -30,8 +30,8 @@ importers:
   examples/ai-bot-starter:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: ^0.14.0
-        version: 0.14.0
+        specifier: ^0.14.1
+        version: 0.14.1
     devDependencies:
       tsx:
         specifier: ^4.20.6
@@ -43,8 +43,8 @@ importers:
   examples/aws-lambda:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: ^0.14.0
-        version: 0.14.0
+        specifier: ^0.14.1
+        version: 0.14.1
     devDependencies:
       serverless:
         specifier: ^4.6.2
@@ -56,8 +56,8 @@ importers:
   examples/cloudflare-worker:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: ^0.14.0
-        version: 0.14.0
+        specifier: ^0.14.1
+        version: 0.14.1
     devDependencies:
       wrangler:
         specifier: ^4.2.0
@@ -66,14 +66,14 @@ importers:
   examples/multi-instance-redis-starter:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: ^0.14.0
-        version: 0.14.0
+        specifier: ^0.14.1
+        version: 0.14.1
       '@jilimb0/tgwrapper-adapter-redis':
-        specifier: ^0.6.0
-        version: 0.6.0
+        specifier: ^0.6.1
+        version: 0.6.1
       '@jilimb0/tgwrapper-observability':
-        specifier: ^0.7.0
-        version: 0.7.0
+        specifier: ^0.7.1
+        version: 0.7.1
       ioredis:
         specifier: ^5.6.1
         version: 5.11.0
@@ -88,8 +88,8 @@ importers:
   examples/node-http:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: ^0.14.0
-        version: 0.14.0
+        specifier: ^0.14.1
+        version: 0.14.1
     devDependencies:
       tsx:
         specifier: ^4.19.2
@@ -98,8 +98,8 @@ importers:
   examples/polling-starter:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: ^0.14.0
-        version: 0.14.0
+        specifier: ^0.14.1
+        version: 0.14.1
     devDependencies:
       tsx:
         specifier: ^4.20.6
@@ -111,8 +111,8 @@ importers:
   examples/serverless-webhook-starter:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: ^0.14.0
-        version: 0.14.0
+        specifier: ^0.14.1
+        version: 0.14.1
     devDependencies:
       tsx:
         specifier: ^4.20.6
@@ -124,8 +124,8 @@ importers:
   examples/template-bot:
     dependencies:
       '@jilimb0/tgwrapper':
-        specifier: ^0.14.0
-        version: 0.14.0
+        specifier: ^0.14.1
+        version: 0.14.1
     devDependencies:
       tsx:
         specifier: ^4.19.2
@@ -762,17 +762,17 @@ packages:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
 
-  '@jilimb0/tgwrapper-adapter-redis@0.6.0':
-    resolution: {integrity: sha512-ZMckjiEPrOYR1lFnSwNV9zE6WrHUhKKo0KYpKe9Kh0szpYrlFtEAfTDzS6s3JfoSf3+sAJRz8caGMyZueJX6Fg==}
-    engines: {node: '>=20'}
+  '@jilimb0/tgwrapper-adapter-redis@0.6.1':
+    resolution: {integrity: sha512-Lsq1wSgp+G8q5qgh/9ygj/teE455GI1GQZ6+iR1kIvZbLQKLZJiyVezW6LpkZtApZnN1duFUFBGMGpntelbpFw==}
+    engines: {node: '>=22.13'}
 
-  '@jilimb0/tgwrapper-observability@0.7.0':
-    resolution: {integrity: sha512-Gakfepzq7lAHMgW6yCLn5k5flBF6FRpH3UMGm2fFgd/rgYdsjqwa2hWp5MXyaXkHNPzVlpNi5ovHhJ30ardHyg==}
-    engines: {node: '>=20'}
+  '@jilimb0/tgwrapper-observability@0.7.1':
+    resolution: {integrity: sha512-E9Zjogg+J798OF/KcQPsIxOY2Qi3XJpbirz0a3+vBzsdDebVNlSWvodA+EHS52MECJ3sfHCFeHtj9Urm3aywXQ==}
+    engines: {node: '>=22.13'}
 
-  '@jilimb0/tgwrapper@0.14.0':
-    resolution: {integrity: sha512-IZKpBbxj5+tqYSMYqyQFkET5vP3m1Ozni83iWZUHbRYb861NzBj6XxanhpTcSLIUWoF9Z2MnqVQ0ZyPRLjIgVQ==}
-    engines: {node: '>=18'}
+  '@jilimb0/tgwrapper@0.14.1':
+    resolution: {integrity: sha512-9TTSn+S2PRoGe4icc4PNExigljxptmH/1DqvzgLg0/7FDwOi580feoOxTRlM1FpiChSN+HSL5Zu6cvX498KpCg==}
+    engines: {node: '>=22.13'}
 
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
@@ -2858,15 +2858,15 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
-  '@jilimb0/tgwrapper-adapter-redis@0.6.0':
+  '@jilimb0/tgwrapper-adapter-redis@0.6.1':
     dependencies:
       ioredis: 5.11.0
     transitivePeerDependencies:
       - supports-color
 
-  '@jilimb0/tgwrapper-observability@0.7.0': {}
+  '@jilimb0/tgwrapper-observability@0.7.1': {}
 
-  '@jilimb0/tgwrapper@0.14.0': {}
+  '@jilimb0/tgwrapper@0.14.1': {}
 
   '@jridgewell/resolve-uri@3.1.2': {}
 

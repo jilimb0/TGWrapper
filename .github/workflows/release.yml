@@ -135,6 +135,32 @@ jobs:
           name: release-diagnostics
           path: .artifacts
           if-no-files-found: ignore
+      - name: Publish retry (bumped but not published)
+        id: publish_retry
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          CHANGESETS_RELEASE: "1"
+        run: |
+          set -euo pipefail
+          UNPUBLISHED=0
+          for d in "." "packages/adapter-redis" "packages/observability"; do
+            NAME="$(node -e "console.log(require('./${d}/package.json').name)")"
+            LOCAL="$(node -e "console.log(require('./${d}/package.json').version)")"
+            REMOTE="$(npm view "${NAME}@${LOCAL}" version 2>/dev/null || true)"
+            if [ -z "${REMOTE}" ]; then
+              echo "Will publish: ${NAME}@${LOCAL}"
+              UNPUBLISHED=1
+            fi
+          done
+          PENDING="$(find .changeset -name '*.md' ! -name 'README.md' 2>/dev/null | wc -l | tr -d ' ')"
+          if [ "${UNPUBLISHED}" -eq 1 ] && [ "${PENDING}" -eq 0 ]; then
+            echo "Retrying publish for bumped-but-unpublished packages..."
+            pnpm -r publish --access public --no-git-checks
+            echo "published=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No retry needed."
+            echo "published=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Verify publish readiness
         run: |
           set -euo pipefail
@@ -153,9 +179,8 @@ jobs:
           PENDING="$(find .changeset -name '*.md' ! -name 'README.md' 2>/dev/null | wc -l | tr -d ' ')"
           if [ "${UNPUBLISHED}" -eq 1 ] && [ "${PENDING}" -eq 0 ]; then
             echo ""
-            echo "ERROR: Versions were bumped but packages are not published and no pending changesets found."
-            echo "The version PR was merged but publish failed. Re-run this workflow to retry publish."
-            exit 1
+            echo "NOTICE: Versions were bumped but not yet published and no pending changesets found."
+            echo "Proceeding to publish retry via changesets/action."
           fi
           echo "Publish readiness OK (unpublished=${UNPUBLISHED}, pending_changesets=${PENDING})"
       - uses: changesets/action@v1
@@ -168,7 +193,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Sync example deps post-publish
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.changesets.outputs.published == 'true' || steps.publish_retry.outputs.published == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

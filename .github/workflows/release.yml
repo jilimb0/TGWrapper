@@ -139,9 +139,6 @@ jobs:
           path: .artifacts
           if-no-files-found: ignore
 
-      # changesets/action handles two modes automatically:
-      #   1. Pending changesets exist → creates/updates version PR
-      #   2. No pending changesets    → publishes any unpublished packages
       - uses: changesets/action@v1
         id: changesets
         with:
@@ -152,11 +149,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Confirm all package versions are reachable on npm before syncing examples.
-      # changesets/action may return published=false even on a successful publish
-      # (e.g. when re-running after a partial failure). This step is the
-      # authoritative source of truth: it polls npm with retries and sets
-      # all_published=true only when every local version is confirmed live.
       - name: Confirm packages live on npm
         id: npm_confirm
         if: always()

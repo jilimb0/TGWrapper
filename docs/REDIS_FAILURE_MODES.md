@@ -1,6 +1,6 @@
 # Redis Failure Modes & Behavior Matrix
 
-This matrix outlines how TGWrapper and `@jilimb0/tgwrapper-adapter-redis` behave during Redis failures, along with recommended mitigation paths.
+This matrix outlines how TGWrapper and `@tgwrapper/adapter-redis` behave during Redis failures, along with recommended mitigation paths.
 
 ---
 

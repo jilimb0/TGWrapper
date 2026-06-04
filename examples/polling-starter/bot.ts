@@ -1,4 +1,4 @@
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 
 const bot = createBotClient({
   token: process.env.BOT_TOKEN!,

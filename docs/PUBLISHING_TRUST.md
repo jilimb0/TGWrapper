@@ -47,6 +47,6 @@ Every release contains signed cryptographic proofs linking the built package dir
 
 Verify the build origin locally before installing updates:
 ```bash
-npm info @jilimb0/tgwrapper --json | grep provenance
+npm info @tgwrapper/core --json | grep provenance
 ```
 Confirming that the build was initiated by official workflows guarantees that the artifact has not been modified or replaced in transit.

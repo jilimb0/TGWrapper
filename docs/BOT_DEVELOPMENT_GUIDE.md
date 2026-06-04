@@ -11,7 +11,7 @@ This guide shows the fastest path to a production-ready bot using TGWrapper.
 ## 1) Install packages
 
 ```bash
-pnpm add @jilimb0/tgwrapper @jilimb0/tgwrapper-adapter-redis @jilimb0/tgwrapper-observability
+pnpm add @tgwrapper/core @tgwrapper/adapter-redis @tgwrapper/observability
 ```
 
 ## 2) Create a 5-minute bot (polling)
@@ -19,7 +19,7 @@ pnpm add @jilimb0/tgwrapper @jilimb0/tgwrapper-adapter-redis @jilimb0/tgwrapper-
 Create `src/bot.ts`:
 
 ```ts
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 
 const bot = createBotClient({
   token: process.env.BOT_TOKEN!,
@@ -62,7 +62,7 @@ BOT_TOKEN="<your_token>" node --import tsx src/bot.ts
 Use `mode: 'webhook'` and call `bot.ingest(update)` from your HTTP handler:
 
 ```ts
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'webhook' });
 
@@ -91,7 +91,7 @@ Use raw `callApiUnsafe` only as escape hatch.
 For production multi-instance deployments, prefer Redis-backed distributed rate limiting. The core in-memory limiter is suitable for local development and single-instance setups only.
 
 ```ts
-import { RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
 
 const kv = new RedisKvStore({ redisUrl: process.env.REDIS_URL!, prefix: 'mybot' });
 const cache = kv.createCacheNamespace('cache');
@@ -113,7 +113,7 @@ await cache.setJson('profile:123', { language: 'en' }, 3600);
 ## 6) Observability in one step
 
 ```ts
-import { EcsJsonLogger, InMemoryMetrics, attachBotObservability } from '@jilimb0/tgwrapper-observability';
+import { EcsJsonLogger, InMemoryMetrics, attachBotObservability } from '@tgwrapper/observability';
 
 const metrics = new InMemoryMetrics();
 const logger = new EcsJsonLogger({ serviceName: 'my-bot' }, { write: (line) => console.log(line) });

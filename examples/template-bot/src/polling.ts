@@ -7,8 +7,8 @@ import {
   PollingSource,
   SessionManager,
   TreeRouter
-} from '@jilimb0/tgwrapper';
-import type { SessionEnvelope } from '@jilimb0/tgwrapper';
+} from '@tgwrapper/core';
+import type { SessionEnvelope } from '@tgwrapper/core';
 
 type State = 'idle' | 'await_name';
 interface Data {

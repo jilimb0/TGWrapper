@@ -43,7 +43,7 @@ AI requests can execute for seconds. Enforce strict timeout boundaries:
 To trace operations across systems, pass the active `traceId` as an HTTP header to external AI endpoints:
 
 ```typescript
-import { ContextStore } from '@jilimb0/tgwrapper-observability';
+import { ContextStore } from '@tgwrapper/observability';
 
 const context = ContextStore.getStore();
 const response = await fetch('https://api.openai.com/v1/chat/completions', {

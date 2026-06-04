@@ -1,11 +1,11 @@
-# @jilimb0/tgwrapper-observability
+# @tgwrapper/observability
 
 > **Metrics, logs, traces and correlation for Telegram bot operations.**
 >
 > Attach once. Get structured JSON events, in-process counters, per-update trace IDs, and OpenTelemetry-compatible spans for every update your bot processes — including AI/LLM call timing and token budgets.
 
 ```bash
-pnpm add @jilimb0/tgwrapper-observability
+pnpm add @tgwrapper/observability
 ```
 
 ---
@@ -39,7 +39,7 @@ pnpm add @jilimb0/tgwrapper-observability
 ## 📦 Installation
 
 ```bash
-pnpm add @jilimb0/tgwrapper-observability
+pnpm add @tgwrapper/observability
 ```
 
 ---
@@ -55,8 +55,8 @@ pnpm add @jilimb0/tgwrapper-observability
 ## 🚀 Quick Start
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { createBotClient } from '@tgwrapper/core';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
 const registry = new MetricsRegistry();
@@ -76,7 +76,7 @@ const detach = attachBotObservability(bot, {
 ### Recipe 1: Prometheus Export
 Expose bot metrics to Prometheus scrapers:
 ```typescript
-import { PrometheusExporter } from '@jilimb0/tgwrapper-observability';
+import { PrometheusExporter } from '@tgwrapper/observability';
 import { createServer } from 'http';
 
 const exporter = new PrometheusExporter(registry);
@@ -91,7 +91,7 @@ createServer((req, res) => {
 ### Recipe 2: AI / LLM Call Tracing
 Track conversational request spans and token metrics:
 ```typescript
-import { Tracer } from '@jilimb0/tgwrapper-observability';
+import { Tracer } from '@tgwrapper/observability';
 
 const tracer = new Tracer();
 async function handleQuery(prompt: string) {

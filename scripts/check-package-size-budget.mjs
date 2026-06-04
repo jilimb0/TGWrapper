@@ -7,19 +7,19 @@ const repoRoot = process.cwd();
 const budgets = [
   {
     dir: '.',
-    name: '@jilimb0/tgwrapper',
+    name: '@tgwrapper/core',
     maxPackageSizeBytes: 60_000,
     maxUnpackedSizeBytes: 260_000
   },
   {
     dir: 'packages/adapter-redis',
-    name: '@jilimb0/tgwrapper-adapter-redis',
+    name: '@tgwrapper/adapter-redis',
     maxPackageSizeBytes: 10_000,
     maxUnpackedSizeBytes: 48_000
   },
   {
     dir: 'packages/observability',
-    name: '@jilimb0/tgwrapper-observability',
+    name: '@tgwrapper/observability',
     maxPackageSizeBytes: 28_000,
     maxUnpackedSizeBytes: 120_000
   }

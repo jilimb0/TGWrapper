@@ -209,7 +209,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p .artifacts
-          pnpm --filter @jilimb0/tgwrapper-adapter-redis test:integration > .artifacts/error.log 2>&1
+          pnpm --filter @tgwrapper/adapter-redis test:integration > .artifacts/error.log 2>&1
         env:
           REDIS_URL: redis://127.0.0.1:6379
       - name: Write failure digest

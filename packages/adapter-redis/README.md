@@ -1,11 +1,11 @@
-# @jilimb0/tgwrapper-adapter-redis
+# @tgwrapper/adapter-redis
 
 > **Distributed state, caching and rate limiting layer for TGWrapper production deployments.**
 >
 > Drop-in Redis-backed session adapter and sliding-window rate limiter. Replaces in-process primitives with distributed, multi-instance-safe equivalents — no changes to your handler code required.
 
 ```bash
-pnpm add @jilimb0/tgwrapper-adapter-redis ioredis
+pnpm add @tgwrapper/adapter-redis ioredis
 ```
 
 ---
@@ -39,7 +39,7 @@ pnpm add @jilimb0/tgwrapper-adapter-redis ioredis
 ## 📦 Installation
 
 ```bash
-pnpm add @jilimb0/tgwrapper-adapter-redis ioredis
+pnpm add @tgwrapper/adapter-redis ioredis
 ```
 
 ---
@@ -69,7 +69,7 @@ pnpm add @jilimb0/tgwrapper-adapter-redis ioredis
 Features optimistic concurrency control via Compare-and-Swap (CAS) to protect session data in concurrent multi-update scenarios.
 
 ```typescript
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 const sessionAdapter = new RedisSessionAdapter({
   redisUrl: process.env.REDIS_URL!,
@@ -83,7 +83,7 @@ const sessionAdapter = new RedisSessionAdapter({
 Protects your bot from load spikes. Uses an atomic Lua script to evaluate limits.
 
 ```typescript
-import { RedisKvStore, createRateLimiter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
 
 const kv = new RedisKvStore({ redisUrl: process.env.REDIS_URL! });
 const limiter = createRateLimiter(kv, {

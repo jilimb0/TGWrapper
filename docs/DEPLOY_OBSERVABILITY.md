@@ -1,6 +1,6 @@
 # Deployment Recipes: Observability Stacks
 
-This guide provides deployment integration recipes for the `@jilimb0/tgwrapper-observability` package across three common infrastructure environments.
+This guide provides deployment integration recipes for the `@tgwrapper/observability` package across three common infrastructure environments.
 
 ---
 
@@ -19,8 +19,8 @@ This guide provides deployment integration recipes for the `@jilimb0/tgwrapper-o
 Designed for rapid iteration without spinning up extra monitoring servers.
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { createBotClient } from '@tgwrapper/core';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
 const registry = new MetricsRegistry();
@@ -42,8 +42,8 @@ attachBotObservability(bot, {
 Configures a scraping endpoint to serve Prometheus counters.
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { attachBotObservability, MetricsRegistry, PrometheusExporter } from '@jilimb0/tgwrapper-observability';
+import { createBotClient } from '@tgwrapper/core';
+import { attachBotObservability, MetricsRegistry, PrometheusExporter } from '@tgwrapper/observability';
 import { createServer } from 'http';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
@@ -83,8 +83,8 @@ scrape_configs:
 Edge/serverless environments (AWS Lambda, Cloudflare Workers) require pushing metrics and traces via HTTP POST to an OpenTelemetry collector before the execution context is destroyed.
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { attachBotObservability, OtlpHttpTraceExporter } from '@jilimb0/tgwrapper-observability';
+import { createBotClient } from '@tgwrapper/core';
+import { attachBotObservability, OtlpHttpTraceExporter } from '@tgwrapper/observability';
 
 export default {
   async fetch(request, env, ctx) {

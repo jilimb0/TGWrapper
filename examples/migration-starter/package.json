@@ -1,0 +1,25 @@
+{
+  "name": "tgwrapper-migration-starter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Template and step-by-step example for migrating Telegraf/grammY bots to TGWrapper",
+  "main": "dist/bot-after.js",
+  "scripts": {
+    "build": "tsc",
+    "start:before": "tsx src/bot-before.ts",
+    "start:after": "tsx src/bot-after.ts"
+  },
+  "dependencies": {
+    "@tgwrapper/core": "workspace:*",
+    "@tgwrapper/adapter-redis": "workspace:*",
+    "@tgwrapper/observability": "workspace:*",
+    "ioredis": "^5.4.1",
+    "telegraf": "^4.16.3"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0"
+  }
+}

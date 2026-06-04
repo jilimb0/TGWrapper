@@ -29,6 +29,6 @@ body:
     attributes:
       label: Environment Info
       description: Node.js version, platform, framework versions (e.g. Node 20.10, Cloudflare Workers, TGWrapper 0.14.0)
-      placeholder: Node 20, CF Workers, @jilimb0/tgwrapper@0.14.0
+      placeholder: Node 20, CF Workers, @tgwrapper/core@0.15.0
     validations:
       required: true

@@ -1,6 +1,6 @@
-import { createBotClient } from '@jilimb0/tgwrapper';
-import { RedisKvStore, createRateLimiter, RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
-import { attachBotObservability, MetricsRegistry } from '@jilimb0/tgwrapper-observability';
+import { createBotClient } from '@tgwrapper/core';
+import { RedisKvStore, createRateLimiter, RedisSessionAdapter } from '@tgwrapper/adapter-redis';
+import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 const BOT_TOKEN = process.env.BOT_TOKEN || 'fake-token-for-dev';
 const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';

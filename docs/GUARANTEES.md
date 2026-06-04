@@ -1,6 +1,6 @@
 # Redis Layer: Guarantees & Non-Guarantees
 
-This document defines the atomic execution semantics, consistency models, and operational boundaries of the `@jilimb0/tgwrapper-adapter-redis` package.
+This document defines the atomic execution semantics, consistency models, and operational boundaries of the `@tgwrapper/adapter-redis` package.
 
 ---
 

@@ -37,7 +37,7 @@ When executing async operations (such as fetching data or running AI prompts), t
 ### Log Instrumentation Example
 When writing custom log statements, verify that the active telemetry wrapper extracts context identifiers automatically:
 ```typescript
-import { ContextStore } from '@jilimb0/tgwrapper-observability';
+import { ContextStore } from '@tgwrapper/observability';
 
 const context = ContextStore.getStore();
 logger.info({

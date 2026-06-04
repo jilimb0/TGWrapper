@@ -17,11 +17,10 @@ TGWrapper is a layered monorepo. Each layer has a single, explicit responsibilit
                                 │  imports
           ┌─────────────────────┼──────────────────────┐
           ▼                     ▼                        ▼
-┌─────────────────┐  ┌──────────────────────┐  ┌────────────────────────┐
-│  @jilimb0/      │  │  @jilimb0/tgwrapper  │  │  @jilimb0/tgwrapper   │
-│  tgwrapper      │  │  -adapter-redis       │  │  -observability        │
-│  (Core)         │  │  (Redis Layer)        │  │  (Telemetry Layer)     │
-│                 │  │                       │  │                        │
+┌─────────────────┐  ┌────────────────────────────┐  ┌───────────────────────────┐
+│  @tgwrapper/    │  │  @tgwrapper/adapter-redis  │  │  @tgwrapper/observability │
+│  core           │  │  (Redis Layer)             │  │  (Telemetry Layer)        │
+│  (Core)         │  │                            │  │                           │
 │ • BotRuntime    │  │ • RedisSessionAdapter │  │ • MetricsRegistry      │
 │ • FSM engine    │  │ • RedisRateLimiter    │  │ • Tracer + Spans       │
 │ • Router        │  │ • RedisKvStore        │  │ • PrometheusExporter   │
@@ -42,7 +41,7 @@ TGWrapper is a layered monorepo. Each layer has a single, explicit responsibilit
 
 ## 🏛️ Layer Responsibilities
 
-### Core (`@jilimb0/tgwrapper`)
+### Core (`@tgwrapper/core`)
 
 The only required package. Handles the full Telegram Bot API surface without external runtime dependencies.
 
@@ -55,7 +54,7 @@ The only required package. Handles the full Telegram Bot API surface without ext
 | **Transport Adapters** | Polling loop and passive webhook ingestion share one `bot.ingest(update)` entrypoint — same handler code runs in both modes. |
 | **Type Schemas** | Fully typed Telegram API request/response surfaces; checked against upstream schema snapshots on every commit. |
 
-### Redis Layer (`@jilimb0/tgwrapper-adapter-redis`)
+### Redis Layer (`@tgwrapper/adapter-redis`)
 
 Optional. Plugs into the Core's session and rate-limiter interfaces. Has no dependency on the observability layer.
 
@@ -65,7 +64,7 @@ Optional. Plugs into the Core's session and rate-limiter interfaces. Has no depe
 | **RedisRateLimiter** | Implements the `RateLimiter` interface. Uses a sliding-window sorted-set counter atomically evaluated per Lua script. |
 | **RedisKvStore** | Generic key-value store primitive used internally by both the session adapter and rate limiter. |
 
-### Telemetry Layer (`@jilimb0/tgwrapper-observability`)
+### Telemetry Layer (`@tgwrapper/observability`)
 
 Optional. Wraps the Core's lifecycle hooks to capture structured telemetry without modifying handler code.
 
@@ -142,9 +141,9 @@ Telegram Bot API
 
 ```
 packages/
-  ├── core/                  @jilimb0/tgwrapper
-  ├── adapter-redis/         @jilimb0/tgwrapper-adapter-redis
-  └── observability/         @jilimb0/tgwrapper-observability
+  ├── core/                  @tgwrapper/core
+  ├── adapter-redis/         @tgwrapper/adapter-redis
+  └── observability/         @tgwrapper/observability
 
 examples/
   ├── polling-starter/       Minimal single-process bot (Node.js long-poll)

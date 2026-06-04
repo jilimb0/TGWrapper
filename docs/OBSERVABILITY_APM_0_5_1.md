@@ -9,7 +9,7 @@ import {
   ConfigurableLogger,
   ExportManager,
   OtlpMetricsExporter
-} from '@jilimb0/tgwrapper-observability';
+} from '@tgwrapper/observability';
 
 const metrics = new MetricsRegistry({ sampleRate: 1, maxSeriesPerMetric: 500 });
 const tracer = new Tracer();

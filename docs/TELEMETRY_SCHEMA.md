@@ -1,6 +1,6 @@
 # Telemetry Schema Contract
 
-This document serves as the formal schema contract for all observability signals emitted by `@jilimb0/tgwrapper-observability`.
+This document serves as the formal schema contract for all observability signals emitted by `@tgwrapper/observability`.
 
 ---
 
@@ -73,7 +73,7 @@ Trace propagation utilizes Node's standard `AsyncLocalStorage` boundary scopes.
 - **Propagation Hook:** Any log event, outgoing HTTP request, or child spans started within the update handler scope automatically inherits this matching `traceId`.
 - **Log Correlation:** Ensure your database and AI adapters extract and output this field from the active telemetry context:
   ```typescript
-  import { ContextStore } from '@jilimb0/tgwrapper-observability';
+  import { ContextStore } from '@tgwrapper/observability';
   
   const currentContext = ContextStore.getStore();
   const traceId = currentContext?.traceId;

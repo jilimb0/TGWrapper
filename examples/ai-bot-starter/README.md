@@ -1,85 +1,131 @@
 # TGWrapper AI Bot Starter
 
-A showcase reference implementation demonstrating how to build **AI-native Telegram bots** using TGWrapper. Integrates conversational interfaces, multi-turn FSM state management, and telemetry traces for LLM interactions.
+A **runnable** reference implementation demonstrating how to build AI-native Telegram bots with TGWrapper. Sends user messages to OpenAI, persists multi-turn conversation history in Redis with CAS protection, traces every LLM call, and tracks token usage per chat.
+
+> Without an `OPENAI_API_KEY`, the bot falls back to echo mode — you can still test the Redis session, rate limiting, and observability flows.
 
 ---
 
-## 🚀 What This Demonstrates
+## What this demonstrates
 
-| Feature / Pattern | Implementation Detail |
+| Feature | Implementation |
 | :--- | :--- |
-| **Conversational Context** | Persists conversation history across update boundaries using session memory |
-| **LLM Tracing** | Instruments OpenAI calls inside standard custom traces to track performance |
-| **Token Budgeting** | Captures input, output, and total token usage in structured telemetry events |
-| **Context Propagation** | Propagates the update `traceId` context cleanly through asynchronous LLM calls |
+| **Multi-turn conversation** | Persists `{ role, content }[]` history in Redis — survives restarts and works across instances |
+| **CAS session protection** | `compareAndSet()` prevents concurrent instances from silently overwriting conversation state |
+| **LLM call tracing** | Every OpenAI call is wrapped in `tracer.withSpan('ai.chat_completion')` — duration, model, and token counts attached |
+| **Token tracking** | `prompt_tokens`, `completion_tokens`, `total_tokens` logged per request and aggregated per chat via session |
+| **Distributed rate limiting** | Redis sliding-window limiter — 10 requests/min per user, shared across all bot instances |
+| **Structured telemetry** | `attachBotObservability()` adds `traceId`, `spanId`, structured events to every update |
+| **Timeout contracts** | `AbortSignal.timeout(30_000)` on OpenAI fetch — no indefinite hangs |
+| **Graceful fallback** | Missing API key → echo mode. OpenAI error → user-visible error message, not a crash |
 
 ---
 
-## 🏗️ Architecture
-
-AI assistants require tracking multi-step conversations and third-party model latencies:
+## Architecture
 
 ```
-  [User Message] ──> [TGWrapper Client] ──> [Load FSM Session]
-                             │
-                             ├──> [Tracer: withSpan("ai_generation")]
-                             │         │
-                             │         ├──> [Call LLM / OpenAI]
-                             │         │
-                             │         └──> [Log Tokens / Trace ID]
-                             │
-                             └──> [Dispatch Message Reply]
+[User Message] ──> [TGWrapper Client] ──> [Rate Limiter (Redis)]
+                         │
+                         ├──> [Load Session (Redis CAS)]
+                         │         │
+                         │         ├──> history[] + totalTokensUsed
+                         │
+                         ├──> [Tracer: withSpan("ai.chat_completion")]
+                         │         │
+                         │         ├──> [OpenAI API — fetch + AbortSignal]
+                         │         │
+                         │         └──> [Log: tokens, model, traceId]
+                         │
+                         ├──> [CAS Write Session (version + 1)]
+                         │
+                         └──> [Send Reply]
 ```
 
 ---
 
-## 📂 Project Structure
+## Project structure
 
-- `src/bot.ts` — Main bot client, update handler, and OpenAI API invocation wrapper.
-- `.env.example` — Environment configuration keys required.
-- `package.json` — Declares scripts and pins framework module dependencies.
+```
+ai-bot-starter/
+├── src/
+│   └── bot.ts          # Main bot — handlers, OpenAI integration, session, tracing
+├── .env.example        # Required environment variables
+├── package.json        # Dependencies: tgwrapper, adapter-redis, observability
+└── README.md
+```
 
 ---
 
-## 🛠️ Getting Started
+## Getting started
 
-### 1. Configuration
-Copy the template configuration file:
+### 1. Prerequisites
+
+- **Node.js >= 18**
+- **Redis** running locally (`redis://localhost:6379`) or a remote instance
+- **Telegram bot token** from [@BotFather](https://t.me/BotFather)
+- **OpenAI API key** (optional — bot falls back to echo mode without it)
+
+### 2. Configure
+
 ```bash
 cp .env.example .env
+# Edit .env with your credentials
 ```
 
-And provide your API credentials:
-```env
-BOT_TOKEN="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
-OPENAI_API_KEY="sk-proj-..."
-```
+| Variable | Required | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `BOT_TOKEN` | Yes | — | Telegram bot token |
+| `OPENAI_API_KEY` | No | — | OpenAI API key (omit for echo fallback) |
+| `REDIS_URL` | No | `redis://localhost:6379` | Redis connection URL |
+| `OPENAI_MODEL` | No | `gpt-4o-mini` | OpenAI model to use |
 
-### 2. Local Execution
+### 3. Install & run
+
 ```bash
-# Install dependencies
 pnpm install
-
-# Start the bot locally in polling mode
 pnpm start
 ```
 
+### 4. Test
+
+Send messages to your bot in Telegram:
+
+| Command | What it does |
+| :--- | :--- |
+| `/start` | Reset conversation history |
+| `/tokens` | Show total tokens used in this chat |
+| `/clear` | Clear conversation history (keep stats) |
+| *any text* | Send to OpenAI and get a response |
+
 ---
 
-## 🧪 Smoke Testing
+## What to look for in the logs
 
-You can smoke-test the AI integration locally:
-1. Start the bot process (`pnpm start`).
-2. Send a query to your bot: `"What is the capital of France?"`.
-3. Check the console stdout. You should see structured logs correlating the query:
-   ```json
-   {"timestamp":"2026-06-04T12:00:00Z","level":"INFO","event":"ai_generation","durationMs":452,"traceId":"8f8b8a8b...","prompt_tokens":15,"completion_tokens":8}
-   ```
+```json
+{"event":"ai.completion","traceId":"a1b2c3d4...","model":"gpt-4o-mini","prompt_tokens":42,"completion_tokens":18,"total_tokens":60}
+```
+
+Filter by `traceId` in your log aggregator to trace: user message → session load → OpenAI call → session write → reply sent.
 
 ---
 
-## 🛡️ Production Hardening Checklist
-- **Rate Limit Check:** Ensure you attach the distributed Redis rate limiter to prevent users from flooding the LLM endpoint and exhausting token budgets.
-- **Context Size Limit:** Limit FSM conversation history length stored in the session to avoid hitting Redis memory limits.
-- **Error Boundaries:** Wrap OpenAI API calls in try-catch-finally loops to capture rate limits (429) or token capacity errors, returning a clean fallback message to the user.
+## Production hardening checklist
 
+- [ ] **Rate limit tuning** — adjust `limit` and `blockDurationMs` in the rate limiter config for your traffic
+- [ ] **History size** — `MAX_HISTORY` is set to 20 messages; tune based on your model's context window and Redis memory
+- [ ] **Token budget** — add a per-user daily token cap using the `totalTokensUsed` session field
+- [ ] **Error boundaries** — the bot catches OpenAI errors but you may want retry logic for 429/503
+- [ ] **Webhook mode** — switch from `polling` to `webhook` for production (see [serverless-webhook-starter](../serverless-webhook-starter))
+- [ ] **Redis topology** — see [Redis Runtime Guide](../../docs/REDIS_RUNTIME.md) for Sentinel/Cluster setups
+
+---
+
+## Related docs & Team Evaluation
+
+- [Why TGWrapper?](../../docs/WHY_TGWRAPPER.md) — positioning and architectural wedge
+- [Redis Runtime Guide](../../docs/REDIS_RUNTIME.md) — session topologies, failure modes
+- [Telemetry Reference](../../docs/TELEMETRY_REFERENCE.md) — structured logs, metrics, traces
+- [Team Evaluation Checklist](../../docs/champion/TEAM_EVALUATION_CHECKLIST.md) — checklist for auditing AI bots
+- [Convince Your Team](../../docs/champion/CONVINCE_YOUR_TEAM.md) — one-pager comparison
+- [Internal Pilot Playbook](../../docs/champion/PILOT_PLAYBOOK.md) — step-by-step POC migrations
+- [Proof of Viability Guide](../../docs/PROOF_OF_VIABILITY.md) — 90-minute testing path

@@ -1,6 +1,6 @@
 # Telemetry Anti-Patterns & Best Practices
 
-This guide highlights common telemetry instrumentation anti-patterns to avoid when using `@jilimb0/tgwrapper-observability`.
+This guide highlights common telemetry instrumentation anti-patterns to avoid when using `@tgwrapper/observability`.
 
 ---
 

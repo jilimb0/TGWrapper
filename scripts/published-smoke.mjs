@@ -33,9 +33,9 @@ async function main() {
       'npm',
       [
         'i',
-        `@jilimb0/tgwrapper@${versions.core}`,
-        `@jilimb0/tgwrapper-adapter-redis@${versions.adapterRedis}`,
-        `@jilimb0/tgwrapper-observability@${versions.observability}`,
+        `@tgwrapper/core@${versions.core}`,
+        `@tgwrapper/adapter-redis@${versions.adapterRedis}`,
+        `@tgwrapper/observability@${versions.observability}`,
         'typescript@5.8.2'
       ],
       tempDir
@@ -71,9 +71,9 @@ async function main() {
   TreeRouter,
   type Context,
   type Update
-} from '@jilimb0/tgwrapper';
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
-import { EcsJsonLogger, InMemoryMetrics } from '@jilimb0/tgwrapper-observability';
+} from '@tgwrapper/core';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
+import { EcsJsonLogger, InMemoryMetrics } from '@tgwrapper/observability';
 
 type State = 'idle';
 type Data = { seen: number };
@@ -148,17 +148,17 @@ if (typeof RedisSessionAdapter !== 'function') {
 
 async function loadPublishedVersions() {
   return {
-    core: getLatestNpmVersion('@jilimb0/tgwrapper'),
-    adapterRedis: getLatestNpmVersion('@jilimb0/tgwrapper-adapter-redis'),
-    observability: getLatestNpmVersion('@jilimb0/tgwrapper-observability')
+    core: getLatestNpmVersion('@tgwrapper/core'),
+    adapterRedis: getLatestNpmVersion('@tgwrapper/adapter-redis'),
+    observability: getLatestNpmVersion('@tgwrapper/observability')
   };
 }
 
 async function assertPublishedVersionsExist(versions, options) {
   const checks = [
-    ['@jilimb0/tgwrapper', versions.core],
-    ['@jilimb0/tgwrapper-adapter-redis', versions.adapterRedis],
-    ['@jilimb0/tgwrapper-observability', versions.observability]
+    ['@tgwrapper/core', versions.core],
+    ['@tgwrapper/adapter-redis', versions.adapterRedis],
+    ['@tgwrapper/observability', versions.observability]
   ];
   const missing = [];
 

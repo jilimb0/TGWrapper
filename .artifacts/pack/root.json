@@ -1,7 +1,7 @@
 [
   {
-    "id": "@jilimb0/tgwrapper@0.13.1",
-    "name": "@jilimb0/tgwrapper",
+    "id": "@tgwrapper/core@0.13.1",
+    "name": "@tgwrapper/core",
     "version": "0.13.1",
     "size": 39146,
     "unpackedSize": 228338,

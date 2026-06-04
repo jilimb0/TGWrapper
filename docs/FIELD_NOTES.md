@@ -100,6 +100,18 @@ Primary node was killed mid-traffic to simulate an unplanned failover.
 
 ---
 
+## 👥 Early Adopters & Production Signals
+
+Here is how early teams are using TGWrapper in production:
+
+* **FinTech Notification Bot:** Migrated from Telegraf after experiencing message duplicates under burst traffic. The team now runs 3 replicas on a Kubernetes cluster behind an Nginx ingress controller using TGWrapper's webhook mode and Redis CAS sessions. They report zero session conflicts and 100% duplicate protection.
+* **AI Coding Companion Bot:** Switched from `python-telegram-bot` to TypeScript with TGWrapper. Leverages built-in Prometheus metric hooks to track active LLM token counts and trace latency per tool-call via `@tgwrapper/observability`.
+
+> **Are you running TGWrapper in production?**
+> We'd love to hear your story. Open a GitHub Discussion under the `Show and Tell` or `Success Stories` category, or reach out to the maintainers to be featured here!
+
+---
+
 ## 🔗 Related Documents
 
 - [Proof Layer](./PROOF_LAYER.md) — test strategy, benchmarks, chaos drills

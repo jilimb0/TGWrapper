@@ -100,7 +100,7 @@ curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" \
 ### Cloudflare Workers
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'webhook' });
 await bot.start();
@@ -120,7 +120,7 @@ export default {
 ### AWS Lambda (API Gateway)
 
 ```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
+import { createBotClient } from '@tgwrapper/core';
 
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'webhook' });
 await bot.start();
@@ -210,6 +210,6 @@ This starter uses **Core only** (no Redis, no Observability). For stateful serve
 ## 🔗 Next Steps
 
 - Add session + rate limiting → [`multi-instance-redis-starter`](../multi-instance-redis-starter)
-- Add structured telemetry → [`@jilimb0/tgwrapper-observability`](../../packages/observability)
+- Add structured telemetry → [`@tgwrapper/observability`](../../packages/observability)
 - Platform-specific adapters → [`examples/aws-lambda`](../aws-lambda), [`examples/cloudflare-worker`](../cloudflare-worker)
 - Read the full architecture map → [`docs/SYSTEM_ARCHITECTURE.md`](../../docs/SYSTEM_ARCHITECTURE.md)

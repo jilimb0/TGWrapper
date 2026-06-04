@@ -24,9 +24,9 @@
 
 ## Package Scope
 
-- `@jilimb0/tgwrapper`: runtime/kernel/router/FSM contracts.
-- `@jilimb0/tgwrapper-adapter-redis`: Redis session adapter and storage guarantees.
-- `@jilimb0/tgwrapper-observability`: logging/metrics utilities.
+- `@tgwrapper/core`: runtime/kernel/router/FSM contracts.
+- `@tgwrapper/adapter-redis`: Redis session adapter and storage guarantees.
+- `@tgwrapper/observability`: logging/metrics utilities.
 
 ## Release Flow
 
@@ -55,9 +55,9 @@
 ## npm OIDC Setup
 
 1. Open each package page in npm:
-   - `@jilimb0/tgwrapper`
-   - `@jilimb0/tgwrapper-adapter-redis`
-   - `@jilimb0/tgwrapper-observability`
+   - `@tgwrapper/core`
+   - `@tgwrapper/adapter-redis`
+   - `@tgwrapper/observability`
 2. In package settings, add a Trusted Publisher:
    - Provider: GitHub Actions
    - Repository: `jilimb0/TGWrapper`

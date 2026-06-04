@@ -85,7 +85,7 @@ bot.on('message', async (ctx) => {
 
 ### Framework Mechanism
 If the connection to Redis drops:
-- `@jilimb0/tgwrapper-adapter-redis` relies on `ioredis` internal reconnection loop.
+- `@tgwrapper/adapter-redis` relies on `ioredis` internal reconnection loop.
 - During the reconnect window, any call to load session data or evaluate rate limits will immediately fail or reject, avoiding silent corruption or state bypass.
 - The framework does **not** silently fallback to in-memory storage, preventing split-brain data states where different instances have diverging versions of user sessions.
 
@@ -93,7 +93,7 @@ If the connection to Redis drops:
 Initialize your Redis adapter client with explicit timeout limits and reconnect rules:
 ```typescript
 import Redis from 'ioredis';
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 const redisClient = new Redis(process.env.REDIS_URL!, {
   maxRetriesPerRequest: 3,

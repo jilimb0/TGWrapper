@@ -653,7 +653,7 @@ export class OtlpMetricsExporter {
       },
       scopeMetrics: [
         {
-          scope: { name: '@jilimb0/tgwrapper-observability' },
+          scope: { name: '@tgwrapper/observability' },
           metrics: [] as JsonObject[]
         }
       ]

@@ -82,7 +82,7 @@ console.error(
       status: 'failed',
       reason: 'schema_drift_without_followup_changeset',
       drift_count: driftCount,
-      required: 'Add a changeset for @jilimb0/tgwrapper mentioning telegram/schema compatibility follow-up.'
+      required: 'Add a changeset for @tgwrapper/core mentioning telegram/schema compatibility follow-up.'
     },
     null,
     2

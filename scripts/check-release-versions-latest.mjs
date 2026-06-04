@@ -2,9 +2,9 @@
 import { getPublishedVersionWithoutRange, getLatestNpmVersion } from './shared-release-versions.mjs';
 
 const packages = [
-  '@jilimb0/tgwrapper',
-  '@jilimb0/tgwrapper-adapter-redis',
-  '@jilimb0/tgwrapper-observability',
+  '@tgwrapper/core',
+  '@tgwrapper/adapter-redis',
+  '@tgwrapper/observability',
 ];
 
 const mismatches = [];

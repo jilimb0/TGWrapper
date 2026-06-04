@@ -1,6 +1,6 @@
 # Redis Topology & Deployment Reference
 
-This guide details support levels, configuration guidelines, and trade-offs for deploying the `@jilimb0/tgwrapper-adapter-redis` package across various Redis topology modes.
+This guide details support levels, configuration guidelines, and trade-offs for deploying the `@tgwrapper/adapter-redis` package across various Redis topology modes.
 
 ---
 
@@ -23,7 +23,7 @@ Best suited for single-server setups, development environments, and small-to-med
 
 ### Configuration
 ```typescript
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 const sessionAdapter = new RedisSessionAdapter({
   redisUrl: 'redis://127.0.0.1:6379/0',
@@ -43,7 +43,7 @@ Recommended for enterprise production. These environments typically configure sh
 
 ```typescript
 import Redis from 'ioredis';
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 const client = new Redis(process.env.REDIS_URL!, {
   tls: {},
@@ -64,7 +64,7 @@ Designed for high-availability setups where failover handling is automated via S
 Inject a custom pre-configured sentinel client:
 ```typescript
 import Redis from 'ioredis';
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 const client = new Redis({
   sentinels: [
@@ -90,7 +90,7 @@ Because the session adapter executes atomic operations via multi-key Lua scripts
 To guarantee this, configure a custom prefix using **hash-tags** `{}`:
 ```typescript
 import Redis from 'ioredis';
-import { RedisSessionAdapter } from '@jilimb0/tgwrapper-adapter-redis';
+import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 
 // All keys will be mapped to the same slot using the hash tag prefix
 const sessionAdapter = new RedisSessionAdapter({

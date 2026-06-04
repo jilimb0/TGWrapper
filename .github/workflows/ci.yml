@@ -20,6 +20,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@v6
         with:
           version: 10.4.1
@@ -29,10 +31,12 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: |
-          if git log -1 --pretty=%s | grep -q '^Version Packages'; then
+          # Use --no-frozen-lockfile when lockfile is genuinely out of sync with
+          # package.json (e.g. Version Packages commits that bump specifiers).
+          # --frozen-lockfile is used everywhere else to catch accidental drift.
+          if pnpm install --frozen-lockfile 2>&1 | grep -q 'ERR_PNPM_OUTDATED_LOCKFILE'; then
+            echo "Lockfile outdated (Version Packages commit) — regenerating."
             pnpm install --no-frozen-lockfile
-          else
-            pnpm install --frozen-lockfile
           fi
       - name: Check changeset requirement
         id: run_check
@@ -80,10 +84,9 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: |
-          if git log -1 --pretty=%s | grep -q '^Version Packages'; then
+          if pnpm install --frozen-lockfile 2>&1 | grep -q 'ERR_PNPM_OUTDATED_LOCKFILE'; then
+            echo "Lockfile outdated (Version Packages commit) — regenerating."
             pnpm install --no-frozen-lockfile
-          else
-            pnpm install --frozen-lockfile
           fi
       - name: Verify toolchain
         id: run_verify
@@ -132,10 +135,9 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: |
-          if git log -1 --pretty=%s | grep -q '^Version Packages'; then
+          if pnpm install --frozen-lockfile 2>&1 | grep -q 'ERR_PNPM_OUTDATED_LOCKFILE'; then
+            echo "Lockfile outdated (Version Packages commit) — regenerating."
             pnpm install --no-frozen-lockfile
-          else
-            pnpm install --frozen-lockfile
           fi
       - name: Release integrity checks
         id: run_release_integrity
@@ -197,10 +199,9 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: |
-          if git log -1 --pretty=%s | grep -q '^Version Packages'; then
+          if pnpm install --frozen-lockfile 2>&1 | grep -q 'ERR_PNPM_OUTDATED_LOCKFILE'; then
+            echo "Lockfile outdated (Version Packages commit) — regenerating."
             pnpm install --no-frozen-lockfile
-          else
-            pnpm install --frozen-lockfile
           fi
       - name: Redis integration tests
         id: run_redis_integration

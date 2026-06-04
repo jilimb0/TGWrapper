@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper-adapter-redis
 
+## 0.7.0
+
+### Minor Changes
+
+- 406e9bc: Platform ready upgrade
+
 ## 0.6.1
 
 ### Patch Changes

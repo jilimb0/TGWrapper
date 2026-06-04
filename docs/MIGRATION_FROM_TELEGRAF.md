@@ -1,43 +1,97 @@
 # Migration from Telegraf
 
-## API Mapping
+This guide maps common Telegraf features to their TGWrapper equivalents, providing code translation recipes.
 
-- `bot.command('start', fn)` -> `router.command('/start', fn)`
-- `bot.on('text', fn)` -> `router.regex(/.+/, fn)` or `router.use(fn)`
-- `ctx.session` -> `ctx.session.data`
-- Scenes/Wizard -> `router.scene('state', handlers, hooks)` + `ctx.scene.enter('state')`
-- `bot.launch()` -> `new BotRuntime(source, kernel).start()`
+---
 
-## Middleware Chains -> Priority Router
+## 🧭 Architectural Mapping
 
-Telegraf middleware often relies on ordering side effects. In TG Wrapper you model this with route priority:
+| Feature Category | Telegraf Pattern | TGWrapper Equivalent |
+| :--- | :--- | :--- |
+| **Routing** | `bot.command('start', fn)` | `bot.on('message', ...)` |
+| **Launch** | `bot.launch()` | `await bot.start()` |
+| **Middlewares** | `bot.use(fn)` | Global handler wrappers |
+| **Webhook setup** | `bot.webhookCallback('/secret')` | Native edge request handling configs |
 
-1. State handlers (`priority` default 200)
-2. Command handlers (`priority` default 100)
-3. Callback handlers (`priority` default 70)
-4. Regex handlers (`priority` default 50)
-5. Fallback (`use`, priority 0)
+---
 
-## Session Safety
+## 🛠️ Code Translation Recipes
 
-Telegraf session middlewares frequently overwrite state under concurrency. TG Wrapper enforces optimistic locking:
+### 1. Handler & Command Setup
 
-1. `SessionManager.load` reads `{value, version}`
-2. Handler mutates session in-memory
-3. `compareAndSet(expectedVersion)` commits atomically
-4. On mismatch, transaction retries
+**Telegraf Code:**
+```typescript
+import { Telegraf } from 'telegraf';
 
-## Webhook Migration
+const bot = new Telegraf(process.env.BOT_TOKEN!);
+bot.command('start', (ctx) => ctx.reply('Started!'));
+bot.on('text', (ctx) => {
+  ctx.reply(`Echo: ${ctx.message.text}`);
+});
+bot.launch();
+```
 
-- Telegraf webhook callback -> `WebhookHandler`
-- Node runtime -> `NodeHttpHandler`
-- AWS Lambda -> `AwsLambdaHandler`
-- Cloudflare Workers -> `CloudflareWorkerHandler`
+**TGWrapper Translation:**
+```typescript
+import { createBotClient } from '@jilimb0/tgwrapper';
 
-## Practical Porting Steps
+const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
+bot.on('message', async (message) => {
+  if (!('text' in message) || typeof message.text !== 'string') return;
+  const chatId = message.chat.id;
 
-1. Extract handlers into pure async functions using `Context`.
-2. Declare session type and state union.
-3. Build transition map in `BotKernel`.
-4. Replace middleware with explicit routes and priorities.
-5. Run concurrency tests around critical flows (payments, onboarding).
+  if (message.text === '/start') {
+    await bot.sendMessage(chatId, 'Started!');
+    return;
+  }
+
+  await bot.sendMessage(chatId, `Echo: ${message.text}`);
+});
+await bot.start();
+```
+
+---
+
+### 2. Webhook Handling Translation
+
+**Telegraf Webhook Setup:**
+```typescript
+import { Telegraf } from 'telegraf';
+import express from 'express';
+
+const bot = new Telegraf(process.env.BOT_TOKEN!);
+const app = express();
+
+app.use(bot.webhookCallback('/secret-path'));
+bot.telegram.setWebhook('https://mybot.com/secret-path');
+app.listen(3000);
+```
+
+**TGWrapper Webhook Translation:**
+```typescript
+import { createBotClient } from '@jilimb0/tgwrapper';
+import { createServer } from 'http';
+
+const bot = createBotClient({
+  token: process.env.BOT_TOKEN!,
+  mode: 'webhook'
+});
+
+// Start native HTTP webhooks ingestion server
+createServer(async (req, res) => {
+  if (req.url === '/secret-path' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', async () => {
+      const update = JSON.parse(body);
+      await bot.handleUpdate(update);
+      res.writeHead(200);
+      res.end('ok');
+    });
+  } else {
+    res.writeHead(404);
+    res.end();
+  }
+}).listen(3000);
+```
+

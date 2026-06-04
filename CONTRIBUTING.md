@@ -1,65 +1,30 @@
 # Contributing to TGWrapper
 
-Thanks for contributing to TGWrapper.
+Thank you for contributing to TGWrapper! To maintain platform reliability, we enforce strict guidelines across testing, telemetry drift prevention, and schema validation.
 
-## Development setup
+---
 
-```bash
-pnpm install
-pnpm test
-pnpm typecheck
-pnpm build
-```
+## 🛠️ Local Setup
 
-## Pull requests
+1. **Clone the Repo & Install Dependencies:**
+   ```bash
+   git clone https://github.com/jilimb0/TGWrapper.git
+   cd TGWrapper
+   pnpm install
+   ```
 
-- Create a feature branch from `main`.
-- Keep PRs focused and small.
-- Add or update tests for behavior changes.
-- Add a Changeset in `.changeset/` for user-facing package changes.
-- Link the related issue in the PR description.
+2. **Verify Code Verification Budgets:**
+   Ensure all baseline tests pass locally before committing:
+   ```bash
+   pnpm build
+   pnpm test
+   ```
 
-## Quality gates
+---
 
-Before requesting review, run:
+## 📝 Contribution Policies
 
-```bash
-pnpm verify:release
-```
-
-If your change touches Telegram API baseline or compatibility surface, also ensure:
-
-- `src/types/telegram.ts` is updated as needed
-- compatibility tests are updated:
-  - `test/types/telegram-api-compat.typecheck.ts`
-  - `test/telegram-api-compat.contract.test.ts`
-  - `test/context.compat.test.ts`
-  - `test/runtime.fallbacks.test.ts`
-- `docs/TELEGRAM_API_COMPATIBILITY.md` reflects the change
-
-## Commit style
-
-Use clear, imperative commit messages, for example:
-
-- `fix: handle purchased_paid_media fromId fallback`
-- `feat: cache sorted router routes`
-- `docs: clarify production rate limiter recommendation`
-
-## Code style
-
-- TypeScript strictness and existing patterns should be preserved.
-- Prefer explicit typing on public APIs.
-- Avoid breaking changes without a migration note.
-
-## Reporting bugs
-
-Please include:
-
-- TGWrapper package version(s)
-- Node.js version
-- minimal reproduction
-- expected vs actual behavior
-
-## Security
-
-Please do not disclose vulnerabilities publicly. See `SECURITY.md` for coordinated disclosure.
+- **Strict Type Validation:** All variables and parameters must be explicitly typed. No `any` declarations are allowed on the core request path.
+- **Drift Prevention Gate:** If you make changes to the telemetry system (`@jilimb0/tgwrapper-observability`), you must update the schema contracts inside `docs/TELEMETRY_SCHEMA.md` within the same pull request.
+- **Dual module Delivery:** Code changes must not break CommonJS (CJS) or ES Modules (ESM) dual packaging bundles. Verify by running `pnpm build`.
+- **Changesets Integration:** All PRs containing code changes must run `pnpm changeset` to add a description of the changes.

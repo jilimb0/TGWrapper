@@ -6,7 +6,7 @@
     "dev": "tsx src/server.ts"
   },
   "dependencies": {
-    "@jilimb0/tgwrapper": "^0.14.0"
+    "@jilimb0/tgwrapper": "^0.15.0"
   },
   "devDependencies": {
     "tsx": "^4.19.2"

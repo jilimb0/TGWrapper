@@ -138,7 +138,7 @@ jobs:
       - uses: changesets/action@v1
         with:
           publish: pnpm -r publish --access public --no-git-checks
-          version: pnpm changeset version
+          version: pnpm changeset version && node scripts/sync-examples.mjs --local && pnpm install --no-frozen-lockfile
         env:
           CHANGESETS_RELEASE: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,16 +1,16 @@
 {
-  "name": "multi-instance-redis-starter",
+  "name": "moderation-bot-starter",
   "private": true,
   "type": "module",
   "scripts": {
-    "start": "node --import tsx src/index.ts",
+    "start": "node --import tsx src/bot.ts",
     "test": "tsc --noEmit"
   },
   "dependencies": {
     "@jilimb0/tgwrapper": "^0.15.0",
     "@jilimb0/tgwrapper-adapter-redis": "^0.6.1",
     "@jilimb0/tgwrapper-observability": "^0.8.0",
-    "ioredis": "^5.6.1"
+    "ioredis": "^5.5.0"
   },
   "devDependencies": {
     "tsx": "^4.20.6",

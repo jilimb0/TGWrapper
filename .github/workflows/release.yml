@@ -144,11 +144,25 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ""
       - name: Sync example deps post-publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           node scripts/sync-examples.mjs
           pnpm install --no-frozen-lockfile
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add examples/*/package.json pnpm-lock.yaml
-          git diff --cached --quiet || git commit -m "chore: sync example deps after release"
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes to sync, skipping PR."
+            exit 0
+          fi
+          BRANCH="chore/sync-examples-$(date +%Y%m%d%H%M%S)"
+          git checkout -b "${BRANCH}"
+          git commit -m "chore: sync example deps after release"
+          git push origin "${BRANCH}"
+          gh pr create \
+            --title "chore: sync example deps after release" \
+            --body "Automated PR: updates examples to latest published @jilimb0/* versions and regenerates lockfile." \
+            --base main \
+            --head "${BRANCH}" \
+            --label "automated"

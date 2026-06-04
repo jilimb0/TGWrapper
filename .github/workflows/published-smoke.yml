@@ -23,7 +23,7 @@ jobs:
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: 22
       - name: Run published smoke
         run: |
           set -euo pipefail
@@ -64,7 +64,7 @@ jobs:
             echo ""
             echo "Published package smoke validation completed."
           } >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v7.0.1
+      - uses: actions/upload-artifact@v4
         if: always() && hashFiles('.artifacts/**') != ''
         with:
           name: published-smoke-log

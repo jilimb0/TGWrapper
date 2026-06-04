@@ -8,6 +8,20 @@ This is the template to use when a single polling process is not enough, or when
 
 ---
 
+## ✨ What This Demonstrates
+
+| Capability | Implementation |
+| :--- | :--- |
+| **Distributed session safety** | `RedisSessionAdapter` with CAS (Compare-and-Swap) via Lua script — no silent overwrites across concurrent instances |
+| **Shared rate limiting** | `RedisRateLimiter` using a sliding-window sorted-set — one counter shared across all nodes |
+| **State persistence across restarts** | Session data survives process kills; users resume where they left off |
+| **Structured observability** | Every update emits a `[TELEMETRY]` trace line with `traceId`, duration, and event type |
+| **Multi-node simulation locally** | Run `pnpm start` in two terminals — both share the same Redis state |
+
+> **This is the production-grade template.** Use it whenever you need distributed coordination or state durability.
+
+---
+
 ## 🏗️ Architecture
 
 ```
@@ -139,8 +153,36 @@ multi-instance-redis-starter/
 
 ---
 
+## 🏗️ How This Fits the Architecture
+
+```
+ Telegram Bot API
+       │  getUpdates (each instance polls independently)
+       ├──────────────────────────┐
+       ▼                          ▼
+ ┌─────────────┐          ┌─────────────┐
+ │  Bot Node 1 │          │  Bot Node 2 │   ← identical code, zero config diff
+ └──────┬──────┘          └──────┬──────┘
+        └────────────┬───────────┘
+                     ▼
+          ┌─────────────────────┐
+          │  Redis (CAS + Lua)  │   ← sessions, rate limits, shared state
+          └─────────────────────┘
+                     │
+                     ▼
+          ┌─────────────────────┐
+          │  Observability      │   ← traceId per update, metrics, JSON logs
+          └─────────────────────┘
+```
+
+This template uses all three TGWrapper layers (Core + Redis + Observability). See [SYSTEM_ARCHITECTURE.md](../../docs/SYSTEM_ARCHITECTURE.md) for the full component boundary map.
+
+---
+
 ## 🔗 Related Documentation
 
+- [System Architecture](../../docs/SYSTEM_ARCHITECTURE.md) — component map, dependency direction, runtime stack
 - [Redis Runtime Guide](../../docs/REDIS_RUNTIME.md) — topologies, locking guarantees, failure modes
 - [Telemetry Reference](../../docs/TELEMETRY_REFERENCE.md) — event schemas, exporter configs, debugging
 - [Production Checklist](../../docs/PRODUCTION_CHECKLIST.md) — pre-launch validation steps
+- [Proof Layer](../../docs/PROOF_LAYER.md) — test strategy, benchmarks, chaos drill runbook

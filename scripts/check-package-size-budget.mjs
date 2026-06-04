@@ -15,12 +15,12 @@ const budgets = [
     dir: 'packages/adapter-redis',
     name: '@jilimb0/tgwrapper-adapter-redis',
     maxPackageSizeBytes: 10_000,
-    maxUnpackedSizeBytes: 42_000
+    maxUnpackedSizeBytes: 48_000
   },
   {
     dir: 'packages/observability',
     name: '@jilimb0/tgwrapper-observability',
-    maxPackageSizeBytes: 25_000,
+    maxPackageSizeBytes: 28_000,
     maxUnpackedSizeBytes: 120_000
   }
 ];

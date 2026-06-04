@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper-observability
 
+## 0.7.1
+
+### Patch Changes
+
+- ac73c0d: Enhance documentation and add new validation and hardening resources
+
 ## 0.7.0
 
 ### Minor Changes

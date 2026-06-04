@@ -101,6 +101,8 @@ jobs:
           fi
           echo "Publish mode OK: private repository without provenance."
       - name: OIDC publish preflight (dry-run)
+        env:
+          CHANGESETS_RELEASE: "1"
         run: |
           set -euo pipefail
           for d in "." "packages/adapter-redis" "packages/observability"; do

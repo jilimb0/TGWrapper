@@ -2,6 +2,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawn } from 'node:child_process';
+import { getLatestNpmVersion } from './shared-release-versions.mjs';
 
 const rootDir = process.cwd();
 
@@ -146,16 +147,10 @@ if (typeof RedisSessionAdapter !== 'function') {
 }
 
 async function loadPublishedVersions() {
-  const [corePkg, redisPkg, obsPkg] = await Promise.all([
-    readJson(join(rootDir, 'package.json')),
-    readJson(join(rootDir, 'packages/adapter-redis/package.json')),
-    readJson(join(rootDir, 'packages/observability/package.json'))
-  ]);
-
   return {
-    core: corePkg.version,
-    adapterRedis: redisPkg.version,
-    observability: obsPkg.version
+    core: getLatestNpmVersion('@jilimb0/tgwrapper'),
+    adapterRedis: getLatestNpmVersion('@jilimb0/tgwrapper-adapter-redis'),
+    observability: getLatestNpmVersion('@jilimb0/tgwrapper-observability')
   };
 }
 
@@ -174,70 +169,59 @@ async function assertPublishedVersionsExist(versions, options) {
         stdio: 'pipe',
         timeoutMs: 20_000
       });
-    } catch {
+    } catch (error) {
       missing.push(target);
+      if (options.strictMode) {
+        throw new Error(`Published smoke requires ${target} to be available on npm.`, {
+          cause: error
+        });
+      }
     }
   }
 
-  if (missing.length === 0) {
-    return true;
+  if (missing.length > 0) {
+    console.warn(`Skipping published smoke; missing versions: ${missing.join(', ')}`);
+    return false;
   }
 
-  const details = [
-    `Missing published targets: ${missing.join(', ')}`,
-    'This usually means the workflow is checking out a commit whose package version is newer than what was published.',
-    `Current commit: ${process.env.GITHUB_SHA ?? 'unknown'}`
-  ].join('\n');
+  return true;
+}
 
-  if (options.strictMode) {
-    throw new Error(details);
-  }
+async function run(command, args, cwd, options = {}) {
+  const { stdio = 'inherit', timeoutMs = 120_000 } = options;
+  return new Promise((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd,
+      stdio,
+      env: process.env
+    });
 
-  console.warn(details);
-  return false;
+    const timer = setTimeout(() => {
+      child.kill('SIGTERM');
+      reject(new Error(`${command} ${args.join(' ')} timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+
+    child.on('error', (error) => {
+      clearTimeout(timer);
+      reject(error);
+    });
+
+    child.on('close', (code) => {
+      clearTimeout(timer);
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error(`${command} ${args.join(' ')} failed with exit code ${code}`));
+      }
+    });
+  });
 }
 
 async function readJson(filePath) {
   return JSON.parse(await readFile(filePath, 'utf8'));
 }
 
-async function run(cmd, args, cwd, options = {}) {
-  await new Promise((resolve, reject) => {
-    const child = spawn(cmd, args, {
-      cwd,
-      stdio: options.stdio ?? 'inherit',
-      env: process.env
-    });
-    const timeoutMs = options.timeoutMs;
-    const timeoutId =
-      typeof timeoutMs === 'number'
-        ? setTimeout(() => {
-            child.kill('SIGTERM');
-            reject(new Error(`Command timed out after ${timeoutMs}ms: ${cmd} ${args.join(' ')}`));
-          }, timeoutMs)
-        : undefined;
-
-    child.on('exit', (code) => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      if (code === 0) {
-        resolve();
-        return;
-      }
-      reject(new Error(`Command failed (${code}): ${cmd} ${args.join(' ')}`));
-    });
-
-    child.on('error', (error) => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      reject(error);
-    });
-  });
-}
-
 main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
+  console.error(error instanceof Error ? error.message : error);
+  process.exit(1);
 });

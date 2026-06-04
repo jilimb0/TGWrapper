@@ -1,6 +1,17 @@
 # TGWrapper AI Bot Starter
 
-A reference implementation demonstrating how to build **AI-native Telegram bots** using TGWrapper. Integrates conversational interfaces, FSM state management, and telemetry traces for LLM interactions.
+A showcase reference implementation demonstrating how to build **AI-native Telegram bots** using TGWrapper. Integrates conversational interfaces, multi-turn FSM state management, and telemetry traces for LLM interactions.
+
+---
+
+## 🚀 What This Demonstrates
+
+| Feature / Pattern | Implementation Detail |
+| :--- | :--- |
+| **Conversational Context** | Persists conversation history across update boundaries using session memory |
+| **LLM Tracing** | Instruments OpenAI calls inside standard custom traces to track performance |
+| **Token Budgeting** | Captures input, output, and total token usage in structured telemetry events |
+| **Context Propagation** | Propagates the update `traceId` context cleanly through asynchronous LLM calls |
 
 ---
 
@@ -8,21 +19,37 @@ A reference implementation demonstrating how to build **AI-native Telegram bots*
 
 AI assistants require tracking multi-step conversations and third-party model latencies:
 
-```mermaid
-graph TD
-    User[Telegram User] --> BotClient[TGWrapper Client]
-    BotClient --> Session[Session Memory]
-    BotClient --> Tracer[Telemetry Tracer Spans]
-    Tracer --> LLM[External LLM Api / OpenAI]
-    LLM --> Response[Response Dispatch]
 ```
+  [User Message] ──> [TGWrapper Client] ──> [Load FSM Session]
+                             │
+                             ├──> [Tracer: withSpan("ai_generation")]
+                             │         │
+                             │         ├──> [Call LLM / OpenAI]
+                             │         │
+                             │         └──> [Log Tokens / Trace ID]
+                             │
+                             └──> [Dispatch Message Reply]
+```
+
+---
+
+## 📂 Project Structure
+
+- `src/bot.ts` — Main bot client, update handler, and OpenAI API invocation wrapper.
+- `.env.example` — Environment configuration keys required.
+- `package.json` — Declares scripts and pins framework module dependencies.
 
 ---
 
 ## 🛠️ Getting Started
 
 ### 1. Configuration
-Provide API credentials:
+Copy the template configuration file:
+```bash
+cp .env.example .env
+```
+
+And provide your API credentials:
 ```env
 BOT_TOKEN="123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ"
 OPENAI_API_KEY="sk-proj-..."
@@ -33,18 +60,26 @@ OPENAI_API_KEY="sk-proj-..."
 # Install dependencies
 pnpm install
 
-# Start the bot
+# Start the bot locally in polling mode
 pnpm start
 ```
 
 ---
 
-## 🛡️ Production Tracing & AI Observability
+## 🧪 Smoke Testing
 
-For production AI bots, you should instrument the LLM spans to monitor token usage and response latencies:
+You can smoke-test the AI integration locally:
+1. Start the bot process (`pnpm start`).
+2. Send a query to your bot: `"What is the capital of France?"`.
+3. Check the console stdout. You should see structured logs correlating the query:
+   ```json
+   {"timestamp":"2026-06-04T12:00:00Z","level":"INFO","event":"ai_generation","durationMs":452,"traceId":"8f8b8a8b...","prompt_tokens":15,"completion_tokens":8}
+   ```
 
-1. **Attach Tracer:** Import the tracer from `@jilimb0/tgwrapper-observability`.
-2. **Nest Spans:** Wrap model invocations inside logical span frames.
-3. **Log Usage:** Save prompt and completion token counts into span metrics tags.
+---
 
-*For exact metrics exporter recipes, see [Observability Telemetry Documentation](../../packages/observability/README.md).*
+## 🛡️ Production Hardening Checklist
+- **Rate Limit Check:** Ensure you attach the distributed Redis rate limiter to prevent users from flooding the LLM endpoint and exhausting token budgets.
+- **Context Size Limit:** Limit FSM conversation history length stored in the session to avoid hitting Redis memory limits.
+- **Error Boundaries:** Wrap OpenAI API calls in try-catch-finally loops to capture rate limits (429) or token capacity errors, returning a clean fallback message to the user.
+

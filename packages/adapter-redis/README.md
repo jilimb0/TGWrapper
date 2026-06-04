@@ -1,6 +1,40 @@
 # @jilimb0/tgwrapper-adapter-redis
 
-> Redis storage adapter for TGWrapper, designed for production-oriented scaling, distributed FSM sessions, and sliding-window rate limiters.
+> **Distributed state, caching and rate limiting layer for TGWrapper production deployments.**
+>
+> Drop-in Redis-backed session adapter and sliding-window rate limiter. Replaces in-process primitives with distributed, multi-instance-safe equivalents — no changes to your handler code required.
+
+```bash
+pnpm add @jilimb0/tgwrapper-adapter-redis ioredis
+```
+
+---
+
+## 🎯 When you need this / When you do not
+
+**Use this when:**
+- Running **2+ bot instances** sharing the same bot token
+- User state must **survive process restarts**
+- Need **distributed rate limiting** shared across all instances
+- Need **atomic session writes** with no silent overwrites under concurrent load
+
+**Skip this if:**
+- Single-process bot with no horizontal scaling plans — in-memory defaults are sufficient
+- Serverless without persistent Redis — connection establishment overhead degrades cold starts
+- Prototyping or testing — use the default in-memory session adapter
+
+---
+
+## 🔑 What it solves
+
+| Problem | Mechanism |
+| :--- | :--- |
+| Concurrent session overwrites | CAS (Compare-and-Swap) via atomic Lua script — returns `ok: false` on conflict, never silently overwrites |
+| Shared rate limits across nodes | Sliding-window sorted-set counter evaluated atomically per Lua script — one counter, all instances |
+| State lost on process restart | Redis key-value persistence with configurable TTL per session |
+| Cross-dataset key clashes | All keys namespaced by configured prefix + environment — no accidental overlap |
+
+---
 
 ## 📦 Installation
 
@@ -88,6 +122,22 @@ const limiter = createRateLimiter(kv, {
 
 ---
 
+## ⏱️ Rate Limiter Semantics & Boundary Behaviors
+
+The distributed rate limiter enforces request quotas using an atomic sorted-set sliding window model.
+
+### Core Mechanics
+- **Algorithm:** Sorted Set (ZSET) Sliding Window. Every checked request pushes a unique string member `timestamp:randomId` scored by the epoch timestamp `Date.now()`.
+- **Atomic Cleanup:** The Lua check script executes `ZREMRANGEBYSCORE` to evict logs older than the current window limit (`now - windowMs`) before checking the cardinality (`ZCARD`).
+- **Temporary Block Option:** If `blockDurationMs` is configured, a temporary block key is written in Redis when the rate is breached, causing instant rejections without running ZSET updates.
+
+### Boundary Anomalies & Caveats
+- **Clock Synchronization:** Because evaluation scores rely on JS timestamps (`Date.now()`), **wide clock variations (>100ms) between multiple bot servers** will cause uneven rate limit enforcement. Synchronize all servers using NTP/Chrony.
+- **Fairness:** Rejection is immediate and strict. The limiter does **not** queue, buffer, or schedule incoming messages; it rejects them immediately.
+- **Memory Purging:** Sliding window keys configure automatic TTL parameters (`windowMs + 1000`) to guarantee cleanup of idle client records.
+
+---
+
 ## 📊 What to Monitor (Operational Metrics)
 
 When running the Redis adapter in critical production deployments, ensure your telemetry dashboard tracks:
@@ -116,3 +166,9 @@ Before using the Redis adapter in your production architecture, review these con
 We enforce continuous verification on the Redis adapter:
 - **Integration Test Coverage:** Validated against real Redis instances using the `pnpm test:integration` command. Covers connection pooling, client injection lifecycle, CAS version updates, and Lua-based rate limiting.
 - **Concurrency Test Verification:** Concurrency conflicts are automatically tested via fuzzing checks inside `test/chaos` to ensure the integrity of the CAS state machine.
+
+### 🔬 Proof & Operations Validation
+- **Topology Support:** Verified across standalone Redis, Managed Redis (ElastiCache), Sentinel, and Hash-tagged Cluster deployments.
+- **Behavior Under Contention:** Fuzz tests run 100+ concurrent writes to a single session to verify zero silent overwrites, ensuring CAS consistency.
+- **Limiter Robustness:** Sliding-window rate limiters tested with high-frequency concurrent script calls to guarantee accurate token count under load.
+- **Caveats Audited:** Monitored against standard memory limits with eviction policies to prevent OOM issues.

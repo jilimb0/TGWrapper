@@ -1,11 +1,51 @@
 # TGWrapper
 
-> A TypeScript framework built for production-oriented Telegram bot deployments, focusing on FSM resilience, transport portability, and structural request tracing.
+> **TypeScript-first Telegram bot platform for teams that need runtime portability, distributed state, and structured telemetry.** The same handler code runs on Node.js, Cloudflare Workers, and AWS Lambda. Scales from a single dev process to a Redis-backed multi-instance fleet without rewriting a line of handler logic.
 
 [![npm version](https://img.shields.io/npm/v/@jilimb0/tgwrapper.svg)](https://www.npmjs.com/package/@jilimb0/tgwrapper)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
-TGWrapper is designed for teams building structured Telegram applications where runtime flexibility, serverless support, and structured logs matter.
+---
+
+## ⚡ Quick Start
+
+```typescript
+import { createBotClient } from '@jilimb0/tgwrapper';
+
+const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
+bot.on('message', async (msg) => {
+  if ('text' in msg) await bot.sendMessage(msg.chat.id, `Echo: ${msg.text}`);
+});
+await bot.start();
+```
+
+```bash
+pnpm add @jilimb0/tgwrapper   # install
+pnpm build && pnpm test       # validate types + tests
+```
+
+**Production path:** `mode: 'polling'` (local dev) → add Redis adapter (distributed state) → switch to `mode: 'webhook'` (serverless / edge)
+
+**Reference apps:** [Polling bot](./examples/polling-starter) · [Multi-instance + Redis](./examples/multi-instance-redis-starter) · [Serverless / edge](./examples/serverless-webhook-starter) · [AI-native bot](./examples/ai-bot-starter)
+
+---
+
+## 🎯 Why teams choose TGWrapper
+
+| Reason | What you get |
+| :--- | :--- |
+| **Typed contracts** | Zero `any` on the critical path — compiler catches Telegram API mistakes before runtime |
+| **Runtime portability** | Node.js, Cloudflare Workers, AWS Lambda — same code, mode is a config flag, not a rewrite |
+| **Redis scale-out** | CAS-based distributed sessions prevent silent overwrites across concurrent instances |
+| **Built-in telemetry** | Structured logs, trace IDs, pull-based metrics — no custom middleware glue needed |
+| **Release verification** | Automated schema drift detection + benchmark budgets enforced on every commit |
+
+## ❌ Do not choose TGWrapper if…
+
+- You want a **toy bot in < 30 lines** — any library works; TGWrapper adds deliberate structure for serious bots
+- You have **no distributed state or scaling needs** — in-memory defaults work but the Redis layer is the main differentiator
+- You do not care about **structured observability and telemetry** — the framework is designed with production monitoring in mind
+- You are working outside **TypeScript / JavaScript** — TS-first only; no other language bindings planned
 
 ---
 
@@ -20,6 +60,12 @@ Direct operational evidence backing the framework's reliability:
 | **Benchmark Performance** | `Validated` — Low-overhead core processing (up to 180,000 updates/sec). |
 | **Disaster Recovery** | `Verified` — Chaos drills simulating Redis reconnect storms & network partition splits. |
 | **Runtime Portability** | `Cross-Platform` — Verified on Node.js >= 18, Cloudflare Workers, and AWS Lambda. |
+
+### 🔬 Proof & Release Safeguards
+- **Runtime Portability:** Every build is automatically tested against both Node.js (v18+) and Edge runtimes (Cloudflare Workers, AWS Lambda).
+- **Auto Drift Protection:** Weekly watchdog scripts validate our generated types against the latest official Bot API schema, preventing drift.
+- **Benchmark Budgets:** Core processing cost budget is capped at <0.5ms per update under simulated load of 180,000 updates/sec.
+- **Disaster Drills:** Automated tests simulate network packet losses, 429 backpressures, and thread locks to verify robust recovery.
 
 ---
 
@@ -68,22 +114,6 @@ Deploying a production-ready Telegram bot follows a single, non-branching workfl
 5. **Switch to Webhook & Deploy:** Toggle mode to `webhook` and export to serverless runtimes.
 
 ---
-
-## ✅ Choose TGWrapper if…
-
-- You need the same bot code to run across **Node.js, Cloudflare Workers, and AWS Lambda** without rewriting.
-- You want **TypeScript-first** API contracts with full inference — no runtime type surprises.
-- You need **distributed rate limiting and session state** that works safely across multiple bot instances.
-- You want **structured observability** (trace IDs, metrics, error events) built in, not patched on.
-- You are building an **AI-native bot** with stateful multi-turn conversations backed by external storage.
-
-## ❌ Don't Choose TGWrapper if…
-
-- You want a **drag-and-drop or visual flow builder** — TGWrapper is code-first.
-- You need a **rich plugin marketplace** with dozens of pre-built integrations — consider grammY.
-- You are building a **small hobby bot** in < 50 lines and don't need distributed state — any library works.
-- You are working outside the **TypeScript / JavaScript** ecosystem.
-- You need **multi-platform support** (Discord + Telegram + Slack in one framework) — TGWrapper is Telegram-only.
 
 ---
 

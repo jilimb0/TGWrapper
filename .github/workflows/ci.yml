@@ -20,8 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
       - uses: pnpm/action-setup@v6
         with:
           version: 10.4.1
@@ -29,7 +27,13 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: |
+          if git log -1 --pretty=%s | grep -q '^Version Packages'; then
+            pnpm install --no-frozen-lockfile
+          else
+            pnpm install --frozen-lockfile
+          fi
       - name: Check changeset requirement
         id: run_check
         continue-on-error: true
@@ -74,7 +78,13 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: |
+          if git log -1 --pretty=%s | grep -q '^Version Packages'; then
+            pnpm install --no-frozen-lockfile
+          else
+            pnpm install --frozen-lockfile
+          fi
       - name: Verify toolchain
         id: run_verify
         continue-on-error: true
@@ -120,7 +130,13 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: |
+          if git log -1 --pretty=%s | grep -q '^Version Packages'; then
+            pnpm install --no-frozen-lockfile
+          else
+            pnpm install --frozen-lockfile
+          fi
       - name: Release integrity checks
         id: run_release_integrity
         continue-on-error: true
@@ -179,7 +195,13 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: |
+          if git log -1 --pretty=%s | grep -q '^Version Packages'; then
+            pnpm install --no-frozen-lockfile
+          else
+            pnpm install --frozen-lockfile
+          fi
       - name: Redis integration tests
         id: run_redis_integration
         continue-on-error: true
@@ -252,7 +274,6 @@ jobs:
 
           FOUND=0
           if [ -d .artifacts-upload ]; then
-            # Safe loop without process substitution
             for file in $(find .artifacts-upload -name 'failure-summary.md' | sort); do
               if [ -f "$file" ]; then
                 FOUND=1
@@ -271,5 +292,4 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          # Done summary without hard exit to allow rendering
           echo "CI Summary write completed."

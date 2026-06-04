@@ -135,54 +135,10 @@ jobs:
           name: release-diagnostics
           path: .artifacts
           if-no-files-found: ignore
-      - name: Publish retry (bumped but not published)
-        id: publish_retry
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          CHANGESETS_RELEASE: "1"
-        run: |
-          set -euo pipefail
-          UNPUBLISHED=0
-          for d in "." "packages/adapter-redis" "packages/observability"; do
-            NAME="$(node -e "console.log(require('./${d}/package.json').name)")"
-            LOCAL="$(node -e "console.log(require('./${d}/package.json').version)")"
-            REMOTE="$(npm view "${NAME}@${LOCAL}" version 2>/dev/null || true)"
-            if [ -z "${REMOTE}" ]; then
-              echo "Will publish: ${NAME}@${LOCAL}"
-              UNPUBLISHED=1
-            fi
-          done
-          PENDING="$(find .changeset -name '*.md' ! -name 'README.md' 2>/dev/null | wc -l | tr -d ' ')"
-          if [ "${UNPUBLISHED}" -eq 1 ] && [ "${PENDING}" -eq 0 ]; then
-            echo "Retrying publish for bumped-but-unpublished packages..."
-            pnpm -r publish --access public --no-git-checks
-            echo "published=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "No retry needed."
-            echo "published=false" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Verify publish readiness
-        run: |
-          set -euo pipefail
-          UNPUBLISHED=0
-          for d in "." "packages/adapter-redis" "packages/observability"; do
-            NAME="$(node -e "console.log(require('./${d}/package.json').name)")"
-            LOCAL="$(node -e "console.log(require('./${d}/package.json').version)")"
-            REMOTE="$(npm view "${NAME}@${LOCAL}" version 2>/dev/null || true)"
-            if [ -z "${REMOTE}" ]; then
-              echo "UNPUBLISHED: ${NAME}@${LOCAL} exists locally but not on npm"
-              UNPUBLISHED=1
-            else
-              echo "OK: ${NAME}@${LOCAL} already published"
-            fi
-          done
-          PENDING="$(find .changeset -name '*.md' ! -name 'README.md' 2>/dev/null | wc -l | tr -d ' ')"
-          if [ "${UNPUBLISHED}" -eq 1 ] && [ "${PENDING}" -eq 0 ]; then
-            echo ""
-            echo "NOTICE: Versions were bumped but not yet published and no pending changesets found."
-            echo "Proceeding to publish retry via changesets/action."
-          fi
-          echo "Publish readiness OK (unpublished=${UNPUBLISHED}, pending_changesets=${PENDING})"
+
+      # changesets/action handles two modes automatically:
+      #   1. Pending changesets exist → creates/updates version PR
+      #   2. No pending changesets    → publishes any unpublished packages
       - uses: changesets/action@v1
         id: changesets
         with:
@@ -192,8 +148,41 @@ jobs:
           CHANGESETS_RELEASE: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Confirm all package versions are reachable on npm before syncing examples.
+      # changesets/action may return published=false even on a successful publish
+      # (e.g. when re-running after a partial failure). This step is the
+      # authoritative source of truth: it polls npm with retries and sets
+      # all_published=true only when every local version is confirmed live.
+      - name: Confirm packages live on npm
+        id: npm_confirm
+        if: always()
+        run: |
+          set -euo pipefail
+          ALL_PUBLISHED=true
+          for d in "." "packages/adapter-redis" "packages/observability"; do
+            NAME="$(node -e "console.log(require('./${d}/package.json').name)")"
+            VERSION="$(node -e "console.log(require('./${d}/package.json').version)")"
+            FOUND=false
+            for i in 1 2 3 4 5; do
+              REMOTE="$(npm view "${NAME}@${VERSION}" version 2>/dev/null || true)"
+              if [ "${REMOTE}" = "${VERSION}" ]; then
+                echo "✓ ${NAME}@${VERSION} confirmed on npm"
+                FOUND=true
+                break
+              fi
+              echo "Attempt ${i}: ${NAME}@${VERSION} not yet visible, retrying in 10s..."
+              sleep 10
+            done
+            if [ "${FOUND}" = "false" ]; then
+              echo "✗ ${NAME}@${VERSION} NOT found on npm after retries"
+              ALL_PUBLISHED=false
+            fi
+          done
+          echo "all_published=${ALL_PUBLISHED}" >> "$GITHUB_OUTPUT"
+
       - name: Sync example deps post-publish
-        if: steps.changesets.outputs.published == 'true' || steps.publish_retry.outputs.published == 'true'
+        if: steps.npm_confirm.outputs.all_published == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

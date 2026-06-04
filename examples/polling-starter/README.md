@@ -6,6 +6,20 @@ A clean, self-contained template demonstrating the canonical **polling** mode se
 
 ---
 
+## ✨ What This Demonstrates
+
+| Capability | Implementation |
+| :--- | :--- |
+| **Zero-dependency bot runtime** | Core package only — no Redis, no external services |
+| **Typed update handlers** | Full TypeScript inference on all Telegram update shapes |
+| **Graceful shutdown** | `SIGTERM` stops the loop cleanly after the current batch |
+| **Error boundary** | `bot.on('error', ...)` captures runtime and API failures |
+| **Echo + command routing** | `/start` command + catch-all text echo in < 30 lines |
+
+> **When to upgrade:** Once you need persistent state, add the [`multi-instance-redis-starter`](../multi-instance-redis-starter). Once you need edge/serverless, switch to [`serverless-webhook-starter`](../serverless-webhook-starter).
+
+---
+
 ## 🏗️ Architecture
 
 ```
@@ -103,8 +117,25 @@ polling-starter/
 
 ---
 
+## 🏗️ How This Fits the Architecture
+
+```
+Telegram Bot API
+      │  getUpdates (long-poll)
+      ▼
+ BotRuntime (polling loop) ← single Node.js process
+      │
+      ├─► Error Handler middleware
+      └─► Message / Command Handlers → bot.sendMessage(...)
+```
+
+This starter uses **Core only**. It is the entry-level layer of the TGWrapper stack. See [SYSTEM_ARCHITECTURE.md](../../docs/SYSTEM_ARCHITECTURE.md) for how it fits alongside Redis and Observability.
+
+---
+
 ## 🔗 Next Steps
 
-- Add distributed rate limiting → [`multi-instance-redis-starter`](../multi-instance-redis-starter)
-- Deploy serverless → [`serverless-webhook-starter`](../serverless-webhook-starter)
-- Add telemetry → [`packages/observability`](../../packages/observability)
+- Add distributed rate limiting + sessions → [`multi-instance-redis-starter`](../multi-instance-redis-starter)
+- Deploy serverless to Cloudflare / Lambda → [`serverless-webhook-starter`](../serverless-webhook-starter)
+- Add structured logs + metrics → [`@jilimb0/tgwrapper-observability`](../../packages/observability)
+- Read the full architecture map → [`docs/SYSTEM_ARCHITECTURE.md`](../../docs/SYSTEM_ARCHITECTURE.md)

@@ -62,10 +62,57 @@ const limiter = createRateLimiter(kv, {
 
 ---
 
-## 🛑 Limitations & Caveats
+## 🏗️ Supported Topologies & Environment Matrix
+
+| Topology Mode | Support Level | Implementation Notes |
+| :--- | :--- | :--- |
+| **Standalone Redis** | `Full` | Supported out of the box with standard TCP connections. |
+| **Managed Redis (AWS ElastiCache, etc.)** | `Full` | Supported. Recommended to enable `keepAlive` in `ioredis` configuration options. |
+| **Redis Sentinel** | `Full` | Supported by passing a pre-configured `ioredis` Sentinel client via client injection. |
+| **Redis Cluster** | `Limited` | Supported with limitations. Lua scripts require all session / rate-limit keys to reside on the same slot (use `{hash-tags}`). |
+| **Read Replicas** | `Not Recommended` | The adapter performs write operations (session updates, rate limits) on almost all calls. Direct replication lag can cause stale session reads. |
+| **Serverless Ephemeral Redis** | `Not Recommended` | Connection establishment overhead on every lambda invocation degrades execution performance. |
+
+---
+
+## 🛡️ Guarantees and Non-Guarantees
+
+### What is Guaranteed:
+* **Session Atomicity via CAS:** The session adapter performs Compare-and-Swap (CAS) writes using an atomic Lua script. This guarantees that concurrent updates for the same user/chat will never silently overwrite each other. If a collision occurs, the adapter returns `ok: false`, allowing developers to handle conflicts explicitly.
+* **Sliding Window Accuracy:** The distributed rate limiter uses a sorted-set sliding window algorithm implemented via a Lua script. Rate checks and increment operations are strictly atomic.
+* **Namespace Isolation:** All written keys are securely namespaced using the configured prefix to prevent clashes with other datasets.
+
+### Non-Guarantees & Trade-offs:
+* **Pessimistic Locking:** The adapter uses optimistic locking (CAS). It does **not** lock session keys pessimistically. Extremely high-concurrency hotspots will experience CAS failures (`ok: false`) and will require an application-level backoff-retry loop.
+* **Hard Dependency on Redis Uptime:** If Redis becomes unavailable, session reads and rate-limiting checks will fail. There is no automated in-memory fallback to avoid split-brain state scenarios across distributed instances.
+
+---
+
+## 📊 What to Monitor (Operational Metrics)
+
+When running the Redis adapter in critical production deployments, ensure your telemetry dashboard tracks:
+
+1. **Redis Cmd Latency:** Slow command execution (> 5ms) on `EVALSHA` / `EVAL` directly degrades update ingestion loops.
+2. **CAS Conflict Rate:** Track the proportion of `session.conflict` events. A rising count signals concurrent state update clashes.
+3. **Limiter Rejects (`ratelimit.blocked`):** Monitor spikes in rate limiter rejections to detect flood/spam attacks or adjust user quotas.
+4. **Reconnect Count:** High frequency of connection drops indicating network partition issues or resource limits on the Redis instance.
+5. **Key Churn & Memory Limit:** Verify key evictions. Ensure Redis `maxmemory-policy` is set to `volatile-lru` or `allkeys-lru` to handle session TTL purges.
+
+---
+
+## 🛑 Limitations & Non-goals
 
 Before using the Redis adapter in your production architecture, review these constraints:
 
 * **No Automatic Master/Replica Partitioning:** The adapter does not natively split read/write queries between master and replica nodes. If you run a large Redis Cluster, configure connection parameter objects on your custom `ioredis` instance and pass it via the `redis` injection parameter.
 * **Lua Execution Overhead:** The rate limiter evaluates limits using Lua script commands. High rates of script execution on single Redis instances can load CPU; ensure your Redis memory policy is set to `volatile-lru` or `allkeys-lru` to auto-evict expired keys.
 * **Client Injection Responsibility:** If you pass your own pre-instantiated `redis` client, lifecycle methods like `.disconnect()` will close the connection. Manage the lifecycle of shared clients carefully.
+* **Non-goal: Relational Session Queries:** The session adapter is key-value based; scanning or querying sessions by inner fields (like filtering active users) is out of scope.
+
+---
+
+## 🛡️ Evidence & Validation
+
+We enforce continuous verification on the Redis adapter:
+- **Integration Test Coverage:** Validated against real Redis instances using the `pnpm test:integration` command. Covers connection pooling, client injection lifecycle, CAS version updates, and Lua-based rate limiting.
+- **Concurrency Test Verification:** Concurrency conflicts are automatically tested via fuzzing checks inside `test/chaos` to ensure the integrity of the CAS state machine.

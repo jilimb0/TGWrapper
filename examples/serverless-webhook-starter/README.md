@@ -6,6 +6,31 @@ A reference template showing how to receive Telegram updates via webhooks in ser
 
 ---
 
+## ✨ What This Demonstrates
+
+| Capability | Implementation |
+| :--- | :--- |
+| **Zero background process** | No polling loop — runs purely on Telegram-triggered HTTP invocations |
+| **Platform-portable handler** | One `bot.ingest(update)` call works on Cloudflare Workers, AWS Lambda, and Node.js HTTP server |
+| **Cold-start optimized** | Bot client initialized at module scope — reused across warm invocations |
+| **Secret token validation** | `X-Telegram-Bot-Api-Secret-Token` header verification shown in production notes |
+| **Local tunnel dev workflow** | `ngrok` / `localtunnel` setup for iterating without deploying |
+
+> **When to add state:** Combine this with the Redis adapter (see [`multi-instance-redis-starter`](../multi-instance-redis-starter)) to get distributed sessions + rate limiting in serverless mode.
+
+---
+
+## 🌐 Platform Deployment Matrix
+
+| Platform | Adapter | Notes |
+| :--- | :--- | :--- |
+| **Node.js HTTP** | `node:http` / Express | Best for VPS or containerized deployments |
+| **Cloudflare Workers** | `fetch` handler export | Edge-native; see [`examples/cloudflare-worker`](../cloudflare-worker) |
+| **AWS Lambda + API GW** | `handler` export | See [`examples/aws-lambda`](../aws-lambda); initialize bot outside handler |
+| **Vercel / Netlify** | Standard serverless function | Use the Node.js HTTP adapter pattern |
+
+---
+
 ## 🏗️ Architecture
 
 ```
@@ -161,8 +186,30 @@ serverless-webhook-starter/
 
 ---
 
+## 🏗️ How This Fits the Architecture
+
+```
+ Telegram Bot API
+       │
+       │  POST /webhook (JSON update)
+       ▼
+  HTTP Handler (Cloudflare Worker / Lambda / Node HTTP)
+       │
+       ▼
+  bot.ingest(update)  ← same API regardless of platform
+       │
+       ├─► [Middleware Pipeline]
+       ├─► Router dispatch → Handlers
+       └─► bot.sendMessage(...) → Telegram Bot API
+```
+
+This starter uses **Core only** (no Redis, no Observability). For stateful serverless bots, add [`adapter-redis`](../../packages/adapter-redis) to persist sessions across invocations. See [SYSTEM_ARCHITECTURE.md](../../docs/SYSTEM_ARCHITECTURE.md) for the full layer map.
+
+---
+
 ## 🔗 Next Steps
 
 - Add session + rate limiting → [`multi-instance-redis-starter`](../multi-instance-redis-starter)
-- Add telemetry → [`packages/observability`](../../packages/observability)
-- See platform-specific adapters → [`examples/aws-lambda`](../aws-lambda), [`examples/cloudflare-worker`](../cloudflare-worker)
+- Add structured telemetry → [`@jilimb0/tgwrapper-observability`](../../packages/observability)
+- Platform-specific adapters → [`examples/aws-lambda`](../aws-lambda), [`examples/cloudflare-worker`](../cloudflare-worker)
+- Read the full architecture map → [`docs/SYSTEM_ARCHITECTURE.md`](../../docs/SYSTEM_ARCHITECTURE.md)

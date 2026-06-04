@@ -1,5 +1,12 @@
 # @tgwrapper/adapter-redis
 
+## 0.8.0
+
+### Minor Changes
+
+- 19a0fe3: Migration, upgrade, improvements
+- 19a0fe3: Migration, upgrade, improvement
+
 ## 0.7.0
 
 ### Minor Changes

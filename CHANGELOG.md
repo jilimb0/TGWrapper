@@ -1,5 +1,12 @@
 # @tgwrapper/core
 
+## 0.16.0
+
+### Minor Changes
+
+- 19a0fe3: Migration, upgrade, improvements
+- 19a0fe3: Migration, upgrade, improvement
+
 ## 0.15.0
 
 ### Minor Changes

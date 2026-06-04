@@ -1,6 +1,6 @@
 {
   "name": "tgwrapper-migration-starter",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "Template and step-by-step example for migrating Telegraf/grammY bots to TGWrapper",

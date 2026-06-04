@@ -1,5 +1,11 @@
 # @jilimb0/tgwrapper-observability
 
+## 0.8.0
+
+### Minor Changes
+
+- 406e9bc: Platform ready upgrade
+
 ## 0.7.1
 
 ### Patch Changes

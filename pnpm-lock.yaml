@@ -63,6 +63,28 @@ importers:
         specifier: ^4.2.0
         version: 4.97.0
 
+  examples/moderation-bot:
+    dependencies:
+      '@jilimb0/tgwrapper':
+        specifier: ^0.14.0
+        version: 0.14.1
+      '@jilimb0/tgwrapper-adapter-redis':
+        specifier: ^0.5.0
+        version: 0.5.1
+      '@jilimb0/tgwrapper-observability':
+        specifier: ^0.5.0
+        version: 0.5.5
+      ioredis:
+        specifier: ^5.5.0
+        version: 5.11.0
+    devDependencies:
+      tsx:
+        specifier: ^4.20.6
+        version: 4.22.4
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+
   examples/multi-instance-redis-starter:
     dependencies:
       '@jilimb0/tgwrapper':
@@ -762,9 +784,15 @@ packages:
     resolution: {integrity: sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA==}
     engines: {node: '>=12'}
 
+  '@jilimb0/tgwrapper-adapter-redis@0.5.1':
+    resolution: {integrity: sha512-i0nAa2IDD1iOODgMYaPZNQVAQ2SYGGniLKnFfSIudr7qeNkygrplflCH7XBJZt6Sr4C/mrlcSK7UmO5+jytFHA==}
+
   '@jilimb0/tgwrapper-adapter-redis@0.6.1':
     resolution: {integrity: sha512-Lsq1wSgp+G8q5qgh/9ygj/teE455GI1GQZ6+iR1kIvZbLQKLZJiyVezW6LpkZtApZnN1duFUFBGMGpntelbpFw==}
     engines: {node: '>=22.13'}
+
+  '@jilimb0/tgwrapper-observability@0.5.5':
+    resolution: {integrity: sha512-cyhq860MCUUcGkCSCe0T9fcsKlGmWlXNamZ2aL5BW2Keebz9BlEzl9IFtVb9aZ69rMXL9LdvNzRkNAJuuSqCog==}
 
   '@jilimb0/tgwrapper-observability@0.7.1':
     resolution: {integrity: sha512-E9Zjogg+J798OF/KcQPsIxOY2Qi3XJpbirz0a3+vBzsdDebVNlSWvodA+EHS52MECJ3sfHCFeHtj9Urm3aywXQ==}
@@ -2858,11 +2886,19 @@ snapshots:
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
 
+  '@jilimb0/tgwrapper-adapter-redis@0.5.1':
+    dependencies:
+      ioredis: 5.11.0
+    transitivePeerDependencies:
+      - supports-color
+
   '@jilimb0/tgwrapper-adapter-redis@0.6.1':
     dependencies:
       ioredis: 5.11.0
     transitivePeerDependencies:
       - supports-color
+
+  '@jilimb0/tgwrapper-observability@0.5.5': {}
 
   '@jilimb0/tgwrapper-observability@0.7.1': {}
 

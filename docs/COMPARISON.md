@@ -1,89 +1,68 @@
-# TGWrapper Comparison Matrix & Positioning
+# TGWrapper Comparison Matrix
 
-TGWrapper is built for teams designing serverless, edge-native, or distributed Telegram bots in TypeScript where structured logging, request trace correlation, and type validation are priority requirements.
+You are probably here because you already have a Telegram bot in production — on Telegraf, grammY, or raw `node-telegram-bot-api` — and something is not working the way it should. Maybe sessions are losing data under concurrent updates. Maybe you are debugging a production incident with `console.log` timestamps and no trace IDs. Maybe your rate limiter is an in-memory `Map` that resets every time a process restarts.
+
+TGWrapper was built for that moment. It is not a better beginner framework — it is a production operations framework for teams who have outgrown the defaults.
 
 ---
 
-## 📊 Comparison Matrix
+## Feature Comparison Matrix
 
-| Feature / Metric | **TGWrapper** | **grammY** | **Telegraf** |
+| Feature | **TGWrapper** | **grammY** | **Telegraf** |
 | :--- | :--- | :--- | :--- |
-| **Primary Focus** | Distributed scaling, serverless layouts, and telemetry | General developer ergonomics & extensive plugins | General-purpose setups, legacy JS/TS codebases |
-| **Serverless Cold Starts** | **Low** (Built on native fetch APIs) | Moderate (Requires adapter translation shims) | Moderate (Includes standard Node.js server dependencies) |
-| **API Type Updates** | Checked against Telegram schemas | Handled manually on major releases | Handled manually |
-| **Redis Session Protection** | **Compare-And-Swap (CAS)** (Prevents state overwrite) | Default key overrides (Last write wins) | Default key overrides (Last write wins) |
-| **Trace Propagation** | **Built-in AsyncLocalStorage contexts** | Requires manual middleware setup | Requires manual middleware setup |
+| **Primary focus** | Distributed ops, serverless, telemetry | Developer ergonomics, plugin ecosystem | Simplicity, Express-like middleware |
+| **Session concurrency** | **CAS (Compare-And-Swap)** — conflicts return `ok: false` | Last-write-wins | Last-write-wins |
+| **Rate limiting** | Distributed Redis sliding window (atomic Lua) | Per-instance auto-retry (outgoing only) | Manual / in-memory |
+| **Trace propagation** | Built-in `AsyncLocalStorage` context with UUID per update | Manual middleware | Manual middleware |
+| **Structured telemetry** | Built-in events, metrics registry, OTEL bridge | Not included | Not included |
+| **Serverless cold starts** | Low — fetch-native core, no server deps | Moderate — requires adapter shims | Moderate — includes Node.js server deps |
+| **API type safety** | Full TS inference, schema drift detection on CI | Full TS inference | Partial |
+| **Plugin ecosystem** | Small (Redis, observability) | Large (menus, conversations, storage adapters, etc.) | Medium |
+| **Community size** | Small / early | Large / active | Large / established |
+| **Runtime targets** | Node.js, Cloudflare Workers, AWS Lambda | Node.js, Deno, browsers | Node.js |
 
 ---
 
-## 🆚 TGWrapper vs. grammY
+## Deep-Dive Comparisons
 
-### When to stay on grammY:
-- You are building hobby or simple standalone bots where state persistence constraints and distributed rate limits do not matter.
-- You rely heavily on grammY's extensive ecosystem of community plugins (e.g. menus, conversations, inline queries wrappers).
+Each comparison is a standalone document with code side-by-side, decision guides, and honest trade-offs:
 
-### When to switch to TGWrapper:
-- You need to scale horizontally across multiple instances (VPS or Serverless) where concurrent updates can trigger race conditions on user sessions.
-- You require deep production visibility with metrics, distributed traces, and log correlation.
-
-### What you gain:
-- Atomic transaction-safe session writes via CAS Redis adapters.
-- Out-of-the-box OpenTelemetry compatibility and structured telemetry signals.
-- Low cold-start latency when running on Cloudflare Workers or AWS Lambda edge.
-
-### What you lose:
-- Access to grammY's specific community plugin ecosystem.
-- High-level abstractions for UI menus (must return raw Telegram API button layouts).
-
-### Code Shape Comparison:
-**grammY Session Read/Write:**
-```typescript
-bot.use(session({
-  storage: new RedisAdapter({ client: redis }) // Default overwrites on concurrency
-}));
-bot.command('increment', (ctx) => {
-  ctx.session.counter++; // Race condition prone if multiple taps occur within 50ms
-});
-```
-
-**TGWrapper Session Read/Write:**
-```typescript
-bot.on('message', async (ctx) => {
-  // Uses atomic OCC/CAS to guarantee update safety
-  const result = await bot.updateSession(ctx.chat.id, (state) => {
-    state.counter = (state.counter || 0) + 1;
-  });
-  if (!result.ok) {
-    // Handle write lock conflict explicitly (retry or alert)
-  }
-});
-```
+- **[Telegraf vs TGWrapper](./TELEGRAF_VS_TGWRAPPER.md)** — familiar middleware vs production contracts
+- **[grammY vs TGWrapper](./GRAMMY_VS_TGWRAPPER.md)** — easy first vs strong forever
+- **[When Telegraf stops being enough](./WHEN_TELEGRAF_STOPS.md)** — four real scenarios where Telegraf becomes a liability
 
 ---
 
-## 🆚 TGWrapper vs. Telegraf
+## Decision Summary
 
-### When to stay on Telegraf:
-- You maintain legacy Node.js bots written in CommonJS that do not require state management and are running stable in production.
-- Your infrastructure has no distributed state or telemetry requirements.
-
-### When to switch to TGWrapper:
-- You are migrating codebase templates to Edge/Serverless environments.
-- You are converting codebases to modern TypeScript with strict compilation checks.
-
-### What you gain:
-- Dual-build (ESM + CommonJS) bundle without heavy middleware or Node server dependencies.
-- Automatic verification against official Telegram Bot API schema types.
-- Trace propagation across asynchronous function boundaries.
-
-### What you lose:
-- Compatibility with old Node.js runtimes (< v18).
+| Your situation | Pick |
+| :--- | :--- |
+| Learning Telegram bots, want the smoothest path | **grammY** |
+| Single-process bot, no ops requirements | **Telegraf** or **grammY** — both work well |
+| Need distributed sessions with conflict detection | **TGWrapper** |
+| Need structured traces and production metrics | **TGWrapper** |
+| Need rich UI plugins (menus, conversations) | **grammY** |
+| Deploying to edge/serverless, want minimal cold starts | **TGWrapper** |
+| AI-native bot with LLM tracing | **TGWrapper** |
+| Legacy bot running stable, no reason to migrate | **Stay where you are** |
 
 ---
 
-## 🛠️ Transition Guides
+## Bottom line
 
-- [Migration from grammY](./MIGRATION_FROM_GRMMY.md)
+**Telegraf** is the right choice for teams who want Express-like simplicity and have no distributed state or observability requirements. It is stable, well-known, and has years of production mileage.
+
+**grammY** is the right choice for teams who want the best developer experience, the richest plugin ecosystem, and strong TypeScript types — on a single instance or with simple scaling needs.
+
+**TGWrapper** is the right choice for teams who are past the "make it work" phase and are now dealing with "make it work reliably across instances, with traces, under load." It trades ecosystem breadth and convenience for distributed safety, architectural observability, and explicit failure contracts.
+
+All three are legitimate tools. Pick the one that matches your pain, not the one with the most features.
+
+---
+
+## Migration Guides
+
 - [Migration from Telegraf](./MIGRATION_FROM_TELEGRAF.md)
+- [Migration from grammY](./MIGRATION_FROM_GRMMY.md)
+- [Migration from python-telegram-bot](./MIGRATION_FROM_PYTHON.md)
 - [Migration from Node Telegram Bot API](./MIGRATION_FROM_NODE_TELEGRAM_BOT_API.md)
-

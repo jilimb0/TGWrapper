@@ -133,9 +133,10 @@ This starter uses **Core only**. It is the entry-level layer of the TGWrapper st
 
 ---
 
-## 🔗 Next Steps
+## 🔗 Next Steps & Team Evaluation
 
-- Add distributed rate limiting + sessions → [`multi-instance-redis-starter`](../multi-instance-redis-starter)
-- Deploy serverless to Cloudflare / Lambda → [`serverless-webhook-starter`](../serverless-webhook-starter)
-- Add structured logs + metrics → [`@jilimb0/tgwrapper-observability`](../../packages/observability)
-- Read the full architecture map → [`docs/SYSTEM_ARCHITECTURE.md`](../../docs/SYSTEM_ARCHITECTURE.md)
+- **Port to Redis Sessions:** Add distributed rate limiting + sessions → [`multi-instance-redis-starter`](../multi-instance-redis-starter)
+- **Scale to Production:** Deploy serverless to Cloudflare / Lambda → [`serverless-webhook-starter`](../serverless-webhook-starter)
+- **Add Telemetry:** Add structured logs + metrics → [`@jilimb0/tgwrapper-observability`](../../packages/observability)
+- **Convince Your Team:** Share the [Convince Your Team Guide](../../docs/champion/CONVINCE_YOUR_TEAM.md) and [Team Evaluation Checklist](../../docs/champion/TEAM_EVALUATION_CHECKLIST.md) with your architecture team.
+- **Pilot Implementation:** Use the [Internal Pilot Playbook](../../docs/champion/PILOT_PLAYBOOK.md) to migrate your first staging service.

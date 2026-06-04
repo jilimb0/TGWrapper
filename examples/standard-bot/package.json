@@ -1,0 +1,21 @@
+{
+  "name": "tgwrapper-standard-bot",
+  "version": "1.0.0",
+  "description": "Standard production-ready TGWrapper bot template with Redis state and observability",
+  "main": "dist/bot.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/bot.ts"
+  },
+  "dependencies": {
+    "@jilimb0/tgwrapper": "workspace:*",
+    "@jilimb0/tgwrapper-adapter-redis": "workspace:*",
+    "@jilimb0/tgwrapper-observability": "workspace:*",
+    "ioredis": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0"
+  }
+}

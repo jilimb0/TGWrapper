@@ -1,0 +1,20 @@
+{
+  "name": "tgwrapper-support-bot",
+  "version": "1.0.0",
+  "description": "A support queue routing bot template built with TGWrapper",
+  "main": "dist/bot.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/bot.ts"
+  },
+  "dependencies": {
+    "@jilimb0/tgwrapper": "workspace:*",
+    "@jilimb0/tgwrapper-adapter-redis": "workspace:*",
+    "@jilimb0/tgwrapper-observability": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3",
+    "tsx": "^4.7.0"
+  }
+}

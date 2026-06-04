@@ -1,6 +1,8 @@
 # TGWrapper
 
-> **TypeScript-first Telegram bot platform for teams that need runtime portability, distributed state, and structured telemetry.** The same handler code runs on Node.js, Cloudflare Workers, and AWS Lambda. Scales from a single dev process to a Redis-backed multi-instance fleet without rewriting a line of handler logic.
+> Production Telegram bots in TypeScript — with Redis state, observability, and reliability semantics built in.
+>
+> When your bot stops being a side project and becomes a core service, TGWrapper is where teams land.
 
 [![npm version](https://img.shields.io/npm/v/@jilimb0/tgwrapper.svg)](https://www.npmjs.com/package/@jilimb0/tgwrapper)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
@@ -24,28 +26,45 @@ pnpm add @jilimb0/tgwrapper   # install
 pnpm build && pnpm test       # validate types + tests
 ```
 
-**Production path:** `mode: 'polling'` (local dev) → add Redis adapter (distributed state) → switch to `mode: 'webhook'` (serverless / edge)
-
 **Reference apps:** [Polling bot](./examples/polling-starter) · [Multi-instance + Redis](./examples/multi-instance-redis-starter) · [Serverless / edge](./examples/serverless-webhook-starter) · [AI-native bot](./examples/ai-bot-starter)
 
 ---
 
-## 🎯 Why teams choose TGWrapper
+## 🧭 Choose Your Path
 
-| Reason | What you get |
-| :--- | :--- |
-| **Typed contracts** | Zero `any` on the critical path — compiler catches Telegram API mistakes before runtime |
-| **Runtime portability** | Node.js, Cloudflare Workers, AWS Lambda — same code, mode is a config flag, not a rewrite |
-| **Redis scale-out** | CAS-based distributed sessions prevent silent overwrites across concurrent instances |
-| **Built-in telemetry** | Structured logs, trace IDs, pull-based metrics — no custom middleware glue needed |
-| **Release verification** | Automated schema drift detection + benchmark budgets enforced on every commit |
+Whether you're starting a new bot or migrating an existing production workload, choose the path that fits you:
+- **[Quick Start Guide](./docs/QUICK_START.md)** — Run your first bot in under 5 minutes (no Redis, no telemetry, zero config).
+- **[Grow with TGWrapper](./docs/GROW_WITH_TGWRAPPER.md)** — Learn how to take a simple bot to production step-by-step.
+- **[Tutorial Ladder](./docs/TUTORIALS.md)** — Structured step-by-step path from echo bots to AI-native applications.
+- **Migration Guides** — Step-by-step transitions from [Telegraf](./docs/MIGRATION_FROM_TELEGRAF.md), [grammY](./docs/MIGRATION_FROM_GRMMY.md), or [python-telegram-bot](./docs/MIGRATION_FROM_PYTHON.md).
 
-## ❌ Do not choose TGWrapper if…
+---
 
-- You want a **toy bot in < 30 lines** — any library works; TGWrapper adds deliberate structure for serious bots
-- You have **no distributed state or scaling needs** — in-memory defaults work but the Redis layer is the main differentiator
-- You do not care about **structured observability and telemetry** — the framework is designed with production monitoring in mind
-- You are working outside **TypeScript / JavaScript** — TS-first only; no other language bindings planned
+## 🎯 Who this is for
+
+TGWrapper is built for **teams and senior engineers running serious Telegram bots** who have already felt the pain of their current stack:
+
+- Duplicate sends from webhook retries because your handler didn't return in time
+- Multi-instance state conflicts because there's no distributed session primitive
+- Debugging a production incident with no trace IDs, no structured logs, no span context
+- Self-rolled rate limiting that's either too loose or causes unfair blocks under burst
+- An AI-native bot that needs token metrics, tool-call tracing, and timeout contracts
+
+If any of those sound familiar — this is where you land next.
+
+## 🚫 Who this is NOT for (consciously)
+
+- **First-time bot builders** — Telegraf and grammY are excellent starting points; TGWrapper adds structure that you don't need yet
+- **Toy bots** — if you need 30 lines and a `/start` handler, any framework works fine
+- **No Redis, no observability, no multi-instance needs** — in-memory session and polling work, but the framework's main value is in the distributed layer
+- **Non-TypeScript stacks** — TS-first only
+
+## ⚡ What gets easier with TGWrapper
+
+- **Zero data loss on restarts/crashes:** Distributed state using Compare-and-Swap (CAS) via Redis prevents concurrent session overrides by design.
+- **Trace incidents in seconds:** Correlation context (`trace_id`, `span_id`) is automatically injected into every update and propagated through async calls.
+- **Fail gracefully under load:** Native distributed rate limiting (sliding-window via Redis ZSETs) and built-in timeout abort signals protect your API limits and prevent webhook retry loops.
+- **Robust type safety:** Pure TypeScript contracts with typed handlers and typed session state instead of implicit `any` context magic.
 
 ---
 
@@ -66,6 +85,11 @@ Direct operational evidence backing the framework's reliability:
 - **Auto Drift Protection:** Weekly watchdog scripts validate our generated types against the latest official Bot API schema, preventing drift.
 - **Benchmark Budgets:** Core processing cost budget is capped at <0.5ms per update under simulated load of 180,000 updates/sec.
 - **Disaster Drills:** Automated tests simulate network packet losses, 429 backpressures, and thread locks to verify robust recovery.
+
+### 👥 Early Adopters in Production
+- **FinTech Notification Bot:** Switched from Telegraf to solve message duplicate issues. Runs 3 replicas on Kubernetes using webhook mode and Redis CAS sessions.
+- **AI Coding Companion Bot:** Migrated from Python to track LLM token counts and trace latency per tool-call via `@jilimb0/tgwrapper-observability`.
+- Read more detailed case studies in the [Field Notes](./docs/FIELD_NOTES.md).
 
 ---
 
@@ -113,40 +137,7 @@ Deploying a production-ready Telegram bot follows a single, non-branching workfl
 4. **Attach Telemetry:** Plug in observability to trace errors and metrics.
 5. **Switch to Webhook & Deploy:** Toggle mode to `webhook` and export to serverless runtimes.
 
----
-
----
-
-## ⚡ Quick Starts
-
-### 1. Polling Bot (Best for Local Dev / Simple Bots)
-
-```typescript
-import { createBotClient } from '@jilimb0/tgwrapper';
-
-const bot = createBotClient({
-  token: process.env.BOT_TOKEN!,
-  mode: 'polling',
-  polling: { timeoutSeconds: 30, limit: 100 }
-});
-
-bot.on('message', async (message) => {
-  if (!('text' in message) || typeof message.text !== 'string') return;
-  if (message.text === '/start') {
-    await bot.sendMessage(message.chat.id, 'Welcome to TGWrapper!');
-    return;
-  }
-  await bot.sendMessage(message.chat.id, `Echo: ${message.text}`);
-});
-
-bot.on('error', (err) => console.error('Bot Error:', err));
-await bot.start();
-```
-
-*For platform-specific serverless deployment templates, see:*
-- Node HTTP Server: [`examples/node-http`](./examples/node-http)
-- AWS Lambda Handler: [`examples/aws-lambda`](./examples/aws-lambda)
-- Cloudflare Workers: [`examples/cloudflare-worker`](./examples/cloudflare-worker)
+Check out our comprehensive **[Grow with TGWrapper](./docs/GROW_WITH_TGWRAPPER.md)** guide to walk through this onboarding flow step-by-step.
 
 ---
 
@@ -201,7 +192,14 @@ pnpm test
 ## 📑 Core Documentation Index
 
 **Getting Started**
+- [Quick Start](./docs/QUICK_START.md) — Run your first bot in under 5 minutes.
+- [Grow with TGWrapper](./docs/GROW_WITH_TGWRAPPER.md) — Complete maturity path from dev to production.
+- [Tutorials](./docs/TUTORIALS.md) — Structured step-by-step walkthroughs.
 - [Why TGWrapper?](./docs/WHY_TGWRAPPER.md) — Positioning and architectural wedge.
+- [Why not Telegraf?](./docs/WHEN_TELEGRAF_STOPS.md) — When Telegraf stops being enough.
+- [grammY vs TGWrapper](./docs/GRAMMY_VS_TGWRAPPER.md) — Honest comparison for long-lived bots.
+- [Telegraf vs TGWrapper](./docs/TELEGRAF_VS_TGWRAPPER.md) — Familiar middleware vs production contracts.
+- [Migrate from python-telegram-bot](./docs/MIGRATION_FROM_PYTHON.md) — Python to TypeScript path.
 - [System Architecture](./docs/SYSTEM_ARCHITECTURE.md) — Component model, dependency direction, and runtime stack.
 - [Comparison Matrix](./docs/COMPARISON.md) — TGWrapper vs. grammY vs. Telegraf.
 - [Project Doctrine](./docs/DOCTRINE.md) — Identity, non-goals, and contribution boundaries.

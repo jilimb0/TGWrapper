@@ -1,65 +1,43 @@
-# Support & Compatibility Matrix
+# Getting Support for TGWrapper
 
-This document defines the official support window, runtime environment compatibility, module standards, and infrastructure dependencies for all packages within the TGWrapper ecosystem.
-
----
-
-## 💻 Node.js Engine Support
-
-TGWrapper guarantees support for modern Node.js Long Term Support (LTS) releases:
-
-| Node.js Version | Support Level | CI Verification | Notes |
-| :--- | :--- | :--- | :--- |
-| **Node.js < 18** | `Unsupported` | ❌ No | Deprecated features, lack of modern Fetch API primitives. |
-| **Node.js 18 (LTS)** | `Supported` | ✅ Yes | Baseline verification target. |
-| **Node.js 20 (LTS)** | `Supported` | ✅ Yes | Recommended production environment. |
-| **Node.js 22 (LTS)** | `Supported` | ✅ Yes | Fully validated. |
+Welcome! If you are building with TGWrapper or migrating your production Telegram bots to it, here is where you can find support, ask questions, and connect with the community.
 
 ---
 
-## 🌐 JavaScript Runtimes & Serverless Platforms
+## 💬 Community Channels
 
-We compile TGWrapper to run seamlessly in both long-lived server processes and ephemeral edge environments:
-
-| Runtime Environment | Webhook Mode | Polling Mode | Context Propagation (`AsyncLocalStorage`) | Support Level |
-| :--- | :--- | :--- | :--- | :--- |
-| **Node.js Standard Process** | ✅ Fully Supported | ✅ Fully Supported | ✅ Supported | `Primary` |
-| **Cloudflare Workers (Edge)** | ✅ Fully Supported | ❌ Unsupported | ⚠️ Fallback Behavior | `First-Class` |
-| **AWS Lambda (Serverless)** | ✅ Fully Supported | ❌ Unsupported | ⚠️ Fallback Behavior | `First-Class` |
-| **Bun** | ✅ Fully Supported | ✅ Fully Supported | ✅ Supported | `Compatible` |
-| **Deno** | ✅ Fully Supported | ✅ Fully Supported | ✅ Supported | `Compatible` |
-
-### Edge Runtimes Support Details
-- **No Long-Polling:** Edge and Serverless execution environments enforce rigid request timeouts. Long-polling (`mode: 'polling'`) is strictly blocked in these environments. You must configure `mode: 'webhook'`.
-- **AsyncLocalStorage Fallbacks:** In edge engines where `AsyncLocalStorage` is not fully supported or is disabled, the `@jilimb0/tgwrapper-observability` context propagation behaves as a global fallback trace holder. Spans are still captured but trace propagation through nested async limits may be degraded.
+- **[GitHub Discussions Q&A](https://github.com/jilimb0/tgwrapper/discussions)** — The best place for architectural questions, "How-to" queries, and general setup help.
+- **[Telegram Community Chat](https://t.me/tgwrapper_community)** *(placeholder link)* — Real-time chat with other developers building production-grade Telegram bots.
+- **[Success Stories / Show & Tell](https://github.com/jilimb0/tgwrapper/discussions/categories/show-and-tell)** — Built something great? Let us know! We love highlighting production use cases.
 
 ---
 
-## 📦 Module Delivery Formats
+## 🐛 Bug Reports & Feature Requests
 
-All official packages are distributed with dual-format builds supporting both JavaScript module resolution models:
+Before filing a new issue on GitHub, please check our [Troubleshooting Guide](./docs/BOT_DEVELOPMENT_GUIDE.md) and search existing issues.
 
-- **ES Modules (ESM):** Native standard module structure (`import`/`export`).
-- **CommonJS (CJS):** Legacy standard (`require`/`module.exports`).
-
-We run automated bundle audits during releases to guarantee correct export entry declarations in `package.json` configurations.
+- **[Report a Bug](https://github.com/jilimb0/tgwrapper/issues/new?template=bug_report.md)** — If you've found a bug in the core, the Redis adapter, or the telemetry package.
+- **[Request a Feature](https://github.com/jilimb0/tgwrapper/issues/new?template=feature_request.md)** — If you need a new capability designed into the framework core.
 
 ---
 
-## 🗄️ Redis Infrastructure Compatibility
+## 🔀 Migration Assistance
 
-The `@jilimb0/tgwrapper-adapter-redis` package is tested against official Redis releases:
+Are you migrating a live production bot to TGWrapper? We've designed resources to make your transition smooth:
+- Read our **[Migration Starter Example](./examples/migration-starter/)** to see a side-by-side codebase comparison.
+- Refer to the dedicated guides for:
+  - [Migrating from Telegraf](./docs/MIGRATION_FROM_TELEGRAF.md)
+  - [Migrating from grammY](./docs/MIGRATION_FROM_GRMMY.md)
+  - [Migrating from python-telegram-bot](./docs/MIGRATION_FROM_PYTHON.md)
+- If you run into blockers, open a thread in **[GitHub Discussions under Migration Help](https://github.com/jilimb0/tgwrapper/discussions/categories/migration-help)**.
 
-| Redis Server Version | Support Level | Notes / Rationale |
-| :--- | :--- | :--- |
-| **Redis < 6.2** | `Unsupported` | Lack of core Lua script primitives and specific sorted set commands. |
-| **Redis 6.2.x** | `Supported` | Baseline compatibility level. |
-| **Redis 7.x** | `Supported` | Recommended production engine. |
-| **KeyDB / Valkey** | `Compatible` | Drop-in replacements verified with standard commands. |
+---
 
-### Topology Support Scope
-- **Standalone:** Full native support.
-- **Managed Redis (ElastiCache / MemoryDB):** Full support. We recommend tuning client-side TCP `keepAlive` keepalives to prevent connection drop timeouts.
-- **Redis Sentinel:** Supported by injecting sentinel-ready client configurations.
-- **Redis Cluster:** Supported with slot routing restrictions (session keys must configure `{hash-tags}`).
-- **Read-Replica Partitioning:** Not recommended due to read-after-write consistency lag risks in distributed FSM session evaluations.
+## 💼 Commercial Support & Boundaries
+
+TGWrapper is maintained as a high-quality open-source project. Maintainer bandwidth is focused on:
+1. Fixing bugs in core, `@jilimb0/tgwrapper-adapter-redis`, and `@jilimb0/tgwrapper-observability`.
+2. Validating type definitions against upstream Telegram schema updates.
+3. Keeping edge and serverless runtime cold starts thin.
+
+If your team requires custom architecture reviews, production migration audits, or dedicated uptime SLAs, contact the maintainers directly for commercial support options.

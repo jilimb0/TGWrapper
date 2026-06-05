@@ -1,36 +1,76 @@
-# Support Queue Routing Bot Template
+# TGWrapper Support Bot Starter
 
-This example demonstrates how to build a stateful support queue routing bot using **TGWrapper**.
+Support queue routing template for TGWrapper. It demonstrates stateful support intake, agent assignment, Redis session storage, graceful shutdown, and structured JSON logs.
 
----
+Use this starter when you want a small app blueprint for:
 
-## ✨ Features Demonstrated
+- `/support` intake flows;
+- assigning a user to an available support agent;
+- forwarding user messages after assignment;
+- evolving the in-memory agent list into a database or Redis-backed directory.
 
-- **Support Routing Engine:** Connects users atomically to available support agents.
-- **Optimistic State Updates:** Prevents assigning multiple agents to the same user concurrent queue request.
-- **Trace logs:** Telemetry logs matching user messages forward paths.
+## Quick Start
 
----
-
-## 🚀 Running Locally
-
-### Installation
 ```bash
+pnpm create @tgwrapper my-support-bot --template support
+cd my-support-bot
+cp .env.example .env
 pnpm install
 ```
 
-### Run
+Edit `.env`, then start the bot:
+
 ```bash
-export BOT_TOKEN="your_bot_token"
+export BOT_TOKEN="your_botfather_token"
 export REDIS_URL="redis://localhost:6379"
-pnpm start
+
+pnpm tsx src/bot.ts
 ```
 
----
+Expected startup output:
 
-## 🔗 Next Steps & Team Evaluation
+```json
+{"event":"startup","serviceName":"support-routing-service","mode":"polling","redisUrl":"redis://localhost:6379","availableAgents":2}
+```
 
-- **Evaluation checklist:** Review the [Team Evaluation Checklist](../../docs/champion/TEAM_EVALUATION_CHECKLIST.md) to audit this blueprint against your production standards.
-- **Convince your team:** Share the [Convince Your Team Guide](../../docs/champion/CONVINCE_YOUR_TEAM.md) showing why Compare-and-Swap prevents session races.
-- **Run a pilot:** Walk through the [Internal Pilot Playbook](../../docs/champion/PILOT_PLAYBOOK.md) to run a POC migration.
-- **Proof of viability:** Test this bot with simulated concurrency by reading the [Proof of Viability Guide](../../docs/PROOF_OF_VIABILITY.md).
+Send `/support`, then a follow-up message, to exercise the queue routing path.
+
+## Environment Variables
+
+| Name | Required | Default | Description |
+| --- | --- | --- | --- |
+| `BOT_TOKEN` | yes | none | Telegram bot token from BotFather. |
+| `REDIS_URL` | no | `redis://localhost:6379` | Redis connection used by the session adapter. |
+
+## What Gets Installed
+
+The npm package is a project template, not a runtime library. It ships:
+
+- `src/bot.ts`
+- compiled `dist/` files
+- `README.md`
+- `CHANGELOG.md`
+- `tsconfig.json`
+- `.env.example`
+
+Copy the template into your own repository, rename the package, replace `AVAILABLE_AGENTS`, and connect routing decisions to your production support directory.
+
+## Manual Copy Fallback
+
+Power users can install this package directly and copy the template files:
+
+```bash
+pnpm add -D @tgwrapper/starter-support-bot
+mkdir my-support-bot
+cp -R node_modules/@tgwrapper/starter-support-bot/{src,tsconfig.json,.env.example} my-support-bot/
+```
+
+## Production Webhook Path
+
+This starter uses polling for local development. For production webhook deployment:
+
+- change the TGWrapper client mode to webhook;
+- mount the webhook handler in your HTTP runtime;
+- move the support agent directory out of source code;
+- keep Redis shared across all instances;
+- send structured logs to your production log pipeline.

@@ -59,17 +59,16 @@ jobs:
       - name: Package metadata snapshot
         run: |
           mkdir -p .artifacts
-          node -e "const fs=require('fs');const pkgs=['package.json','packages/adapter-redis/package.json','packages/observability/package.json'];const out=[];for(const p of pkgs){const v=JSON.parse(fs.readFileSync(p,'utf8'));out.push({file:p,name:v.name,version:v.version,files:v.files,exports:v.exports,publishConfig:v.publishConfig});}fs.writeFileSync('.artifacts/package-metadata.json', JSON.stringify(out,null,2));console.log(JSON.stringify(out,null,2));"
+          node scripts/list-publishable-packages.mjs --metadata | tee .artifacts/package-metadata.json
       - name: NPM registry visibility
         continue-on-error: true
         run: |
           set -euxo pipefail
           mkdir -p .artifacts
-          {
-            npm view @tgwrapper/core --json || true
-            npm view @tgwrapper/adapter-redis --json || true
-            npm view @tgwrapper/observability --json || true
-          } > .artifacts/npm-registry-visibility.jsonl
+          : > .artifacts/npm-registry-visibility.jsonl
+          while IFS= read -r name; do
+            npm view "${name}" --json >> .artifacts/npm-registry-visibility.jsonl || true
+          done < <(node scripts/list-publishable-packages.mjs --names)
       - name: Pack artifact check
         run: |
           set -euo pipefail
@@ -82,6 +81,7 @@ jobs:
             cp /tmp/pack.json ".artifacts/pack/${name}.json"
             node -e "const fs=require('fs');const pack=JSON.parse(fs.readFileSync('/tmp/pack.json','utf8'))[0];const files=new Set(pack.files.map(f=>f.path));const pkg=JSON.parse(fs.readFileSync('${d}/package.json','utf8'));const required=['package.json','dist/index.js','dist/index.d.ts'];for(const f of required){if(!files.has(f)){console.error('Missing packed file',f,'for',pkg.name);process.exit(1);}}console.log('Pack OK',pkg.name,pkg.version,'files=',pack.files.length);"
           done
+          pnpm pack:starters
       - run: |
           test -n "${ACTIONS_ID_TOKEN_REQUEST_URL}"
           test -n "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
@@ -108,7 +108,7 @@ jobs:
           CHANGESETS_RELEASE: "1"
         run: |
           set -euo pipefail
-          for d in "." "packages/adapter-redis" "packages/observability"; do
+          while IFS= read -r d; do
             NAME="$(node -e "console.log(require('./${d}/package.json').name)")"
             VERSION="$(node -e "console.log(require('./${d}/package.json').version)")"
             if npm view "${NAME}@${VERSION}" version >/dev/null 2>&1; then
@@ -116,8 +116,8 @@ jobs:
               continue
             fi
             echo "OIDC dry-run publish in ${d} for ${NAME}@${VERSION}"
-            (cd "${d}" && npm publish --access public --dry-run)
-          done
+            (cd "${d}" && pnpm publish --access public --dry-run --no-git-checks)
+          done < <(node scripts/list-publishable-packages.mjs --dirs)
       - name: Release summary
         if: always()
         run: |
@@ -163,7 +163,7 @@ jobs:
         run: |
           set -euo pipefail
           ALL_PUBLISHED=true
-          for d in "." "packages/adapter-redis" "packages/observability"; do
+          while IFS= read -r d; do
             NAME="$(node -e "console.log(require('./${d}/package.json').name)")"
             VERSION="$(node -e "console.log(require('./${d}/package.json').version)")"
             FOUND=false
@@ -181,7 +181,7 @@ jobs:
               echo "✗ ${NAME}@${VERSION} NOT found on npm after retries"
               ALL_PUBLISHED=false
             fi
-          done
+          done < <(node scripts/list-publishable-packages.mjs --dirs)
           echo "all_published=${ALL_PUBLISHED}" >> "$GITHUB_OUTPUT"
 
       - name: Sync example deps post-publish
@@ -189,11 +189,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          node scripts/sync-release-versions.mjs
           node scripts/sync-examples.mjs
           pnpm install --no-frozen-lockfile
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add examples/*/package.json pnpm-lock.yaml
+          git add scripts/release-versions.json examples/*/package.json pnpm-lock.yaml
           if git diff --cached --quiet; then
             echo "No changes to sync, skipping PR."
             exit 0

@@ -12,7 +12,8 @@ const steps = [
   'pnpm build',
   'pnpm -r build',
   'pnpm api:snapshot:check',
-  'pnpm pack:size'
+  'pnpm pack:size',
+  'pnpm pack:starters'
 ];
 
 for (const step of steps) {

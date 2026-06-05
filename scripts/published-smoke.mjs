@@ -7,8 +7,14 @@ import { getLatestNpmVersion } from './shared-release-versions.mjs';
 const rootDir = process.cwd();
 
 async function main() {
-  const versions = await loadPublishedVersions();
   const strictMode = process.env.PUBLISHED_SMOKE_STRICT === 'true';
+  const versions = await loadPublishedVersions({ strictMode });
+  if (!versions) {
+    console.log(
+      'Published smoke skipped: target package latest versions are not available in npm yet (non-strict mode).'
+    );
+    return;
+  }
   const allPublished = await assertPublishedVersionsExist(versions, { strictMode });
   if (!allPublished) {
     console.log(
@@ -36,6 +42,10 @@ async function main() {
         `@tgwrapper/core@${versions.core}`,
         `@tgwrapper/adapter-redis@${versions.adapterRedis}`,
         `@tgwrapper/observability@${versions.observability}`,
+        `@tgwrapper/starter-migration@${versions.starterMigration}`,
+        `@tgwrapper/starter-standard-bot@${versions.starterStandardBot}`,
+        `@tgwrapper/starter-support-bot@${versions.starterSupportBot}`,
+        `@tgwrapper/create@${versions.createTgwrapper}`,
         'typescript@5.8.2'
       ],
       tempDir
@@ -140,25 +150,58 @@ if (typeof RedisSessionAdapter !== 'function') {
     await run('npx', ['tsc', '--noEmit'], tempDir);
     await run('npx', ['tsc'], tempDir);
     await run('node', ['dist/smoke.js'], tempDir);
+    await run('npm', ['init', '@tgwrapper', 'smoke-standard', '--', '--template', 'standard'], tempDir);
+    await run('npm', ['init', '@tgwrapper', 'smoke-support', '--', '--template', 'support'], tempDir);
+    await run('npm', ['init', '@tgwrapper', 'smoke-migration', '--', '--template', 'migration'], tempDir);
     console.log('Published smoke passed.');
   } finally {
     await rm(tempDir, { recursive: true, force: true });
   }
 }
 
-async function loadPublishedVersions() {
-  return {
-    core: getLatestNpmVersion('@tgwrapper/core'),
-    adapterRedis: getLatestNpmVersion('@tgwrapper/adapter-redis'),
-    observability: getLatestNpmVersion('@tgwrapper/observability')
-  };
+async function loadPublishedVersions(options) {
+  const targets = [
+    ['core', '@tgwrapper/core'],
+    ['adapterRedis', '@tgwrapper/adapter-redis'],
+    ['observability', '@tgwrapper/observability'],
+    ['starterMigration', '@tgwrapper/starter-migration'],
+    ['starterStandardBot', '@tgwrapper/starter-standard-bot'],
+    ['starterSupportBot', '@tgwrapper/starter-support-bot'],
+    ['createTgwrapper', '@tgwrapper/create']
+  ];
+  const versions = {};
+  const missing = [];
+
+  for (const [key, packageName] of targets) {
+    try {
+      versions[key] = getLatestNpmVersion(packageName);
+    } catch (error) {
+      missing.push(packageName);
+      if (options.strictMode) {
+        throw new Error(`Published smoke requires ${packageName} latest version to be available on npm.`, {
+          cause: error
+        });
+      }
+    }
+  }
+
+  if (missing.length > 0) {
+    console.warn(`Skipping published smoke; missing latest versions: ${missing.join(', ')}`);
+    return null;
+  }
+
+  return versions;
 }
 
 async function assertPublishedVersionsExist(versions, options) {
   const checks = [
     ['@tgwrapper/core', versions.core],
     ['@tgwrapper/adapter-redis', versions.adapterRedis],
-    ['@tgwrapper/observability', versions.observability]
+    ['@tgwrapper/observability', versions.observability],
+    ['@tgwrapper/starter-migration', versions.starterMigration],
+    ['@tgwrapper/starter-standard-bot', versions.starterStandardBot],
+    ['@tgwrapper/starter-support-bot', versions.starterSupportBot],
+    ['@tgwrapper/create', versions.createTgwrapper]
   ];
   const missing = [];
 

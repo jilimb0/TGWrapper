@@ -15,6 +15,10 @@ if (!process.env.BOT_TOKEN) {
 const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
 const redis = new Redis(redisUrl);
 
+redis.on('error', (error) => {
+  console.error(JSON.stringify({ event: 'redis.error', message: error.message }));
+});
+
 // Define type contract for sessions
 interface RegistrationSession {
   version: number; // Required for CAS tracking
@@ -116,11 +120,37 @@ bot.on('message', async (message) => {
 });
 
 bot.on('error', (err) => {
-  console.error('Core Bot Error:', err);
+  console.error(JSON.stringify({ event: 'bot.error', message: err instanceof Error ? err.message : String(err) }));
+});
+
+let isShuttingDown = false;
+async function shutdown(signal: NodeJS.Signals) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
+  console.log(JSON.stringify({ event: 'shutdown.start', signal }));
+  await bot.stop();
+  await redis.quit();
+  console.log(JSON.stringify({ event: 'shutdown.complete', signal }));
+}
+
+process.once('SIGINT', () => {
+  void shutdown('SIGINT');
+});
+process.once('SIGTERM', () => {
+  void shutdown('SIGTERM');
 });
 
 // Start polling
 (async () => {
-  console.log('TGWrapper bot is running...');
+  console.log(JSON.stringify({
+    event: 'startup',
+    serviceName: 'registration-service',
+    mode: 'polling',
+    redisUrl
+  }));
   await bot.start();
-})();
+})().catch((error) => {
+  console.error(JSON.stringify({ event: 'startup.failed', message: error instanceof Error ? error.message : String(error) }));
+  process.exit(1);
+});

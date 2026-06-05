@@ -1,19 +1,48 @@
 {
-  "name": "tgwrapper-migration-starter",
+  "name": "@tgwrapper/starter-migration",
   "version": "0.2.0",
-  "private": true,
   "type": "module",
-  "description": "Template and step-by-step example for migrating Telegraf/grammY bots to TGWrapper",
+  "description": "Migration starter for moving Telegraf or grammY bots to TGWrapper",
   "main": "dist/bot-after.js",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jilimb0/TGWrapper",
+    "directory": "examples/migration-starter"
+  },
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/examples/migration-starter#readme",
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "tgwrapper",
+    "starter",
+    "migration",
+    "telegraf",
+    "grammy"
+  ],
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "CHANGELOG.md",
+    "tsconfig.json",
+    ".env.example"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "start:before": "tsx src/bot-before.ts",
     "start:after": "tsx src/bot-after.ts"
   },
   "dependencies": {
-    "@tgwrapper/core": "workspace:*",
-    "@tgwrapper/adapter-redis": "workspace:*",
-    "@tgwrapper/observability": "workspace:*",
+    "@tgwrapper/core": "^0.16.0",
+    "@tgwrapper/adapter-redis": "^0.8.0",
+    "@tgwrapper/observability": "^0.9.0",
     "ioredis": "^5.4.1",
     "telegraf": "^4.16.3"
   },

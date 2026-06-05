@@ -1,18 +1,47 @@
 {
-  "name": "tgwrapper-standard-bot",
+  "name": "@tgwrapper/starter-standard-bot",
   "version": "0.2.0",
-  "private": true,
   "type": "module",
-  "description": "Standard production-ready TGWrapper bot template with Redis state and observability",
+  "description": "Production-ready Telegram bot starter for TGWrapper with Redis state and observability",
   "main": "dist/bot.js",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jilimb0/TGWrapper",
+    "directory": "examples/standard-bot"
+  },
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/examples/standard-bot#readme",
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "tgwrapper",
+    "starter",
+    "redis",
+    "observability",
+    "template"
+  ],
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "CHANGELOG.md",
+    "tsconfig.json",
+    ".env.example"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "start": "tsx src/bot.ts"
   },
   "dependencies": {
-    "@tgwrapper/core": "workspace:*",
-    "@tgwrapper/adapter-redis": "workspace:*",
-    "@tgwrapper/observability": "workspace:*",
+    "@tgwrapper/core": "^0.16.0",
+    "@tgwrapper/adapter-redis": "^0.8.0",
+    "@tgwrapper/observability": "^0.9.0",
     "ioredis": "^5.4.1"
   },
   "devDependencies": {

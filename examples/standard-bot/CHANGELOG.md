@@ -1,4 +1,4 @@
-# tgwrapper-standard-bot
+# @tgwrapper/starter-standard-bot
 
 ## 0.2.0
 

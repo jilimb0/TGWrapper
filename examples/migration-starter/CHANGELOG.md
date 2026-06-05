@@ -1,4 +1,4 @@
-# tgwrapper-migration-starter
+# @tgwrapper/starter-migration
 
 ## 0.2.0
 

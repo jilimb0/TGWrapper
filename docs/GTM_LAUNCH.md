@@ -146,7 +146,7 @@ issue or reach out.
 
 ### Consider for Week 6+
 
-- **`create-tgwrapper` CLI scaffolding tool** — if multiple design partners say "I wish there was a starter template."
+- **`@tgwrapper/create` CLI scaffolding tool** — if multiple design partners say "I wish there was a starter template."
 - **Video walkthrough** (5 min) — only if written docs prove insufficient for the ICP.
 - **Discord / community channel** — only if there are 10+ active adopters requesting it.
 

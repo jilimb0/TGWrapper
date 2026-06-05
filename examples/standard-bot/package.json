@@ -1,6 +1,6 @@
 {
   "name": "@tgwrapper/starter-standard-bot",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "description": "Production-ready Telegram bot starter for TGWrapper with Redis state and observability",
   "main": "dist/bot.js",
@@ -39,9 +39,9 @@
     "start": "tsx src/bot.ts"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.16.0",
-    "@tgwrapper/adapter-redis": "^0.8.0",
-    "@tgwrapper/observability": "^0.9.0",
+    "@tgwrapper/core": "^0.16.1",
+    "@tgwrapper/adapter-redis": "^0.8.1",
+    "@tgwrapper/observability": "^0.9.1",
     "ioredis": "^5.4.1"
   },
   "devDependencies": {

@@ -4,6 +4,12 @@
 
 ### Patch Changes
 
+- f9f6702: add platform trust and incident guidance
+
+## 0.16.1
+
+### Patch Changes
+
 - 8a28888: Starter packages
 - 5ff96a7: add platform trust and incident guidance
 

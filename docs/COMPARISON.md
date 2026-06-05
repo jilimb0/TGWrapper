@@ -1,8 +1,8 @@
 # TGWrapper Comparison Matrix
 
-You are probably here because you already have a Telegram bot in production — on Telegraf, grammY, or raw `node-telegram-bot-api` — and something is not working the way it should. Maybe sessions are losing data under concurrent updates. Maybe you are debugging a production incident with `console.log` timestamps and no trace IDs. Maybe your rate limiter is an in-memory `Map` that resets every time a process restarts.
+You are probably here because you already have a Telegram bot in production - on Telegraf, grammY, or raw `node-telegram-bot-api` - and something is not working the way it should. Maybe sessions are losing updates under concurrent writes. Maybe you are debugging a production incident with `console.log` timestamps and no trace IDs. Maybe your rate limiter is an in-memory `Map` that resets every time a process restarts.
 
-TGWrapper was built for that moment. It is not a better beginner framework — it is a production operations framework for teams who have outgrown the defaults.
+TGWrapper was built for that moment. It is not positioned as a universal replacement for every Telegram framework. It is optimized for teams that need explicit distributed-state contracts, structured observability, and deployment profiles they can explain during production review.
 
 ---
 
@@ -11,11 +11,11 @@ TGWrapper was built for that moment. It is not a better beginner framework — i
 | Feature | **TGWrapper** | **grammY** | **Telegraf** |
 | :--- | :--- | :--- | :--- |
 | **Primary focus** | Distributed ops, serverless, telemetry | Developer ergonomics, plugin ecosystem | Simplicity, Express-like middleware |
-| **Session concurrency** | **CAS (Compare-And-Swap)** — conflicts return `ok: false` | Last-write-wins | Last-write-wins |
-| **Rate limiting** | Distributed Redis sliding window (atomic Lua) | Per-instance auto-retry (outgoing only) | Manual / in-memory |
-| **Trace propagation** | Built-in `AsyncLocalStorage` context with UUID per update | Manual middleware | Manual middleware |
-| **Structured telemetry** | Built-in events, metrics registry, OTEL bridge | Not included | Not included |
-| **Serverless cold starts** | Low — fetch-native core, no server deps | Moderate — requires adapter shims | Moderate — includes Node.js server deps |
+| **Session concurrency** | CAS (Compare-And-Swap); conflicts return `ok: false` | Usually last-write-wins unless custom storage logic is added | Usually last-write-wins unless custom storage logic is added |
+| **Rate limiting** | Redis sliding window for shared fleet limits | Strong outgoing retry tooling; shared incoming limits require custom work | Manual / middleware-dependent |
+| **Trace propagation** | Built-in update context in supported Node.js profiles | Middleware / integration-dependent | Middleware / integration-dependent |
+| **Structured telemetry** | Built-in event schema, metrics registry, OTEL bridge | Integration-dependent | Integration-dependent |
+| **Serverless fit** | Fetch-native core; capability-specific caveats | Supported with adapters/runtime choices | Primarily Node.js-oriented |
 | **API type safety** | Full TS inference, schema drift detection on CI | Full TS inference | Partial |
 | **Plugin ecosystem** | Small (Redis, observability) | Large (menus, conversations, storage adapters, etc.) | Medium |
 | **Community size** | Small / early | Large / active | Large / established |
@@ -28,8 +28,8 @@ TGWrapper was built for that moment. It is not a better beginner framework — i
 Each comparison is a standalone document with code side-by-side, decision guides, and honest trade-offs:
 
 - **[Telegraf vs TGWrapper](./TELEGRAF_VS_TGWRAPPER.md)** — familiar middleware vs production contracts
-- **[grammY vs TGWrapper](./GRAMMY_VS_TGWRAPPER.md)** — easy first vs strong forever
-- **[When Telegraf stops being enough](./WHEN_TELEGRAF_STOPS.md)** — four real scenarios where Telegraf becomes a liability
+- **[grammY vs TGWrapper](./GRAMMY_VS_TGWRAPPER.md)** — easy first vs explicit operations
+- **[When Telegraf stops being enough](./WHEN_TELEGRAF_STOPS.md)** — scenarios where Telegraf needs additional operational design
 
 ---
 
@@ -42,7 +42,7 @@ Each comparison is a standalone document with code side-by-side, decision guides
 | Need distributed sessions with conflict detection | **TGWrapper** |
 | Need structured traces and production metrics | **TGWrapper** |
 | Need rich UI plugins (menus, conversations) | **grammY** |
-| Deploying to edge/serverless, want minimal cold starts | **TGWrapper** |
+| Deploying to edge/serverless | **TGWrapper** if your required capabilities are supported by the target runtime |
 | AI-native bot with LLM tracing | **TGWrapper** |
 | Legacy bot running stable, no reason to migrate | **Stay where you are** |
 
@@ -54,7 +54,7 @@ Each comparison is a standalone document with code side-by-side, decision guides
 
 **grammY** is the right choice for teams who want the best developer experience, the richest plugin ecosystem, and strong TypeScript types — on a single instance or with simple scaling needs.
 
-**TGWrapper** is the right choice for teams who are past the "make it work" phase and are now dealing with "make it work reliably across instances, with traces, under load." It trades ecosystem breadth and convenience for distributed safety, architectural observability, and explicit failure contracts.
+**TGWrapper** is the right choice for teams who are past the "make it work" phase and are now dealing with "make it work predictably across instances, with traces, under load." It trades ecosystem breadth and convenience for distributed-state safety, architectural observability, and explicit failure contracts.
 
 All three are legitimate tools. Pick the one that matches your pain, not the one with the most features.
 

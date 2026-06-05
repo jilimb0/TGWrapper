@@ -36,7 +36,7 @@ This document provides tailored copywriting messaging packs for target user pers
 ### ✍️ Value Propositions
 - **Optimistic Session Locking (CAS):** Lua-driven Redis updates ensure only the correct version writes back, safely scaling update routing across multiple container instances.
 - **Structured JSON Logging:** Native AsyncLocalStorage propagation attaches unique `trace_id` and `span_id` values to every update lifecycle log line.
-- **Edge Deployment Portability:** The lightweight core runs directly on serverless runtimes (AWS Lambda, Cloudflare Workers) with sub-50ms cold starts.
+- **Edge Deployment Portability:** The lightweight core targets serverless webhook runtimes such as AWS Lambda and Cloudflare Workers, with runtime-specific caveats documented in the compatibility matrix.
 
 ---
 

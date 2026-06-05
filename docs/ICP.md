@@ -86,8 +86,8 @@ Use these signals to identify high-fit prospects in communities, GitHub issues, 
 
 ```
 ❌  "TGWrapper makes observability effortless."
-✅  "Attach telemetry in two lines — every update gets a trace ID, structured log entry,
-    and latency metric with zero custom middleware:"
+✅  "Attach telemetry in two lines - every update gets a trace ID, structured log entry,
+    and latency metric through the TGWrapper observability package:"
 ```
 
 ```typescript

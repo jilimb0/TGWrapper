@@ -21,7 +21,7 @@ Define clear targets before starting the pilot:
 | :--- | :--- | :--- |
 | **Data Integrity** | Occasional session state loss / overwrites | Zero lost session states during concurrent stress |
 | **Observability** | Multi-server grep required for debugs | Locate full lifecycle of an update in <60 seconds via `trace_id` |
-| **Resource Efficiency** | Slow cold start / High CPU usage | <50ms edge cold start / Zero rate-limiting memory leaks |
+| **Resource Efficiency** | Slow cold start / High CPU usage | Measured cold-start profile / bounded rate-limiter memory behavior |
 | **Developer DX** | Loose types, implicit `any` contexts | Clean lint builds with zero compiler type overrides |
 
 ---

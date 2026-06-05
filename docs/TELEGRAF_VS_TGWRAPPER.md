@@ -1,8 +1,8 @@
-# Telegraf vs TGWrapper — familiar middleware vs production contracts
+# Telegraf vs TGWrapper - familiar middleware vs production contracts
 
 Telegraf is the most widely used Telegram bot framework in the Node.js ecosystem. It has years of production mileage, a familiar Express-like middleware model, and the largest community. This document is a respectful, honest comparison — not a takedown.
 
-TGWrapper was built for a different moment: when the bot stops being a side project and starts being a distributed system that you need to debug at 3 AM.
+TGWrapper was built for a different moment: when the bot stops being a side project and starts behaving like a distributed system that must be debugged from logs, metrics, and state contracts.
 
 ---
 
@@ -24,15 +24,15 @@ These are design trade-offs, not bugs. Telegraf optimised for simplicity; TGWrap
 
 ### Sessions: in-memory default vs CAS
 
-Telegraf's `session()` middleware stores state in-process memory by default. When you plug in a Redis adapter, writes use a simple `SET` — last write wins. Two instances handling the same user concurrently will silently overwrite each other's state.
+Telegraf's `session()` middleware stores state in-process memory by default. With external storage, conflict behavior depends on the adapter and custom code you choose. Many simple Redis-backed designs use last-write-wins writes, so two instances handling the same user concurrently can overwrite each other's state unless you add a version check or merge strategy.
 
-TGWrapper's `RedisSessionAdapter` uses a Lua Compare-And-Swap (CAS) script. If the session version changed between your read and your write, the update returns `ok: false`. You decide what to do — retry, merge, or alert. The framework refuses to silently lose data.
+TGWrapper's `RedisSessionAdapter` uses a Lua Compare-And-Swap (CAS) script. If the session version changed between your read and your write, the update returns `ok: false`. You decide what to do - retry, merge, or alert. The adapter refuses to silently accept a stale overwrite.
 
 ### Observability: manual vs architectural
 
-Telegraf ships no structured telemetry. Adding trace IDs, structured logs, or metrics requires custom middleware you write and maintain. There is no update lifecycle hook system.
+Telegraf does not prescribe a platform telemetry contract. Adding trace IDs, structured logs, or metrics usually means custom middleware or a separate observability integration you own.
 
-TGWrapper bakes observability into the update pipeline. `attachBotObservability()` gives you structured events, `AsyncLocalStorage` trace propagation, and a `MetricsRegistry` — one function call, zero custom middleware.
+TGWrapper provides an observability package for the update pipeline. `attachBotObservability()` gives you structured events, `AsyncLocalStorage` trace propagation in supported Node.js profiles, and a `MetricsRegistry`.
 
 ### Rate limiting: in-memory Map vs distributed counter
 
@@ -40,7 +40,7 @@ The common Telegraf pattern — `Map<number, number>` with `setInterval` clear �
 
 ### Reliability contracts
 
-TGWrapper publishes formal documentation on what is and is not guaranteed: CAS semantics, Redis failure modes (fail-open vs fail-closed), webhook timeout budget (5s), `AbortSignal` propagation. Telegraf's approach is pragmatic — it works, but edge-case behavior in distributed deployments is left to the developer.
+TGWrapper publishes formal documentation on what is and is not guaranteed: CAS semantics, Redis failure modes, webhook timeout budgets, and `AbortSignal` propagation. Telegraf's approach is pragmatic and flexible; distributed edge-case behavior is usually left to application design.
 
 ---
 
@@ -103,7 +103,7 @@ bot.on('message', async (message) => {
 await bot.start();
 ```
 
-More code. But `result.ok` is the line that prevents silent data loss when your second pod boots.
+More code. But `result.ok` is the explicit conflict signal you need when a second pod starts handling the same user state.
 
 ---
 
@@ -114,7 +114,7 @@ More code. But `result.ok` is the line that prevents silent data loss when your 
 | Single-instance bot, stable in production | **Stay on Telegraf.** It works. |
 | Team thinks in Express middleware | **Telegraf.** Same mental model. |
 | Need `ctx.reply()` convenience | **Telegraf.** TGWrapper uses explicit `bot.sendMessage(chatId, text)`. |
-| Running 2+ instances with shared user state | **TGWrapper.** CAS sessions prevent silent data loss. |
+| Running 2+ instances with shared user state | **TGWrapper.** CAS sessions prevent silent stale overwrites. |
 | Need structured traces for production debugging | **TGWrapper.** Built-in, not bolted on. |
 | Deploying to Cloudflare Workers or Lambda | **TGWrapper.** Fetch-native core, no Node server deps. |
 | AI bot with LLM tracing and timeout contracts | **TGWrapper.** Trace context propagates through external API calls. |
@@ -136,12 +136,12 @@ More code. But `result.ok` is the line that prevents silent data loss when your 
 
 ## Bottom line
 
-If your bot is a single process on a VPS, Telegraf is genuinely simpler and you should stay there. If your bot is a distributed system pretending to be a chat interface, TGWrapper gives you the primitives to operate it like one.
+If your bot is a single process on a VPS, Telegraf is genuinely simpler and you should stay there. If your bot has distributed state, shared limits, and production observability requirements, TGWrapper gives you explicit primitives for those concerns.
 
 ---
 
 ## Next steps
 
-- [When Telegraf stops being enough](./WHEN_TELEGRAF_STOPS.md) — four real scenarios where Telegraf becomes a liability
+- [When Telegraf stops being enough](./WHEN_TELEGRAF_STOPS.md) — scenarios where Telegraf needs additional operational design
 - [Migration from Telegraf](./MIGRATION_FROM_TELEGRAF.md) — code translation recipes and minimal-downtime migration plan
 - [Comparison Matrix](./COMPARISON.md) — all three frameworks side-by-side

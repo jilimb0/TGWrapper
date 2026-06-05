@@ -7,7 +7,7 @@ A practical migration guide for teams switching from `python-telegram-bot` (PTB)
 ## 1. Why teams make this move
 
 - **Shared types across the stack** — your frontend, backend, and bot all speak TypeScript. No more maintaining Python type stubs alongside a TS monorepo.
-- **Serverless & edge deployment** — TGWrapper runs on Cloudflare Workers and AWS Lambda with sub-50ms cold starts. Python's asyncio loop adds 200–400ms of startup overhead in the same environments.
+- **Serverless & edge deployment** — TGWrapper's core webhook path is designed for lightweight JavaScript runtimes such as Cloudflare Workers and AWS Lambda. Measure cold starts in your own memory, bundle, and provider profile rather than relying on a universal latency number.
 - **Built-in observability** — structured logs, OpenTelemetry traces, and pull-based metrics ship with the framework. PTB gives you Python's `logging` module and nothing else.
 - **Atomic session state** — PTB's `user_data` / `chat_data` dicts use last-write-wins. TGWrapper's Redis sessions use CAS (compare-and-swap) to prevent silent overwrites.
 

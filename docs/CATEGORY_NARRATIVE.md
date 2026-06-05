@@ -30,7 +30,7 @@ TGWrapper is a dedicated Telegram bot platform designed for teams that require d
 Instead of simple key-value overwrites, TGWrapper leverages Redis Lua-backed Compare-and-Swap (CAS) optimistic locks. If a write conflict is detected, it fails cleanly, ensuring state integrity.
 
 ### 2. Native Edge Portability
-The core client library is built entirely on web-standard APIs (fetch, Request, Response). The same handler code runs identically on Node.js processes, Cloudflare Workers, and AWS Lambda serverless endpoints.
+The core client library is built around web-standard APIs such as `fetch`, `Request`, and `Response`. Webhook-oriented handler architecture can be shared across Node.js processes, Cloudflare Workers, and AWS Lambda, while runtime-specific capabilities such as polling, Redis TCP clients, and observability exporters remain explicitly documented.
 
 ### 3. Built-in OpenTelemetry
 Logging, tracing, and metrics are primary citizen hooks. Dynamic Trace ID propagation ensures every API call and database operation can be correlated on APM dashboards.

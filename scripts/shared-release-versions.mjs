@@ -19,6 +19,7 @@ export function getPublishedVersionWithoutRange(packageName) {
 export function getLatestNpmVersion(packageName) {
   const version = execSync(`npm view ${packageName} version --json`, {
     encoding: 'utf8',
+    timeout: 20_000,
     stdio: ['ignore', 'pipe', 'pipe'],
   }).trim().replace(/"/g, '');
 

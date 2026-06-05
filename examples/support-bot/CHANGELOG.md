@@ -1,4 +1,4 @@
-# tgwrapper-support-bot
+# @tgwrapper/starter-support-bot
 
 ## 0.2.0
 

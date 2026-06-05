@@ -8,7 +8,12 @@ if (!process.env.BOT_TOKEN) {
   process.exit(1);
 }
 
-const redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379');
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+const redis = new Redis(redisUrl);
+
+redis.on('error', (error) => {
+  console.error(JSON.stringify({ event: 'redis.error', message: error.message }));
+});
 
 interface SupportSession {
   version: number;
@@ -94,7 +99,38 @@ bot.on('message', async (message) => {
   await bot.sendMessage(chatId, 'Type /support to connect with our support agents.');
 });
 
+bot.on('error', (err) => {
+  console.error(JSON.stringify({ event: 'bot.error', message: err instanceof Error ? err.message : String(err) }));
+});
+
+let isShuttingDown = false;
+async function shutdown(signal: NodeJS.Signals) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
+  console.log(JSON.stringify({ event: 'shutdown.start', signal }));
+  await bot.stop();
+  await redis.quit();
+  console.log(JSON.stringify({ event: 'shutdown.complete', signal }));
+}
+
+process.once('SIGINT', () => {
+  void shutdown('SIGINT');
+});
+process.once('SIGTERM', () => {
+  void shutdown('SIGTERM');
+});
+
 (async () => {
-  console.log('Support Routing Bot started...');
+  console.log(JSON.stringify({
+    event: 'startup',
+    serviceName: 'support-routing-service',
+    mode: 'polling',
+    redisUrl,
+    availableAgents: AVAILABLE_AGENTS.length
+  }));
   await bot.start();
-})();
+})().catch((error) => {
+  console.error(JSON.stringify({ event: 'startup.failed', message: error instanceof Error ? error.message : String(error) }));
+  process.exit(1);
+});

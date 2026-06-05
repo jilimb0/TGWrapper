@@ -1,0 +1,40 @@
+{
+  "name": "@tgwrapper/create",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Official TGWrapper project scaffolder for starter templates",
+  "bin": {
+    "create-tgwrapper": "bin/create-tgwrapper.mjs"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jilimb0/TGWrapper",
+    "directory": "examples/create-tgwrapper"
+  },
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/examples/create-tgwrapper#readme",
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "keywords": [
+    "telegram",
+    "bot",
+    "tgwrapper",
+    "scaffold",
+    "starter",
+    "template"
+  ],
+  "files": [
+    "bin",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@tgwrapper/starter-migration": "workspace:^0.2.0",
+    "@tgwrapper/starter-standard-bot": "workspace:^0.2.0",
+    "@tgwrapper/starter-support-bot": "workspace:^0.2.0"
+  }
+}

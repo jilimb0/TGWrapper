@@ -1,55 +1,76 @@
-# Standard Bot Template (Production Blueprint)
+# TGWrapper Standard Bot Starter
 
-This directory provides the recommended production blueprint for building a Telegram bot with **TGWrapper**. It integrates:
-- Core Telegram Bot Client
-- Redis-backed distributed session adapters with CAS integrity
-- Redis sorted set distributed rate limiters
-- Structured JSON logging & metrics telemetry
+Production-oriented Telegram bot template for TGWrapper with Redis sessions, distributed rate limiting, graceful shutdown, and structured JSON logs.
 
----
+Use this starter when you need a baseline app with:
 
-## 📁 Project Structure
+- polling-mode development startup;
+- Redis-backed session state with Compare-and-Swap writes;
+- Redis-backed rate limiting;
+- observability wiring through `@tgwrapper/observability`.
 
-- `src/bot.ts` — The main entry point initializing Redis, telemetry adapters, and update handlers.
-- `package.json` — Workspace dependency configurations.
-- `tsconfig.json` — Strict compiler targets.
+## Quick Start
 
----
-
-## 🚀 Running Locally
-
-### Prerequisites
-1. Node.js >= 18
-2. Redis Server running locally on `redis://localhost:6379`
-3. A Telegram Bot Token from [@BotFather](https://t.me/BotFather)
-
-### Installation
 ```bash
+pnpm create @tgwrapper my-standard-bot --template standard
+cd my-standard-bot
+cp .env.example .env
 pnpm install
 ```
 
-### Start Development Server
+Edit `.env`, then start the bot:
+
 ```bash
-export BOT_TOKEN="your_bot_token_here"
+export BOT_TOKEN="your_botfather_token"
 export REDIS_URL="redis://localhost:6379"
 
-pnpm start
+pnpm tsx src/bot.ts
 ```
 
----
+Expected startup output:
 
-## 🐳 Scaling to Production
+```json
+{"event":"startup","serviceName":"standard-bot-service","mode":"polling","redisUrl":"redis://localhost:6379","rateLimit":{"windowMs":60000,"limit":15}}
+```
 
-When migrating from local polling to production environments:
-1. **Switch to Webhooks:** Set `mode: 'webhook'` in the `createBotClient` configuration block.
-2. **Export Handlers:** Wrap the HTTP server integration using native handlers for AWS Lambda or Cloudflare Workers. Refer to the serverless starter templates for details.
-3. **Telemetry Dashboard:** Pipe the stdout structured JSON logs to Logstash, Datadog, or Grafana Loki.
+Send `/start` or `/click` to the bot in Telegram to verify session writes and rate limiting.
 
----
+## Environment Variables
 
-## 🔗 Next Steps & Team Evaluation
+| Name | Required | Default | Description |
+| --- | --- | --- | --- |
+| `BOT_TOKEN` | yes | none | Telegram bot token from BotFather. |
+| `REDIS_URL` | no | `redis://localhost:6379` | Redis connection used for sessions and rate limiting. |
 
-- **Evaluation checklist:** Review the [Team Evaluation Checklist](../../docs/champion/TEAM_EVALUATION_CHECKLIST.md) to audit this blueprint against your production standards.
-- **Convince your team:** Share the [Convince Your Team Guide](../../docs/champion/CONVINCE_YOUR_TEAM.md) showing why Compare-and-Swap prevents session races.
-- **Run a pilot:** Walk through the [Internal Pilot Playbook](../../docs/champion/PILOT_PLAYBOOK.md) to run a POC migration.
-- **Proof of viability:** Test this bot with simulated concurrency by reading the [Proof of Viability Guide](../../docs/PROOF_OF_VIABILITY.md).
+## What Gets Installed
+
+The npm package is a project template, not a runtime library. It ships:
+
+- `src/bot.ts`
+- compiled `dist/` files
+- `README.md`
+- `CHANGELOG.md`
+- `tsconfig.json`
+- `.env.example`
+
+Copy the template into your own repository, rename the package, then replace the sample commands, tenant IDs, bot IDs, rate limits, and telemetry sink with your production values.
+
+## Manual Copy Fallback
+
+Power users can install this package directly and copy the template files:
+
+```bash
+pnpm add -D @tgwrapper/starter-standard-bot
+mkdir my-standard-bot
+cp -R node_modules/@tgwrapper/starter-standard-bot/{src,tsconfig.json,.env.example} my-standard-bot/
+```
+
+## Production Webhook Path
+
+This starter uses polling for local development. For production webhook deployment:
+
+- change the TGWrapper client mode to webhook;
+- mount the webhook handler in your HTTP runtime;
+- store `BOT_TOKEN` and Redis credentials in your secret manager;
+- keep Redis reachable from every instance;
+- send JSON logs to your log pipeline, such as Loki, Datadog, or CloudWatch.

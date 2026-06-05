@@ -152,7 +152,8 @@ jobs:
             pnpm telegram:schema:drift:check &&
             pnpm api:snapshot:check &&
             pnpm pack:size &&
-            pnpm -r build
+            pnpm -r build &&
+            pnpm pack:starters
           ) > .artifacts/error.log 2>&1
       - name: Write failure digest
         if: steps.run_release_integrity.outcome == 'failure'

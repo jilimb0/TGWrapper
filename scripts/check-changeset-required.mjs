@@ -12,6 +12,8 @@ const releaseRelevantPatterns = [
   /^src\//,
   /^packages\/[^/]+\/src\//,
   /^packages\/[^/]+\/package\.json$/,
+  /^examples\/(migration-starter|standard-bot|support-bot)\/(src|package\.json|README\.md|CHANGELOG\.md|\.env\.example)/,
+  /^examples\/create-tgwrapper\/(bin|package\.json|README\.md|CHANGELOG\.md)/,
   /^scripts\//,
   /^docs\//,
   /^\.github\/workflows\//,

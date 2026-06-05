@@ -1,61 +1,84 @@
-# Migration Starter & Checklist
+# TGWrapper Migration Starter
 
-This starter directory demonstrates the step-by-step process of migrating a stateful Telegram bot from **Telegraf** (represented in [bot-before.ts](./src/bot-before.ts)) to **TGWrapper** (represented in [bot-after.ts](./src/bot-after.ts)).
+Template package for migrating a stateful Telegram bot from Telegraf-style handlers to TGWrapper with Redis-backed sessions, Compare-and-Swap writes, and structured logs.
 
----
+Use this starter when you want a side-by-side migration reference:
 
-## 📋 The Migration Checklist
+- `src/bot-before.ts` shows the Telegraf baseline.
+- `src/bot-after.ts` shows the TGWrapper implementation.
+- `dist/` contains built JavaScript entrypoints after `pnpm build`.
 
-Print or copy this checklist when migrating your production bots:
+## Quick Start
 
-- [ ] **1. Dependencies setup**
-  - Install core: `pnpm add @tgwrapper/core`
-  - Install Redis session store: `pnpm add @tgwrapper/adapter-redis`
-  - Install telemetry: `pnpm add @tgwrapper/observability`
-- [ ] **2. Type definition**
-  - Define a strict TypeScript interface for your user/chat session state.
-  - Include the required `version: number` property for Compare-and-Swap (CAS) session operations.
-- [ ] **3. Init Redis Adapter**
-  - Create the `RedisSessionAdapter` instance pointing to your Redis cluster.
-- [ ] **4. Initialize the Client**
-  - Replace `new Telegraf()` or `new Bot()` with `createBotClient()`.
-  - Pass the Redis adapter under the `session: { store, initialState }` configuration block.
-- [ ] **5. Port Commands and Message Routing**
-  - Change `bot.command('name', handler)` and `bot.on('text', handler)` into explicit guard statements inside a global `bot.on('message', handler)` callback.
-  - Assert incoming update shapes using `if ('text' in message) { ... }`.
-- [ ] **6. Replace Magic Contexts (`ctx`)**
-  - Change `ctx.reply(...)` to `bot.sendMessage(message.chat.id, ...)`.
-  - Replace `ctx.session.x = y` with `await bot.updateSession(chatId, (s) => s.x = y)`.
-- [ ] **7. Connect Telemetry**
-  - Run `attachBotObservability()` at startup.
-- [ ] **8. Setup Graceful Shutdowns**
-  - Catch `SIGINT` / `SIGTERM` and clean up connections.
-
----
-
-## 🚀 Running the Comparison
-
-### Prerequisites
-1. Redis running locally on `redis://localhost:6379`.
-2. A Telegram Bot Token from [@BotFather](https://t.me/BotFather).
-
-### Setup
 ```bash
-# Set your token
-export BOT_TOKEN="your-bot-token"
-export REDIS_URL="redis://localhost:6379"
-
-# Install packages
+pnpm create @tgwrapper my-migration-bot --template migration
+cd my-migration-bot
+cp .env.example .env
 pnpm install
 ```
 
-### Run the Telegraf version (Before)
+Edit `.env`, then run one of the entrypoints:
+
 ```bash
-pnpm start:before
+export BOT_TOKEN="your_botfather_token"
+export REDIS_URL="redis://localhost:6379"
+
+pnpm tsx src/bot-before.ts
+pnpm tsx src/bot-after.ts
 ```
 
-### Run the TGWrapper version (After)
-```bash
-pnpm start:after
+Expected TGWrapper startup output:
+
+```json
+{"event":"startup","serviceName":"registration-service","mode":"polling","redisUrl":"redis://localhost:6379"}
 ```
-Observe the structured JSON logging emitted in your terminal console as updates hit the TGWrapper version, and verify that user conversation state is correctly written to your local Redis instance.
+
+## Environment Variables
+
+| Name | Required | Default | Description |
+| --- | --- | --- | --- |
+| `BOT_TOKEN` | yes | none | Telegram bot token from BotFather. |
+| `REDIS_URL` | no | `redis://localhost:6379` | Redis connection used by the TGWrapper session adapter. |
+
+## What Gets Installed
+
+The npm package is a project template, not a library API. It ships:
+
+- `src/bot-before.ts`
+- `src/bot-after.ts`
+- compiled `dist/` files
+- `README.md`
+- `CHANGELOG.md`
+- `tsconfig.json`
+- `.env.example`
+
+Copy the files into your own application and then change package name, commands, Redis topology, tenant IDs, bot IDs, telemetry destinations, and handlers.
+
+## Manual Copy Fallback
+
+Power users can install this package directly and copy the template files:
+
+```bash
+pnpm add -D @tgwrapper/starter-migration
+mkdir my-migration-bot
+cp -R node_modules/@tgwrapper/starter-migration/{src,tsconfig.json,.env.example} my-migration-bot/
+```
+
+## Migration Checklist
+
+- Install `@tgwrapper/core`, `@tgwrapper/adapter-redis`, and `@tgwrapper/observability`.
+- Define a strict session state interface with `version: number`.
+- Replace implicit `ctx.session` mutations with explicit `compareAndSet` writes.
+- Replace `ctx.reply(...)` with `bot.sendMessage(...)`.
+- Attach observability during startup.
+- Handle `SIGINT` and `SIGTERM` to stop polling and close Redis.
+
+## Production Webhook Path
+
+This starter uses polling because it is easiest for local migration work. For production:
+
+- switch the TGWrapper client to webhook mode;
+- expose the webhook handler from your HTTP platform;
+- keep Redis shared across all running instances;
+- route JSON logs to your production log pipeline;
+- keep `BOT_TOKEN` and Redis credentials in your secret manager.

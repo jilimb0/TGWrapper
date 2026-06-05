@@ -2,6 +2,8 @@
 
 This document defines the official support window, runtime environment compatibility, module standards, and infrastructure dependencies for all packages within the TGWrapper ecosystem.
 
+> For capability-level runtime truth, use [COMPATIBILITY_MATRIX.md](./COMPATIBILITY_MATRIX.md). This page is a broad support-window overview; it does not mean every package feature works identically in every runtime.
+
 ---
 
 ## 💻 Node.js Engine Support
@@ -19,15 +21,15 @@ TGWrapper guarantees support for modern Node.js Long Term Support (LTS) releases
 
 ## 🌐 JavaScript Runtimes & Serverless Platforms
 
-We compile TGWrapper to run seamlessly in both long-lived server processes and ephemeral edge environments:
+TGWrapper's core webhook path is designed for long-lived server processes and ephemeral edge environments. Capability support differs by package:
 
 | Runtime Environment | Webhook Mode | Polling Mode | Context Propagation (`AsyncLocalStorage`) | Support Level |
 | :--- | :--- | :--- | :--- | :--- |
 | **Node.js Standard Process** | ✅ Fully Supported | ✅ Fully Supported | ✅ Supported | `Primary` |
-| **Cloudflare Workers (Edge)** | ✅ Fully Supported | ❌ Unsupported | ⚠️ Fallback Behavior | `First-Class` |
-| **AWS Lambda (Serverless)** | ✅ Fully Supported | ❌ Unsupported | ⚠️ Fallback Behavior | `First-Class` |
-| **Bun** | ✅ Fully Supported | ✅ Fully Supported | ✅ Supported | `Compatible` |
-| **Deno** | ✅ Fully Supported | ✅ Fully Supported | ✅ Supported | `Compatible` |
+| **Cloudflare Workers (Edge)** | ✅ Core Supported | ❌ Unsupported | ⚠️ Fallback Behavior | `Capability-specific` |
+| **AWS Lambda (Serverless)** | ✅ Core Supported | ❌ Unsupported | ⚠️ Fallback Behavior | `Capability-specific` |
+| **Bun** | ⚠️ Compatible | ⚠️ Compatible | ⚠️ Runtime-dependent | `Community-compatible` |
+| **Deno** | ⚠️ Compatible | ⚠️ Compatible | ⚠️ Runtime-dependent | `Community-compatible` |
 
 ### Edge Runtimes Support Details
 - **No Long-Polling:** Edge and Serverless execution environments enforce rigid request timeouts. Long-polling (`mode: 'polling'`) is strictly blocked in these environments. You must configure `mode: 'webhook'`.

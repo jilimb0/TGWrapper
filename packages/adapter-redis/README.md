@@ -2,7 +2,7 @@
 
 > **Distributed state, caching and rate limiting layer for TGWrapper production deployments.**
 >
-> Drop-in Redis-backed session adapter and sliding-window rate limiter. Replaces in-process primitives with distributed, multi-instance-safe equivalents — no changes to your handler code required.
+> Redis-backed session adapter and sliding-window rate limiter for multi-instance deployments. It upgrades compatible in-process session/rate-limit integration points to shared Redis primitives with explicit conflict handling.
 
 ```bash
 pnpm add @tgwrapper/adapter-redis ioredis
@@ -11,6 +11,8 @@ pnpm add @tgwrapper/adapter-redis ioredis
 ---
 
 ## 🎯 When you need this / When you do not
+
+For the migration threshold from in-memory state to Redis, see [When To Add Redis](../../docs/WHEN_TO_ADD_REDIS.md).
 
 **Use this when:**
 - Running **2+ bot instances** sharing the same bot token
@@ -29,7 +31,7 @@ pnpm add @tgwrapper/adapter-redis ioredis
 
 | Problem | Mechanism |
 | :--- | :--- |
-| Concurrent session overwrites | CAS (Compare-and-Swap) via atomic Lua script — returns `ok: false` on conflict, never silently overwrites |
+| Concurrent session overwrites | CAS (Compare-and-Swap) via atomic Lua script — returns `ok: false` on conflict instead of silently overwriting newer state |
 | Shared rate limits across nodes | Sliding-window sorted-set counter evaluated atomically per Lua script — one counter, all instances |
 | State lost on process restart | Redis key-value persistence with configurable TTL per session |
 | Cross-dataset key clashes | All keys namespaced by configured prefix + environment — no accidental overlap |
@@ -112,7 +114,7 @@ const limiter = createRateLimiter(kv, {
 ## 🛡️ Guarantees and Non-Guarantees
 
 ### What is Guaranteed:
-* **Session Atomicity via CAS:** The session adapter performs Compare-and-Swap (CAS) writes using an atomic Lua script. This guarantees that concurrent updates for the same user/chat will never silently overwrite each other. If a collision occurs, the adapter returns `ok: false`, allowing developers to handle conflicts explicitly.
+* **Session Atomicity via CAS:** The session adapter performs Compare-and-Swap (CAS) writes using an atomic Lua script. Concurrent updates for the same user/chat do not silently overwrite each other. If a collision occurs, the adapter returns `ok: false`, allowing developers to handle conflicts explicitly.
 * **Sliding Window Accuracy:** The distributed rate limiter uses a sorted-set sliding window algorithm implemented via a Lua script. Rate checks and increment operations are strictly atomic.
 * **Namespace Isolation:** All written keys are securely namespaced using the configured prefix to prevent clashes with other datasets.
 
@@ -134,7 +136,7 @@ The distributed rate limiter enforces request quotas using an atomic sorted-set 
 ### Boundary Anomalies & Caveats
 - **Clock Synchronization:** Because evaluation scores rely on JS timestamps (`Date.now()`), **wide clock variations (>100ms) between multiple bot servers** will cause uneven rate limit enforcement. Synchronize all servers using NTP/Chrony.
 - **Fairness:** Rejection is immediate and strict. The limiter does **not** queue, buffer, or schedule incoming messages; it rejects them immediately.
-- **Memory Purging:** Sliding window keys configure automatic TTL parameters (`windowMs + 1000`) to guarantee cleanup of idle client records.
+- **Memory Purging:** Sliding window keys configure TTL parameters (`windowMs + 1000`) so idle client records are eligible for cleanup. Actual eviction behavior still depends on Redis memory policy and availability.
 
 ---
 
@@ -168,7 +170,7 @@ We enforce continuous verification on the Redis adapter:
 - **Concurrency Test Verification:** Concurrency conflicts are automatically tested via fuzzing checks inside `test/chaos` to ensure the integrity of the CAS state machine.
 
 ### 🔬 Proof & Operations Validation
-- **Topology Support:** Verified across standalone Redis, Managed Redis (ElastiCache), Sentinel, and Hash-tagged Cluster deployments.
+- **Topology Support:** Designed for standalone Redis, managed Redis, Sentinel client injection, and hash-tagged Redis Cluster deployments. Review [Redis Topologies](../../docs/REDIS_TOPOLOGIES.md) for caveats.
 - **Behavior Under Contention:** Fuzz tests run 100+ concurrent writes to a single session to verify zero silent overwrites, ensuring CAS consistency.
 - **Limiter Robustness:** Sliding-window rate limiters tested with high-frequency concurrent script calls to guarantee accurate token count under load.
 - **Caveats Audited:** Monitored against standard memory limits with eviction policies to prevent OOM issues.

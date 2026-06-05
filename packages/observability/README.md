@@ -2,7 +2,7 @@
 
 > **Metrics, logs, traces and correlation for Telegram bot operations.**
 >
-> Attach once. Get structured JSON events, in-process counters, per-update trace IDs, and OpenTelemetry-compatible spans for every update your bot processes — including AI/LLM call timing and token budgets.
+> Attach once to get structured JSON events, in-process counters, per-update trace IDs, and OpenTelemetry-compatible span data. Node.js has the strongest context propagation support; serverless and edge runtimes require the caveats below.
 
 ```bash
 pnpm add @tgwrapper/observability
@@ -16,7 +16,7 @@ pnpm add @tgwrapper/observability
 | :--- | :--- |
 | **Structured JSON events** | `bot.start`, `update.received`, `update.processed`, `update.error`, `session.conflict` — every lifecycle event |
 | **In-process metrics** | `updates_received_total`, `updates_errors_total`, `update_duration_ms`, `ratelimit_blocked_total` |
-| **Trace context** | Unique `traceId` per update propagated through all async calls via `AsyncLocalStorage` |
+| **Trace context** | Unique `traceId` per update propagated through Node.js async paths via `AsyncLocalStorage`; other runtimes may be partial |
 | **OTEL spans** | Ready-to-export spans via the OpenTelemetry bridge — works with Jaeger, Tempo, Datadog |
 | **AI/LLM traces** | `prompt_tokens`, `completion_tokens`, `ai_generation` span duration per LLM call |
 
@@ -47,8 +47,10 @@ pnpm add @tgwrapper/observability
 ## 📈 Maturity & Support Level
 - **Stability:** `Beta`
 - **Adoption Status:** Used in early developer testing environments.
-- **Runtime Support:** Node.js (relies on standard `AsyncLocalStorage` hooks).
+- **Runtime Support:** Node.js is primary. Serverless and edge usage is partial and exporter-dependent.
 - **API Stability:** `Evolving` (Trace context structures might experience minor refinements prior to 1.0).
+
+See [Observability Runtime Support](../../docs/OBSERVABILITY_RUNTIME_SUPPORT.md) and [Observability Stability Contract](../../docs/OBSERVABILITY_STABILITY_CONTRACT.md) for the canonical runtime and stability breakdown.
 
 ---
 
@@ -117,7 +119,7 @@ Once attached, the engine captures and propagates structured telemetry across th
 
 * **Structured JSON Logs & Events:** High-fidelity lifecycle markers (`bot.start`, `update.received`, `update.processed`, `update.error`, `session.conflict`) printed to standard output.
 * **In-Process Metrics (`MetricsRegistry`):** Real-time monotonic counters for total traffic volume, error ratios, rate-limiter rejections, and execution latency.
-* **Trace Context Propagation:** Automatically wraps every Telegram update execution in an isolated `AsyncLocalStorage` boundary, generating a unique `traceId` correlation token.
+* **Trace Context Propagation:** Wraps Telegram update execution in a Node.js `AsyncLocalStorage` boundary, generating a unique `traceId` correlation token. Non-Node runtimes may provide degraded propagation.
 * **OTEL Span Conversion:** Ready-to-export spans through the integrated OpenTelemetry bridge.
 * **AI/LLM Tracing Hooks:** Pre-built functions to trace third-party LLM response latencies and prompt/completion token budgets within the active update's trace chain.
 
@@ -153,6 +155,7 @@ Ensure you match the telemetry backend configuration to your runtime infrastruct
 
 ### 3. Edge / Serverless (Cloudflare Workers / AWS Lambda)
 * **Telemetry Export:** Use the OTLP JSON bridge to push structured traces to an OpenTelemetry collector endpoint asynchronously before execution timeout.
+* **Caveat:** Async context propagation and exporter behavior are runtime-dependent. Prefer explicit trace propagation in handlers that cross platform boundaries.
 
 ---
 
@@ -180,7 +183,7 @@ Continuous quality gates run on every commit to validate the telemetry contract:
 - **Exporter Coverage:** Compatibility validated with Prometheus (`/metrics` exporter), OTLP JSON collector format, and stdout log formats.
 - **Context Integrity:** Verified context separation across concurrent execution paths using Node's `AsyncLocalStorage` under heavy mock loads.
 - **Correlation Mapping:** Tests confirm correct `traceId` correlation across API boundaries, session reads, and simulated external HTTP calls.
-- **Overhead Budget:** Telemetry hooks are optimized to run in <0.05ms per hook, ensuring minimal overhead on the update loop.
+- **Overhead Budget:** Telemetry hooks are designed to stay low-overhead. Treat exact overhead as deployment-specific unless measured with your handler workload and exporter configuration.
 
 Verify locally:
 ```bash

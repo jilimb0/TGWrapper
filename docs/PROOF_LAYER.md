@@ -10,9 +10,9 @@ The framework has been validated across standard JavaScript runtimes:
 
 | Runtime Environment | Support Level | Execution Constraints | Verified Core Functions |
 | :--- | :--- | :--- | :--- |
-| **Node.js (>= 18)** | `Full Support` | None. Standard runtime. | Polling loop, AsyncLocalStorage, webhook ports. |
-| **AWS Lambda** | `Full Support` | Stateless execution, cold starts are low. | Event ingestion, Redis adapter, HTTP client. |
-| **Cloudflare Workers** | `Full Support` | Isolate container execution bounds. | Native fetch, edge request parsing. |
+| **Node.js (>= 18)** | `Full Support` | Standard long-running runtime. | Polling loop, AsyncLocalStorage, webhook ports. |
+| **AWS Lambda** | `Capability-specific` | Stateless execution and timeout budgets. | Core webhook ingestion and HTTP client. Redis and observability exporters require caveats. |
+| **Cloudflare Workers** | `Capability-specific` | Isolate execution bounds and non-Node APIs. | Native fetch and edge request parsing. Redis TCP clients and Node SDK exporters are not first-class. |
 | **Bun (>= 1.0)** | `Compatible` | Standard tests pass. | Polling, fetch clients. |
 | **Deno (>= 1.35)** | `Compatible` | Requires Node compatibility shim. | Basic update ingestion. |
 
@@ -46,7 +46,7 @@ Under simulated execution loads, TGWrapper client components exhibit the followi
 - **Update Ingestion Latency:** `< 1.2ms` overhead (excluding Telegram API round-trips).
 - **Core Memory Overhead:** `< 18MB` active heap allocation (ideal for serverless micro-VMs).
 - **Redis Concurrency Lock Resolution:** `< 4.5ms` Lua evaluation window at 500 requests/sec.
-- **Bundle Footprint:** `< 42KB` compressed ESM bundle (guarantees fast cold starts).
+- **Bundle Footprint:** Monitored compressed ESM bundle size, intended to support serverless-friendly startup profiles. Cold starts remain platform-specific.
 
 ---
 

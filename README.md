@@ -61,8 +61,8 @@ If any of those sound familiar — this is where you land next.
 
 ## ⚡ What gets easier with TGWrapper
 
-- **Zero data loss on restarts/crashes:** Distributed state using Compare-and-Swap (CAS) via Redis prevents concurrent session overrides by design.
-- **Trace incidents in seconds:** Correlation context (`trace_id`, `span_id`) is automatically injected into every update and propagated through async calls.
+- **No silent concurrent session overwrites:** Redis Compare-and-Swap (CAS) returns explicit conflicts instead of silently replacing newer state.
+- **Trace incidents with structured context:** Correlation fields (`trace_id`, `span_id`) are attached to update processing, with strongest async propagation support in Node.js.
 - **Fail gracefully under load:** Native distributed rate limiting (sliding-window via Redis ZSETs) and built-in timeout abort signals protect your API limits and prevent webhook retry loops.
 - **Robust type safety:** Pure TypeScript contracts with typed handlers and typed session state instead of implicit `any` context magic.
 
@@ -76,14 +76,14 @@ Direct operational evidence backing the framework's reliability:
 | :--- | :--- |
 | **Comprehensive Tests** | `100% Passed` — 21 test files / 57 integration & FSM fuzz tests. |
 | **Drift Watchdog** | `Active` — Weekly automated checks against Telegram upstream schemas. |
-| **Benchmark Performance** | `Validated` — Low-overhead core processing (up to 180,000 updates/sec). |
+| **Benchmark Performance** | `Validated with caveats` — Synthetic core benchmark profiles have reached up to 180,000 updates/sec excluding Telegram API, Redis, user handlers, exporters, and network. |
 | **Disaster Recovery** | `Verified` — Chaos drills simulating Redis reconnect storms & network partition splits. |
-| **Runtime Portability** | `Cross-Platform` — Verified on Node.js >= 18, Cloudflare Workers, and AWS Lambda. |
+| **Runtime Portability** | `Capability-specific` — Core webhook handling targets Node.js, Cloudflare Workers, and AWS Lambda; polling, Redis, observability exporters, and shutdown semantics vary by runtime. |
 
 ### 🔬 Proof & Release Safeguards
-- **Runtime Portability:** Every build is automatically tested against both Node.js (v18+) and Edge runtimes (Cloudflare Workers, AWS Lambda).
+- **Runtime Portability:** Compatibility is tracked per capability in the [Compatibility Matrix](./docs/COMPATIBILITY_MATRIX.md).
 - **Auto Drift Protection:** Weekly watchdog scripts validate our generated types against the latest official Bot API schema, preventing drift.
-- **Benchmark Budgets:** Core processing cost budget is capped at <0.5ms per update under simulated load of 180,000 updates/sec.
+- **Benchmark Budgets:** Core processing budget is monitored with synthetic benchmark gates; see [Proof Map](./docs/PROOF_MAP.md) for reproduction scope.
 - **Disaster Drills:** Automated tests simulate network packet losses, 429 backpressures, and thread locks to verify robust recovery.
 
 ### 👥 Early Adopters in Production
@@ -100,10 +100,10 @@ Choose the right framework for your workload:
 | Feature / Workload | **TGWrapper** | **grammY** | **Telegraf** |
 | :--- | :--- | :--- | :--- |
 | **Simple Bot** | ✅ Good (Clean, direct) | ✅ Excellent (Many features) | ✅ Good (Simplicity) |
-| **Distributed / Scaled Bot** | 🌟 **Best-in-class** (Redis CAS) | ⚠️ Manual (Overwrites possible) | ⚠️ Manual |
-| **AI / Conversational Bot** | 🌟 **Best-in-class** (Session safety) | ⚠️ Race-prone | ⚠️ Race-prone |
-| **Observability-Heavy Bot** | 🌟 **Best-in-class** (Context traces) | ❌ None built-in | ❌ None built-in |
-| **Cold Starts (Serverless)** | ⚡ **Low** (Edge native) | ⚠️ Moderate (Requires shims) | ⚠️ Moderate |
+| **Distributed / Scaled Bot** | ✅ Strong fit when Redis CAS and shared rate limits matter | ⚠️ Possible with additional design | ⚠️ Possible with additional design |
+| **AI / Conversational Bot** | ✅ Strong fit when multi-turn state and token/latency traces matter | ⚠️ Add your own state safety | ⚠️ Add your own state safety |
+| **Observability-Heavy Bot** | ✅ Built-in hooks for structured logs, metrics, and traces | ⚠️ External instrumentation | ⚠️ External instrumentation |
+| **Serverless Webhooks** | ✅ Core webhook path is designed for fetch-style runtimes | ✅ Supported with runtime adapters | ⚠️ Usually Node-server oriented |
 
 ---
 
@@ -124,6 +124,8 @@ Choose the canonical template matching your architecture:
 | [**`@tgwrapper/core`**](./README.md) (Core) | `Early Production` | Used in active pilot apps; open for early testing. | Node.js, Cloudflare Workers, AWS Lambda | Stable core surface; minor enhancements ongoing. |
 | [**`@tgwrapper/adapter-redis`**](./packages/adapter-redis/README.md) | `Early Production` | Tested under simulated high concurrency. | Redis server >= 6.2 | Stable API surface. |
 | [**`@tgwrapper/observability`**](./packages/observability/README.md) | `Beta` | Undergoing active validation; feedback welcome. | Node.js AsyncLocalStorage | Evolving; minor trace schema updates possible. |
+
+For the platform-wide truth table, see [Platform Guarantees](./docs/PLATFORM_GUARANTEES.md), [Compatibility Matrix](./docs/COMPATIBILITY_MATRIX.md), and [Deployment Profiles](./docs/DEPLOYMENT_PROFILES.md).
 
 ---
 
@@ -216,6 +218,12 @@ pnpm test
 - [Observability Contract](./docs/OBSERVABILITY_CONTRACT.md) — Monitoring best practices.
 
 **Quality & Evidence**
+- [Claims Audit](./docs/CLAIMS_AUDIT.md) — Public claim status, evidence level, and required wording.
+- [Proof Map](./docs/PROOF_MAP.md) — Claim-to-test/workflow/source mapping.
+- [Compatibility Matrix](./docs/COMPATIBILITY_MATRIX.md) — Capability support by runtime.
+- [Platform Guarantees](./docs/PLATFORM_GUARANTEES.md) — Unified guarantees and non-guarantees.
+- [Deployment Profiles](./docs/DEPLOYMENT_PROFILES.md) — Blessed runtime shapes and caveats.
+- [Demo Flows](./docs/DEMO_FLOWS.md) — Canonical production-safe, Redis-backed, and AI observability demos.
 - [Proof Layer](./docs/PROOF_LAYER.md) — Test strategy, benchmarks, and failure drills.
 - [Field Notes](./docs/FIELD_NOTES.md) — Real-world pilot observations and early adopter feedback.
 - [Hardening Checklist](./docs/HARDENING_CHECKLIST.md) — Release confidence gates for production deployments.

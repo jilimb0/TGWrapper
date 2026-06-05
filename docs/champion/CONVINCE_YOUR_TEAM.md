@@ -9,7 +9,7 @@ If you want to introduce TGWrapper to your engineering team, this guide provides
 For simple bots, any framework works. But when a bot becomes a core business service, standard frameworks leave production issues as an "exercise for the reader." Teams end up custom-building session locking, rate limiters, structured logging, and retry logic. 
 
 **TGWrapper solves these issues natively:**
-- **Zero data loss on restarts/crashes:** Atomic Compare-and-Swap (CAS) Redis sessions prevent race conditions.
+- **No silent concurrent overwrites:** Atomic Compare-and-Swap (CAS) Redis sessions return explicit conflicts instead of replacing newer state.
 - **Trace incidents in seconds:** Automatic request-to-session telemetry context propagation.
 - **Fail gracefully at scale:** Built-in sliding-window rate limiting and AbortSignal support to prevent Telegram retry loops.
 
@@ -37,7 +37,7 @@ For simple bots, any framework works. But when a bot becomes a core business ser
 ## 📈 Operational Readiness
 
 - **Bundle Size:** Clean, minimal core compiles natively to Edge/Serverless targets.
-- **Cold Starts:** Less than 50ms on Cloudflare Workers and AWS Lambda.
+- **Serverless startup:** Designed for lightweight webhook handlers; measure cold-start behavior in your target platform and memory profile.
 - **Upstream Updates:** Weekly automated drift-watchdogs test core types against the latest Telegram schema releases.
 
 ---

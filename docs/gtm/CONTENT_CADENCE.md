@@ -65,7 +65,7 @@ To build a repeatable acquisition engine, the content pipeline follows a monthly
   - **Owner:** Core Maintainers.
 
 - **Week 8: Technical Deep-Dive**
-  - **Topic:** "Low Latency Edge Bots: Deploying to Cloudflare Workers with <50ms cold starts."
+  - **Topic:** "Low Latency Edge Bots: Measuring Cloudflare Workers startup and webhook latency."
   - **Focus:** V8 isolate tuning, bundle optimization.
   - **Target Channels:** Dev.to, HackerNoon.
   - **Owner:** Core Maintainers.

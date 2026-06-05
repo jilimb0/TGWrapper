@@ -1,37 +1,29 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync } from 'node:fs';
+import { getLatestNpmVersion } from './shared-release-versions.mjs';
 
-const releaseVersionsUrl = new URL('./release-versions.json', import.meta.url);
-const packages = [
-  ['@tgwrapper/core', new URL('../package.json', import.meta.url)],
-  ['@tgwrapper/adapter-redis', new URL('../packages/adapter-redis/package.json', import.meta.url)],
-  ['@tgwrapper/observability', new URL('../packages/observability/package.json', import.meta.url)],
+const trackedPackages = [
+  '@tgwrapper/core',
+  '@tgwrapper/adapter-redis',
+  '@tgwrapper/observability',
+  '@tgwrapper/starter-migration',
+  '@tgwrapper/starter-standard-bot',
+  '@tgwrapper/starter-support-bot',
+  '@tgwrapper/create'
 ];
 
-const config = JSON.parse(readFileSync(releaseVersionsUrl, 'utf8'));
-config.publishedVersions ??= {};
+const configPath = new URL('./release-versions.json', import.meta.url);
+const config = JSON.parse(readFileSync(configPath, 'utf8'));
+const nextPublishedVersions = {};
 
-let changed = false;
-
-for (const [expectedName, packageUrl] of packages) {
-  const pkg = JSON.parse(readFileSync(packageUrl, 'utf8'));
-
-  if (pkg.name !== expectedName) {
-    throw new Error(`Expected ${expectedName} in ${packageUrl.pathname}, found ${pkg.name}`);
-  }
-
-  const nextVersion = `^${pkg.version}`;
-  if (config.publishedVersions[pkg.name] !== nextVersion) {
-    console.log(`${pkg.name}: ${config.publishedVersions[pkg.name] ?? '<missing>'} -> ${nextVersion}`);
-    config.publishedVersions[pkg.name] = nextVersion;
-    changed = true;
-  }
+for (const packageName of trackedPackages) {
+  const latest = getLatestNpmVersion(packageName);
+  nextPublishedVersions[packageName] = `^${latest}`;
 }
 
-if (!changed) {
-  console.log('release-versions.json already in sync.');
-  process.exit(0);
-}
+writeFileSync(
+  configPath,
+  `${JSON.stringify({ ...config, publishedVersions: nextPublishedVersions }, null, 2)}\n`
+);
 
-writeFileSync(releaseVersionsUrl, `${JSON.stringify(config, null, 2)}\n`);
-console.log('Updated scripts/release-versions.json');
+console.log('✓ scripts/release-versions.json synced to npm latest for tracked packages');

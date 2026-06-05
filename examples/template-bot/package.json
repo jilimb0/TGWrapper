@@ -7,7 +7,7 @@
     "dev:webhook": "tsx src/server.ts"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.16.1"
+    "@tgwrapper/core": "^0.16.0"
   },
   "devDependencies": {
     "tsx": "^4.19.2"

@@ -1,6 +1,6 @@
 {
   "name": "@tgwrapper/core",
-  "version": "0.16.1",
+  "version": "0.16.0",
   "description": "Serverless-first Telegram bot framework without external bot libraries",
   "repository": {
     "type": "git",

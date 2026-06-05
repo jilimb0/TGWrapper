@@ -48,14 +48,17 @@ const starters = [
   }
 ];
 
-const expectedVersions = {
+const expectedLibVersions = {
   '@tgwrapper/core': withCaret(readPackageVersion('package.json')),
   '@tgwrapper/adapter-redis': withCaret(readPackageVersion('packages/adapter-redis/package.json')),
   '@tgwrapper/observability': withCaret(readPackageVersion('packages/observability/package.json'))
 };
 
-const expectedStarterVersion = withWorkspaceCaret(readPackageVersion('examples/migration-starter/package.json'));
-
+const expectedStarterVersions = {
+  '@tgwrapper/starter-migration': withCaret(readPackageVersion('examples/migration-starter/package.json')),
+  '@tgwrapper/starter-standard-bot': withCaret(readPackageVersion('examples/standard-bot/package.json')),
+  '@tgwrapper/starter-support-bot': withCaret(readPackageVersion('examples/support-bot/package.json'))
+};
 let failed = false;
 
 for (const starter of starters) {
@@ -72,7 +75,7 @@ for (const starter of starters) {
   if (!pkg.bugs?.url) errors.push('bugs.url is required');
   if (!Array.isArray(pkg.keywords) || pkg.keywords.length === 0) errors.push('keywords are required');
 
-  for (const [name, version] of Object.entries(expectedVersions)) {
+  for (const [name, version] of Object.entries(expectedLibVersions)) {
     if (pkg.dependencies?.[name] && pkg.dependencies[name] !== version) {
       errors.push(`${name} must be ${version}, found ${pkg.dependencies[name]}`);
     }
@@ -81,28 +84,7 @@ for (const starter of starters) {
   const serialized = JSON.stringify(pkg);
   if (serialized.includes('workspace:*')) errors.push('package.json must not contain workspace:*');
 
-  const safeName = starter.name.replace(/[^a-zA-Z0-9._-]/g, '-');
-  const packDir = mkdtempSync(join(tmpdir(), `${safeName}-pack-`));
-  const pack = spawnSync('npm', ['pack', '--dry-run', '--json'], {
-    cwd: starter.dir,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-    env: { ...process.env, npm_config_cache: join(packDir, 'npm-cache') }
-  });
-
-  try {
-    if (pack.status !== 0) {
-      errors.push(`npm pack failed: ${pack.stderr || pack.stdout}`);
-    } else {
-      const [packInfo] = JSON.parse(pack.stdout);
-      const packedFiles = new Set(packInfo.files.map((file) => file.path));
-      for (const file of ['package.json', ...starter.requiredFiles]) {
-        if (!packedFiles.has(file)) errors.push(`packed tarball missing ${file}`);
-      }
-    }
-  } finally {
-    rmSync(packDir, { recursive: true, force: true });
-  }
+  checkPackContents(starter.dir, ['package.json', ...starter.requiredFiles], errors);
 
   if (errors.length > 0) {
     failed = true;
@@ -127,32 +109,13 @@ function checkScaffolderPackage() {
   if (pkg.bin?.['create-tgwrapper'] !== 'bin/create-tgwrapper.mjs') errors.push('bin.create-tgwrapper is required');
   if (pkg.publishConfig?.access !== 'public') errors.push('publishConfig.access must be public');
   for (const starter of starters) {
-    if (pkg.dependencies?.[starter.name] !== expectedStarterVersion) {
-      errors.push(`${starter.name} dependency must be ${expectedStarterVersion}`);
+    const expected = expectedStarterVersions[starter.name];
+    if (pkg.dependencies?.[starter.name] !== expected) {
+      errors.push(`${starter.name} dependency must be ${expected}`);
     }
   }
 
-  const packDir = mkdtempSync(join(tmpdir(), 'create-tgwrapper-pack-'));
-  const pack = spawnSync('npm', ['pack', '--dry-run', '--json'], {
-    cwd: dir,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-    env: { ...process.env, npm_config_cache: join(packDir, 'npm-cache') }
-  });
-
-  try {
-    if (pack.status !== 0) {
-      errors.push(`npm pack failed: ${pack.stderr || pack.stdout}`);
-    } else {
-      const [packInfo] = JSON.parse(pack.stdout);
-      const packedFiles = new Set(packInfo.files.map((file) => file.path));
-      for (const file of ['package.json', 'bin/create-tgwrapper.mjs', 'README.md']) {
-        if (!packedFiles.has(file)) errors.push(`packed tarball missing ${file}`);
-      }
-    }
-  } finally {
-    rmSync(packDir, { recursive: true, force: true });
-  }
+  checkPackContents(dir, ['package.json', 'bin/create-tgwrapper.mjs', 'README.md', 'CHANGELOG.md'], errors);
 
   if (errors.length > 0) {
     failed = true;
@@ -164,29 +127,74 @@ function checkScaffolderPackage() {
 }
 
 function checkScaffolderTemplates() {
-  const templatesDir = 'examples/create-tgwrapper/templates';
-  const requiredTemplateFiles = [
-    'migration-starter/package.json',
-    'standard-bot/package.json',
-    'support-bot/package.json'
-  ];
+  const file = 'examples/create-tgwrapper/bin/create-tgwrapper.mjs';
+  const source = readFileSync(file, 'utf8');
+  const errors = [];
 
-  for (const relativePath of requiredTemplateFiles) {
-    if (!existsSync(join(templatesDir, relativePath))) {
-      failed = true;
-      console.error(`Missing scaffolder template file: ${relativePath}`);
+  for (const starter of starters) {
+    if (!source.includes(starter.name)) {
+      errors.push(`missing starter reference ${starter.name} in ${file}`);
     }
+  }
+
+  for (const [name, version] of Object.entries(expectedLibVersions)) {
+    if (!source.includes(`'${name}': '${version}'`) && !source.includes(`\"${name}\": \"${version}\"`)) {
+      errors.push(`missing published dependency version ${name}@${version} in ${file}`);
+    }
+  }
+
+  if (errors.length > 0) {
+    failed = true;
+    console.error(`\ncreate-tgwrapper templates are out of sync:`);
+    for (const error of errors) console.error(`- ${error}`);
+  } else {
+    console.log('✓ create-tgwrapper templates reference published starter packages and dependency versions');
   }
 }
 
-function readPackageVersion(path) {
-  return JSON.parse(readFileSync(path, 'utf8')).version;
+function checkPackContents(dir, requiredFiles, errors) {
+  const safeName = dir.replace(/[^a-zA-Z0-9._-]/g, '-');
+  const packDir = mkdtempSync(join(tmpdir(), `${safeName}-pack-`));
+  const pack = spawnSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], {
+    cwd: dir,
+    encoding: 'utf8',
+    stdio: ['ignore', 'pipe', 'pipe'],
+    timeout: 20_000,
+    env: {
+      ...process.env,
+      npm_config_cache: join(packDir, 'npm-cache'),
+      npm_config_fund: 'false',
+      npm_config_audit: 'false',
+      npm_config_update_notifier: 'false'
+    }
+  });
+
+  try {
+    if (pack.error) {
+      errors.push(`npm pack failed: ${pack.error.message}`);
+      return;
+    }
+
+    if (pack.status !== 0) {
+      errors.push(`npm pack failed: ${pack.stderr || pack.stdout}`);
+      return;
+    }
+
+    const [packInfo] = JSON.parse(pack.stdout);
+    const packedFiles = new Set(packInfo.files.map((file) => file.path));
+    for (const file of requiredFiles) {
+      if (!packedFiles.has(file)) errors.push(`packed tarball missing ${file}`);
+    }
+  } finally {
+    rmSync(packDir, { recursive: true, force: true });
+  }
+}
+
+function readPackageVersion(relativePath) {
+  const pkg = JSON.parse(readFileSync(relativePath, 'utf8'));
+  return pkg.version;
 }
 
 function withCaret(version) {
-  return `^${version}`;
-}
-
-function withWorkspaceCaret(version) {
-  return `workspace:^${version}`;
+  return version.startsWith('^') ? version : `^${version}`;
 }

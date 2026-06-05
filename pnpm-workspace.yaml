@@ -11,6 +11,9 @@ minimumReleaseAgeExclude:
   - '@tgwrapper/core'
   - '@tgwrapper/adapter-redis'
   - '@tgwrapper/observability'
+  - '@tgwrapper/starter-migration'
+  - '@tgwrapper/starter-standard-bot'
+  - '@tgwrapper/starter-support-bot'
 allowBuilds:
   '@parcel/watcher': true
   esbuild: true

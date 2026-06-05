@@ -29,6 +29,14 @@ jobs:
           set -euo pipefail
           mkdir -p .artifacts
           rm -f .artifacts/failure-summary.md .artifacts/error.log || true
+          pnpm dlx wait-on@8.0.1 --timeout 300000 \
+            "https://registry.npmjs.org/@tgwrapper/core" \
+            "https://registry.npmjs.org/@tgwrapper/adapter-redis" \
+            "https://registry.npmjs.org/@tgwrapper/observability" \
+            "https://registry.npmjs.org/@tgwrapper/starter-migration" \
+            "https://registry.npmjs.org/@tgwrapper/starter-standard-bot" \
+            "https://registry.npmjs.org/@tgwrapper/starter-support-bot" \
+            "https://registry.npmjs.org/@tgwrapper/create"
           if ! node scripts/published-smoke.mjs 2>&1 | tee .artifacts/published-smoke.log; then
             {
               echo "### published-smoke"

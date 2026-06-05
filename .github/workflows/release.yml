@@ -81,7 +81,6 @@ jobs:
             cp /tmp/pack.json ".artifacts/pack/${name}.json"
             node -e "const fs=require('fs');const pack=JSON.parse(fs.readFileSync('/tmp/pack.json','utf8'))[0];const files=new Set(pack.files.map(f=>f.path));const pkg=JSON.parse(fs.readFileSync('${d}/package.json','utf8'));const required=['package.json','dist/index.js','dist/index.d.ts'];for(const f of required){if(!files.has(f)){console.error('Missing packed file',f,'for',pkg.name);process.exit(1);}}console.log('Pack OK',pkg.name,pkg.version,'files=',pack.files.length);"
           done
-          pnpm pack:starters
       - run: |
           test -n "${ACTIONS_ID_TOKEN_REQUEST_URL}"
           test -n "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
@@ -185,7 +184,7 @@ jobs:
           echo "all_published=${ALL_PUBLISHED}" >> "$GITHUB_OUTPUT"
 
       - name: Sync example deps post-publish
-        if: steps.npm_confirm.outputs.all_published == 'true'
+        if: steps.npm_confirm.outputs.all_published == 'true' && steps.changesets.outcome == 'success'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |

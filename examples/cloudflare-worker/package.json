@@ -7,7 +7,7 @@
     "dev": "wrangler dev"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.16.0"
+    "@tgwrapper/core": "^0.16.1"
   },
   "devDependencies": {
     "wrangler": "^4.2.0"

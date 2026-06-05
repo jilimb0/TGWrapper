@@ -1,5 +1,11 @@
 # @tgwrapper/observability
 
+## 0.9.1
+
+### Patch Changes
+
+- 5ff96a7: add platform trust and incident guidance
+
 ## 0.9.0
 
 ### Minor Changes

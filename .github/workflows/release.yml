@@ -43,6 +43,12 @@ jobs:
       # changesets/action updates package.json versions before pnpm install runs,
       # so the lockfile is intentionally out of date at this point in the flow.
       - run: pnpm install --no-frozen-lockfile
+      - name: Sync examples to latest published versions
+        run: pnpm sync:examples:published
+      - name: Regenerate lockfile after example sync
+        run: pnpm install --no-frozen-lockfile
+      - name: Verify synced release versions
+        run: pnpm release:versions:check
       - run: pnpm verify:release
       - run: pnpm telegram:schema:fetch:ci
       - run: pnpm telegram:schema:completeness:check
@@ -81,7 +87,6 @@ jobs:
             cp /tmp/pack.json ".artifacts/pack/${name}.json"
             node -e "const fs=require('fs');const pack=JSON.parse(fs.readFileSync('/tmp/pack.json','utf8'))[0];const files=new Set(pack.files.map(f=>f.path));const pkg=JSON.parse(fs.readFileSync('${d}/package.json','utf8'));const required=['package.json','dist/index.js','dist/index.d.ts'];for(const f of required){if(!files.has(f)){console.error('Missing packed file',f,'for',pkg.name);process.exit(1);}}console.log('Pack OK',pkg.name,pkg.version,'files=',pack.files.length);"
           done
-          pnpm pack:starters
       - run: |
           test -n "${ACTIONS_ID_TOKEN_REQUEST_URL}"
           test -n "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"

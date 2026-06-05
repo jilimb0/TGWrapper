@@ -1,5 +1,11 @@
 # @tgwrapper/adapter-redis
 
+## 0.8.1
+
+### Patch Changes
+
+- 5ff96a7: add platform trust and incident guidance
+
 ## 0.8.0
 
 ### Minor Changes

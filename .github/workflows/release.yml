@@ -21,17 +21,21 @@ jobs:
       NPM_PUBLISH_PROVENANCE: "false"
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
-        with:
-          version: 11.5.1
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 22
-          cache: pnpm
+
       - name: Upgrade npm for trusted publishing
         run: |
           npm i -g npm@11.8.0
           npm -v
+
+      # Release job always uses --no-frozen-lockfile:
+      # changesets/action updates package.json versions before pnpm install runs,
+      # so the lockfile is intentionally out of date at this point in the flow.
+      # Examples are excluded because they reference the about-to-be-published
+      # versions which are not yet on npm at this stage of the pipeline.
+      - uses: ./.github/actions/pnpm-install
+        with:
+          frozen: "false"
+
       - name: Tooling versions
         run: |
           node -v
@@ -39,12 +43,7 @@ jobs:
           pnpm -v
           echo "registry=$(npm config get registry)"
           echo "always-auth=$(npm config get always-auth || true)"
-      # Release job always uses --no-frozen-lockfile:
-      # changesets/action updates package.json versions before pnpm install runs,
-      # so the lockfile is intentionally out of date at this point in the flow.
-      # Examples are excluded because they reference the about-to-be-published
-      # versions which are not yet on npm at this stage of the pipeline.
-      - run: pnpm install --no-frozen-lockfile --filter '!./examples/**'
+
       - run: pnpm verify:release
       - run: pnpm telegram:schema:fetch:ci
       - run: pnpm telegram:schema:completeness:check
@@ -55,13 +54,16 @@ jobs:
         env:
           BENCHMARK_MIN_RATIO: "0.55"
           BENCHMARK_MIN_UPS: "180000"
+
       - name: Release status (informational)
         continue-on-error: true
         run: pnpm release:status || echo "Release status check reported missing changeset (informational)."
+
       - name: Package metadata snapshot
         run: |
           mkdir -p .artifacts
           node scripts/list-publishable-packages.mjs --metadata | tee .artifacts/package-metadata.json
+
       - name: NPM registry visibility
         continue-on-error: true
         run: |
@@ -71,6 +73,7 @@ jobs:
           while IFS= read -r name; do
             npm view "${name}" --json >> .artifacts/npm-registry-visibility.jsonl || true
           done < <(node scripts/list-publishable-packages.mjs --names)
+
       - name: Pack artifact check
         run: |
           set -euo pipefail
@@ -83,30 +86,21 @@ jobs:
             cp /tmp/pack.json ".artifacts/pack/${name}.json"
             node -e "const fs=require('fs');const pack=JSON.parse(fs.readFileSync('/tmp/pack.json','utf8'))[0];const files=new Set(pack.files.map(f=>f.path));const pkg=JSON.parse(fs.readFileSync('${d}/package.json','utf8'));const required=['package.json','dist/index.js','dist/index.d.ts'];for(const f of required){if(!files.has(f)){console.error('Missing packed file',f,'for',pkg.name);process.exit(1);}}console.log('Pack OK',pkg.name,pkg.version,'files=',pack.files.length);"
           done
+
       - run: |
           test -n "${ACTIONS_ID_TOKEN_REQUEST_URL}"
           test -n "${ACTIONS_ID_TOKEN_REQUEST_TOKEN}"
           echo "OIDC context is available"
+
       - name: OIDC debug claims
         run: |
           set -euo pipefail
           mkdir -p .artifacts
           RAW="$(curl -sS -H "Authorization: bearer ${ACTIONS_ID_TOKEN_REQUEST_TOKEN}" "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=npm:registry.npmjs.org")"
           JWT="$(echo "${RAW}" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>process.stdout.write(JSON.parse(s).value))")"
-          echo "${JWT}" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const token=s.trim();const parts=token.split('.');if(parts.length<2){throw new Error('Invalid JWT');}const payload=JSON.parse(Buffer.from(parts[1],'base64url').toString('utf8'));const out={iss:payload.iss,aud:payload.aud,sub:payload.sub,repository:payload.repository,repository_owner:payload.repository_owner,ref:payload.ref,job_workflow_ref:payload.job_workflow_ref,workflow_ref:payload.workflow_ref,actor:payload.actor};require('fs').writeFileSync('.artifacts/oidc-claims.json', JSON.stringify(out,null,2));console.log(JSON.stringify(out,null,2));})"
-      - name: Assert supported npm publish mode
-        run: |
-          set -euo pipefail
-          if [ "${NPM_PUBLISH_PROVENANCE}" = "true" ]; then
-            echo "Unsupported publish configuration for current repository visibility:"
-            echo "NPM_PUBLISH_PROVENANCE=true with private GitHub repository."
-            echo "Set NPM_PUBLISH_PROVENANCE=false (current supported mode) or migrate repository/package settings to supported public provenance flow."
-            exit 1
-          fi
-          echo "Publish mode OK: private repository without provenance."
-      - name: OIDC publish preflight (dry-run)
-        env:
-          CHANGESETS_RELEASE: "1"
+          echo "${JWT}" | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const token=s.trim();const parts=token.split('.');if(parts.length<2){throw new Error('Invalid JWT');}const payload=JSON.parse(Buffer.from(parts[1],'base64url').toString('utf8'));const out={iss:payload.iss,aud:payload.aud,sub:payload.sub,repository:payload.repository,repository_owner:payload.repository_owner,ref:payload.ref,job_workflow_ref:payload.job_workflow_ref,runner_environment:payload.runner_environment};console.log(JSON.stringify(out,null,2));})" | tee .artifacts/oidc-claims.json
+
+      - name: OIDC publish preflight
         run: |
           set -euo pipefail
           while IFS= read -r d; do
@@ -119,6 +113,7 @@ jobs:
             echo "OIDC dry-run publish in ${d} for ${NAME}@${VERSION}"
             (cd "${d}" && pnpm publish --access public --dry-run --no-git-checks)
           done < <(node scripts/list-publishable-packages.mjs --dirs)
+
       - name: Release summary
         if: always()
         run: |
@@ -133,6 +128,7 @@ jobs:
             echo ""
             echo "Artifacts: package metadata, npm visibility, pack manifests, OIDC claims."
           } >> "$GITHUB_STEP_SUMMARY"
+
       - uses: actions/upload-artifact@v7
         if: always()
         with:
@@ -153,11 +149,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      # Confirm all package versions are reachable on npm before syncing examples.
-      # changesets/action may return published=false even on a successful publish
-      # (e.g. when re-running after a partial failure). This step is the
-      # authoritative source of truth: it polls npm with retries and sets
-      # all_published=true only when every local version is confirmed live.
       - name: Confirm packages live on npm
         id: npm_confirm
         if: always()
@@ -171,7 +162,7 @@ jobs:
             for i in 1 2 3 4 5; do
               REMOTE="$(npm view "${NAME}@${VERSION}" version 2>/dev/null || true)"
               if [ "${REMOTE}" = "${VERSION}" ]; then
-                echo "✓ ${NAME}@${VERSION} confirmed on npm"
+                echo "\u2713 ${NAME}@${VERSION} confirmed on npm"
                 FOUND=true
                 break
               fi
@@ -179,7 +170,7 @@ jobs:
               sleep 10
             done
             if [ "${FOUND}" = "false" ]; then
-              echo "✗ ${NAME}@${VERSION} NOT found on npm after retries"
+              echo "\u2717 ${NAME}@${VERSION} NOT found on npm after retries"
               ALL_PUBLISHED=false
             fi
           done < <(node scripts/list-publishable-packages.mjs --dirs)
@@ -192,7 +183,9 @@ jobs:
         run: |
           node scripts/sync-release-versions.mjs
           node scripts/sync-examples.mjs
-          pnpm install --no-frozen-lockfile
+          # Re-install after version sync — use composite action logic directly
+          # (no checkout needed, lockfile regeneration only)
+          pnpm install --no-frozen-lockfile --filter '!./examples/**'
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add scripts/release-versions.json examples/*/package.json pnpm-lock.yaml

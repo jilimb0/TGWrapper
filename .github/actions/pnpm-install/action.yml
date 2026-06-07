@@ -1,0 +1,71 @@
+name: pnpm install
+description: >-
+  Setup pnpm + Node, then install workspace dependencies.
+  Falls back to --no-frozen-lockfile (excluding examples) when the lockfile is
+  out of sync with package.json — this happens on Version Packages commits where
+  changesets bumps specifiers before the lockfile is regenerated.
+
+inputs:
+  node-version:
+    description: Node.js version to use
+    required: false
+    default: "22"
+  pnpm-version:
+    description: pnpm version to use
+    required: false
+    default: "11.5.2"
+  frozen:
+    description: >
+      Use --frozen-lockfile (true) or --no-frozen-lockfile (false).
+      When set to "false" the examples filter is also applied automatically.
+    required: false
+    default: "true"
+  filter:
+    description: Extra pnpm --filter argument (e.g. '!./examples/**')
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@v6
+      with:
+        version: ${{ inputs.pnpm-version }}
+
+    - uses: actions/setup-node@v6
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: pnpm
+
+    - name: Install dependencies
+      shell: bash
+      # Pass inputs via env — never interpolate directly into run: (shell injection)
+      env:
+        INPUT_FROZEN: ${{ inputs.frozen }}
+        INPUT_FILTER: ${{ inputs.filter }}
+      run: |
+        set -euo pipefail
+
+        FILTER_ARG=()
+        if [ -n "${INPUT_FILTER}" ]; then
+          FILTER_ARG=(--filter "${INPUT_FILTER}")
+        fi
+
+        if [ "${INPUT_FROZEN}" = "false" ]; then
+          # Explicit no-frozen mode: skip examples to avoid referencing
+          # not-yet-published versions (e.g. during the release job).
+          pnpm install --no-frozen-lockfile --filter '!./examples/**' "${FILTER_ARG[@]+${FILTER_ARG[@]}}"
+          exit 0
+        fi
+
+        # Try frozen first; fall back gracefully on lockfile drift caused by
+        # changesets Version Packages commits or unpublished example deps.
+        INSTALL_EXIT=0
+        INSTALL_OUT="$(pnpm install --frozen-lockfile 2>&1)" || INSTALL_EXIT=$?
+        if echo "${INSTALL_OUT}" | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
+          echo "Lockfile outdated or unpublished deps detected — regenerating without examples."
+          pnpm install --no-frozen-lockfile --filter '!./examples/**' "${FILTER_ARG[@]+${FILTER_ARG[@]}}"
+        elif [ "${INSTALL_EXIT}" != "0" ]; then
+          echo "${INSTALL_OUT}"
+          exit "${INSTALL_EXIT}"
+        fi

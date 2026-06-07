@@ -34,8 +34,8 @@ jobs:
           # Use --no-frozen-lockfile when lockfile is genuinely out of sync with
           # package.json (e.g. Version Packages commits that bump specifiers).
           # --frozen-lockfile is used everywhere else to catch accidental drift.
-          if pnpm install --frozen-lockfile 2>&1 | grep -q 'ERR_PNPM_OUTDATED_LOCKFILE'; then
-            echo "Lockfile outdated (Version Packages commit) — regenerating."
+          if pnpm install --frozen-lockfile 2>&1 | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
+            echo "Lockfile outdated or unpublished deps (Version Packages commit) — regenerating without frozen lockfile."
             pnpm install --no-frozen-lockfile
           fi
       - name: Check changeset requirement
@@ -84,8 +84,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: |
-          if pnpm install --frozen-lockfile 2>&1 | grep -q 'ERR_PNPM_OUTDATED_LOCKFILE'; then
-            echo "Lockfile outdated (Version Packages commit) — regenerating."
+          if pnpm install --frozen-lockfile 2>&1 | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
+            echo "Lockfile outdated or unpublished deps (Version Packages commit) — regenerating without frozen lockfile."
             pnpm install --no-frozen-lockfile
           fi
       - name: Verify toolchain
@@ -135,8 +135,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: |
-          if pnpm install --frozen-lockfile 2>&1 | grep -q 'ERR_PNPM_OUTDATED_LOCKFILE'; then
-            echo "Lockfile outdated (Version Packages commit) — regenerating."
+          if pnpm install --frozen-lockfile 2>&1 | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
+            echo "Lockfile outdated or unpublished deps (Version Packages commit) — regenerating without frozen lockfile."
             pnpm install --no-frozen-lockfile
           fi
       - name: Release integrity checks
@@ -200,8 +200,8 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: |
-          if pnpm install --frozen-lockfile 2>&1 | grep -q 'ERR_PNPM_OUTDATED_LOCKFILE'; then
-            echo "Lockfile outdated (Version Packages commit) — regenerating."
+          if pnpm install --frozen-lockfile 2>&1 | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
+            echo "Lockfile outdated or unpublished deps (Version Packages commit) — regenerating without frozen lockfile."
             pnpm install --no-frozen-lockfile
           fi
       - name: Redis integration tests

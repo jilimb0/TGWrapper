@@ -44,6 +44,10 @@ const starters = [
   }
 ];
 
+// --skip-version-checks: skip dep version validation when workspace:^ is in use
+// (i.e. between changeset version bump and publish). Metadata and file checks still run.
+const skipVersionChecks = process.argv.includes('--skip-version-checks');
+
 const publishedVersions = JSON.parse(readFileSync('scripts/release-versions.json', 'utf8')).publishedVersions;
 
 const expectedLibVersions = {
@@ -73,14 +77,16 @@ for (const starter of starters) {
   if (!pkg.bugs?.url) errors.push('bugs.url is required');
   if (!Array.isArray(pkg.keywords) || pkg.keywords.length === 0) errors.push('keywords are required');
 
-  for (const [name, version] of Object.entries(expectedLibVersions)) {
-    if (pkg.dependencies?.[name] && pkg.dependencies[name] !== version) {
-      errors.push(`${name} must be ${version}, found ${pkg.dependencies[name]}`);
+  if (!skipVersionChecks) {
+    for (const [name, version] of Object.entries(expectedLibVersions)) {
+      if (pkg.dependencies?.[name] && pkg.dependencies[name] !== version) {
+        errors.push(`${name} must be ${version}, found ${pkg.dependencies[name]}`);
+      }
     }
-  }
 
-  const serialized = JSON.stringify(pkg);
-  if (serialized.includes('workspace:*')) errors.push('package.json must not contain workspace:*');
+    const serialized = JSON.stringify(pkg);
+    if (serialized.includes('workspace:*')) errors.push('package.json must not contain workspace:*');
+  }
 
   checkPackContents(starter.dir, ['package.json', ...starter.requiredFiles], errors);
 
@@ -106,10 +112,12 @@ function checkScaffolderPackage() {
   if (pkg.name !== '@tgwrapper/create') errors.push(`expected name @tgwrapper/create, found ${pkg.name}`);
   if (pkg.bin?.['create-tgwrapper'] !== 'bin/create-tgwrapper.mjs') errors.push('bin.create-tgwrapper is required');
   if (pkg.publishConfig?.access !== 'public') errors.push('publishConfig.access must be public');
-  for (const starter of starters) {
-    const expected = expectedStarterVersions[starter.name];
-    if (pkg.dependencies?.[starter.name] !== expected) {
-      errors.push(`${starter.name} dependency must be ${expected}`);
+  if (!skipVersionChecks) {
+    for (const starter of starters) {
+      const expected = expectedStarterVersions[starter.name];
+      if (pkg.dependencies?.[starter.name] !== expected) {
+        errors.push(`${starter.name} dependency must be ${expected}`);
+      }
     }
   }
 
@@ -135,9 +143,11 @@ function checkScaffolderTemplates() {
     }
   }
 
-  for (const [name, version] of Object.entries(expectedLibVersions)) {
-    if (!source.includes(`'${name}': '${version}'`) && !source.includes(`\"${name}\": \"${version}\"`)) {
-      errors.push(`missing published dependency version ${name}@${version} in ${file}`);
+  if (!skipVersionChecks) {
+    for (const [name, version] of Object.entries(expectedLibVersions)) {
+      if (!source.includes(`'${name}': '${version}'`) && !source.includes(`\"${name}\": \"${version}\"`)) {
+        errors.push(`missing published dependency version ${name}@${version} in ${file}`);
+      }
     }
   }
 

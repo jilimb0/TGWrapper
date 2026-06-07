@@ -4,6 +4,12 @@
 
 ### Patch Changes
 
+- 8fc3cfe: Upgrade packages product readiness
+
+## 0.8.1
+
+### Patch Changes
+
 - f9f6702: add platform trust and incident guidance
 
 ## 0.8.1

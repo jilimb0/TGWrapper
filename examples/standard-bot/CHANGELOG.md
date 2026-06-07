@@ -4,6 +4,16 @@
 
 ### Patch Changes
 
+- 8fc3cfe: Upgrade packages product readiness
+- Updated dependencies [8fc3cfe]
+  - @tgwrapper/adapter-redis@0.8.1
+  - @tgwrapper/observability@0.9.1
+  - @tgwrapper/core@0.16.1
+
+## 0.2.1
+
+### Patch Changes
+
 - f9f6702: add platform trust and incident guidance
 - Updated dependencies [f9f6702]
   - @tgwrapper/adapter-redis@0.8.1

@@ -3,7 +3,6 @@
   "version": "0.2.1",
   "type": "module",
   "description": "Support queue bot starter for TGWrapper with stateful routing and observability",
-  "main": "dist/bot.js",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -24,7 +23,6 @@
     "redis"
   ],
   "files": [
-    "dist",
     "src",
     "README.md",
     "CHANGELOG.md",

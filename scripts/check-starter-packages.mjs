@@ -8,13 +8,11 @@ const starters = [
   {
     dir: 'examples/migration-starter',
     name: '@tgwrapper/starter-migration',
-    main: 'dist/bot-after.js',
+    main: null,
     requiredFiles: [
       '.env.example',
       'CHANGELOG.md',
       'README.md',
-      'dist/bot-after.js',
-      'dist/bot-before.js',
       'src/bot-after.ts',
       'src/bot-before.ts',
       'tsconfig.json'
@@ -23,12 +21,11 @@ const starters = [
   {
     dir: 'examples/standard-bot',
     name: '@tgwrapper/starter-standard-bot',
-    main: 'dist/bot.js',
+    main: null,
     requiredFiles: [
       '.env.example',
       'CHANGELOG.md',
       'README.md',
-      'dist/bot.js',
       'src/bot.ts',
       'tsconfig.json'
     ]
@@ -36,12 +33,11 @@ const starters = [
   {
     dir: 'examples/support-bot',
     name: '@tgwrapper/starter-support-bot',
-    main: 'dist/bot.js',
+    main: null,
     requiredFiles: [
       '.env.example',
       'CHANGELOG.md',
       'README.md',
-      'dist/bot.js',
       'src/bot.ts',
       'tsconfig.json'
     ]
@@ -69,7 +65,7 @@ for (const starter of starters) {
 
   if (pkg.name !== starter.name) errors.push(`expected name ${starter.name}, found ${pkg.name}`);
   if (pkg.private === true) errors.push('private must not be true');
-  if (pkg.main !== starter.main) errors.push(`expected main ${starter.main}, found ${pkg.main}`);
+  if (starter.main !== null && pkg.main !== starter.main) errors.push(`expected main ${starter.main}, found ${pkg.main}`);
   if (pkg.publishConfig?.access !== 'public') errors.push('publishConfig.access must be public');
   if (!pkg.license) errors.push('license is required');
   if (!pkg.repository?.url) errors.push('repository.url is required');

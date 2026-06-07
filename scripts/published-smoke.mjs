@@ -150,9 +150,13 @@ if (typeof RedisSessionAdapter !== 'function') {
     await run('npx', ['tsc', '--noEmit'], tempDir);
     await run('npx', ['tsc'], tempDir);
     await run('node', ['dist/smoke.js'], tempDir);
-    await run('npm', ['init', '@tgwrapper', 'smoke-standard', '--', '--template', 'standard'], tempDir);
-    await run('npm', ['init', '@tgwrapper', 'smoke-support', '--', '--template', 'support'], tempDir);
-    await run('npm', ['init', '@tgwrapper', 'smoke-migration', '--', '--template', 'migration'], tempDir);
+    // Run create-tgwrapper from the locally installed binary so it can resolve
+    // @tgwrapper/starter-* from the same node_modules (npm init @tgwrapper runs
+    // from the npm cache and cannot find the sibling starter packages).
+    const createBin = join(tempDir, 'node_modules', '.bin', 'create-tgwrapper');
+    await run(createBin, ['smoke-standard', '--template', 'standard'], tempDir);
+    await run(createBin, ['smoke-support', '--template', 'support'], tempDir);
+    await run(createBin, ['smoke-migration', '--template', 'migration'], tempDir);
     console.log('Published smoke passed.');
   } finally {
     await rm(tempDir, { recursive: true, force: true });

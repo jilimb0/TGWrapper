@@ -137,3 +137,110 @@ jobs:
       - name: Fail job if gate failed
         if: steps.run_release_integrity.outcome == 'failure'
         run: exit 1
+
+  redis-integration:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ./.github/actions/pnpm-install
+      - name: Redis integration tests
+        id: run_redis_integration
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          pnpm --filter @tgwrapper/adapter-redis test:integration > .artifacts/error.log 2>&1
+        env:
+          REDIS_URL: redis://127.0.0.1:6379
+      - name: Write failure digest
+        if: steps.run_redis_integration.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts
+          {
+            echo "### redis-integration"
+            echo ""
+            echo '```text'
+            tail -n 120 .artifacts/error.log
+            echo '```'
+          } > .artifacts/failure-summary.md
+      - uses: actions/upload-artifact@v7
+        if: steps.run_redis_integration.outcome == 'failure'
+        with:
+          name: ci-redis-integration
+          path: .artifacts/failure-summary.md
+          if-no-files-found: error
+      - name: Fail job if gate failed
+        if: steps.run_redis_integration.outcome == 'failure'
+        run: exit 1
+
+  summary:
+    runs-on: ubuntu-latest
+    needs:
+      - changeset-required
+      - verify
+      - release-integrity
+      - redis-integration
+    if: always()
+    steps:
+      - name: Download failure digests
+        uses: actions/download-artifact@v8
+        if: always()
+        continue-on-error: true
+        with:
+          path: .artifacts-upload
+          pattern: ci-*
+      - name: CI summary
+        run: |
+          set -euo pipefail
+
+          CHANGESET_RESULT="${{ needs.changeset-required.result }}"
+          VERIFY_RESULT="${{ needs.verify.result }}"
+          RELEASE_RESULT="${{ needs.release-integrity.result }}"
+          REDIS_RESULT="${{ needs.redis-integration.result }}"
+
+          {
+            echo "## CI Summary"
+            echo ""
+            echo "| Job | Result |"
+            echo "|---|---|"
+            echo "| changeset-required | ${CHANGESET_RESULT} |"
+            echo "| verify | ${VERIFY_RESULT} |"
+            echo "| release-integrity | ${RELEASE_RESULT} |"
+            echo "| redis-integration | ${REDIS_RESULT} |"
+            echo ""
+            echo "## Failure details"
+            echo ""
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          FOUND=0
+          if [ -d .artifacts-upload ]; then
+            for file in $(find .artifacts-upload -name 'failure-summary.md' | sort); do
+              if [ -f "$file" ]; then
+                FOUND=1
+                cat "$file" >> "$GITHUB_STEP_SUMMARY"
+                echo "" >> "$GITHUB_STEP_SUMMARY"
+              fi
+            done
+          fi
+
+          if [ "$FOUND" -eq 0 ]; then
+            {
+              echo "No failure digests were collected."
+              echo ""
+              echo "A gate failed before its digest was uploaded, or no digest artifact matched the download pattern."
+              echo ""
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          echo "CI Summary write completed."

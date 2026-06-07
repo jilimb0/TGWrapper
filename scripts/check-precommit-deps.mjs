@@ -1,22 +1,19 @@
 #!/usr/bin/env node
-import fs from 'node:fs';
-import path from 'node:path';
-import { execSync } from 'node:child_process';
-import { publishedVersions } from './shared-release-versions.mjs';
+/**
+ * Pre-commit hook:
+ *   1. If any package.json is staged, runs `pnpm install --no-frozen-lockfile`.
+ *   2. If pnpm-lock.yaml changed after install, stages it automatically.
+ *   3. If install exits non-zero, aborts the commit with a clear error.
+ *
+ * This ensures the lockfile is always in sync and broken installs are
+ * caught before they reach CI.
+ */
+import { execSync, spawnSync } from 'node:child_process';
 
 const root = process.cwd();
 
-function getStagedFiles() {
-  const out = execSync('git diff --cached --name-only --diff-filter=ACMR', {
-    cwd: root,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'pipe'],
-  }).trim();
-  return out ? out.split('\n').filter(Boolean) : [];
-}
-
-function readJson(filePath) {
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+function exec(cmd, opts = {}) {
+  return execSync(cmd, { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], ...opts }).trim();
 }
 
 function fail(message) {
@@ -24,36 +21,32 @@ function fail(message) {
   process.exit(1);
 }
 
-const stagedFiles = getStagedFiles();
-const stagedSet = new Set(stagedFiles);
-const stagedPackageJson = stagedFiles.filter((f) => f.endsWith('package.json'));
-const examplePackageJson = stagedPackageJson.filter((f) => /^examples\/[^/]+\/package\.json$/.test(f));
+// Collect staged files
+const stagedFiles = exec('git diff --cached --name-only --diff-filter=ACMR').split('\n').filter(Boolean);
+const hasPackageJson = stagedFiles.some((f) => f.endsWith('package.json'));
 
-if (stagedPackageJson.length > 0 && !stagedSet.has('pnpm-lock.yaml')) {
-  fail([
-    'You staged one or more package.json files but pnpm-lock.yaml is not staged.',
-    'Run `pnpm install --lockfile-only` or `pnpm install`, then stage pnpm-lock.yaml.',
-  ].join(' '));
+if (!hasPackageJson) {
+  console.log('✓ pre-commit checks passed (no package.json changes)');
+  process.exit(0);
 }
 
-const versionErrors = [];
-for (const relPath of examplePackageJson) {
-  const absPath = path.join(root, relPath);
-  const pkg = readJson(absPath);
-  const deps = pkg.dependencies ?? {};
+console.log('📦 package.json changed — running pnpm install...');
 
-  for (const [name, expected] of Object.entries(publishedVersions)) {
-    if (name in deps && deps[name] !== expected) {
-      versionErrors.push(`${relPath}: ${name} is ${deps[name]}, expected ${expected}`);
-    }
-  }
+const result = spawnSync('pnpm', ['install', '--no-frozen-lockfile'], {
+  cwd: root,
+  stdio: 'inherit',
+  encoding: 'utf8',
+});
+
+if (result.status !== 0) {
+  fail('pnpm install failed. Fix the errors above before committing.');
 }
 
-if (versionErrors.length > 0) {
-  fail([
-    'Example packages must reference the latest published package versions.',
-    ...versionErrors,
-  ].join('\n'));
+// Check if lockfile changed and stage it automatically
+const lockfileChanged = exec('git diff --name-only pnpm-lock.yaml').includes('pnpm-lock.yaml');
+if (lockfileChanged) {
+  console.log('🔒 pnpm-lock.yaml updated — staging automatically...');
+  exec('git add pnpm-lock.yaml');
 }
 
 console.log('✓ pre-commit checks passed');

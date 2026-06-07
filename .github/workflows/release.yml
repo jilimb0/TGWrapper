@@ -19,6 +19,7 @@ jobs:
       cancel-in-progress: false
     env:
       NPM_PUBLISH_PROVENANCE: "false"
+      CHANGESETS_RELEASE: "1"
     steps:
       - uses: actions/checkout@v6
 
@@ -145,7 +146,6 @@ jobs:
           publish: pnpm -r publish --access public --no-git-checks
           version: bash scripts/changeset-version.sh
         env:
-          CHANGESETS_RELEASE: "1"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

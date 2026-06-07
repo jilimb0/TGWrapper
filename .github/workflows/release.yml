@@ -147,7 +147,6 @@ jobs:
           version: bash scripts/changeset-version.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Confirm packages live on npm
         id: npm_confirm
@@ -182,10 +181,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           node scripts/sync-release-versions.mjs
+          # sync-examples (default mode) writes ^version — converts workspace:^ back
+          # to published ranges so the sync PR has clean explicit versions.
           node scripts/sync-examples.mjs
-          # Re-install after version sync — use composite action logic directly
-          # (no checkout needed, lockfile regeneration only)
-          pnpm install --no-frozen-lockfile --filter '!./examples/**'
+          # Re-install to regenerate lockfile with the newly published ^version ranges.
+          pnpm install --no-frozen-lockfile
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add scripts/release-versions.json examples/*/package.json pnpm-lock.yaml

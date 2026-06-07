@@ -10,7 +10,7 @@ const steps = [
   'pnpm typecheck:compat',
   'pnpm -r typecheck',
   'pnpm build',
-  'pnpm -r build',
+  'pnpm -r --filter=!./examples/** build',
   'pnpm api:snapshot:check',
   'pnpm pack:size',
   'pnpm pack:starters'

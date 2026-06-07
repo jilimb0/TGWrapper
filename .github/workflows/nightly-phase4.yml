@@ -34,7 +34,16 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: |
+          INSTALL_OUT="$(pnpm install --frozen-lockfile 2>&1)" || INSTALL_EXIT=$?
+          if echo "${INSTALL_OUT}" | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
+            echo "Lockfile outdated or unpublished deps detected (Version Packages commit) — regenerating without examples."
+            pnpm install --no-frozen-lockfile --filter '!./examples/**'
+          elif [ "${INSTALL_EXIT:-0}" != "0" ]; then
+            echo "${INSTALL_OUT}"
+            exit "${INSTALL_EXIT}"
+          fi
       - run: pnpm typecheck
       - run: pnpm -r typecheck
       - run: pnpm build

@@ -42,7 +42,9 @@ jobs:
       # Release job always uses --no-frozen-lockfile:
       # changesets/action updates package.json versions before pnpm install runs,
       # so the lockfile is intentionally out of date at this point in the flow.
-      - run: pnpm install --no-frozen-lockfile
+      # Examples are excluded because they reference the about-to-be-published
+      # versions which are not yet on npm at this stage of the pipeline.
+      - run: pnpm install --no-frozen-lockfile --filter '!./examples/**'
       - run: pnpm verify:release
       - run: pnpm telegram:schema:fetch:ci
       - run: pnpm telegram:schema:completeness:check

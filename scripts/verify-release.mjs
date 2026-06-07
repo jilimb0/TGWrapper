@@ -13,7 +13,9 @@ const steps = [
   'pnpm -r --filter=!./examples/** build',
   'pnpm api:snapshot:check',
   'pnpm pack:size',
-  'pnpm pack:starters'
+  // In CI examples use workspace:^ (not yet published), so skip dep version checks.
+  // Locally pack:starters enforces exact published versions before tagging.
+  process.env.GITHUB_ACTIONS === 'true' ? 'pnpm pack:starters:ci' : 'pnpm pack:starters'
 ];
 
 for (const step of steps) {

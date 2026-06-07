@@ -1,6 +1,6 @@
 {
   "name": "@tgwrapper/core",
-  "version": "0.16.1",
+  "version": "0.16.0",
   "description": "Serverless-first Telegram bot framework without external bot libraries",
   "repository": {
     "type": "git",
@@ -92,11 +92,11 @@
     "serverless"
   ],
   "devDependencies": {
-    "@changesets/cli": "^2.29.6",
+    "@changesets/cli": "^2.31.0",
     "typedoc": "^0.28.19",
     "typescript": "6.0.3",
     "vite": "8.0.16",
-    "vitest": "^4.0.18"
+    "vitest": "^4.1.8"
   },
   "packageManager": "pnpm@11.5.1+sha512.93f7b57422ea7068257235b4c16eb60762eb68e1dc23723199cc739043ea9be2c4143274a399d8c6defa2b1176226d9ca1c4b63482d6200c1a8fbaa78c1d1485",
   "files": [

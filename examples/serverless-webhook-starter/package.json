@@ -7,10 +7,10 @@
     "test": "tsc --noEmit"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.16.1"
+    "@tgwrapper/core": "^0.16.0"
   },
   "devDependencies": {
-    "tsx": "^4.20.6",
+    "tsx": "^4.20.5",
     "typescript": "6.0.3"
   }
 }

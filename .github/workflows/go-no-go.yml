@@ -59,7 +59,7 @@ jobs:
             tail -n 120 .artifacts/error.log
             echo '```'
           } > .artifacts/failure-summary.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: steps.run_release_gates.outcome == 'failure'
         with:
           name: go-no-go-release-gates
@@ -120,7 +120,7 @@ jobs:
             tail -n 120 .artifacts/error.log
             echo '```'
           } > .artifacts/failure-summary.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: steps.run_reliability_gates.outcome == 'failure'
         with:
           name: go-no-go-reliability-gates
@@ -138,7 +138,7 @@ jobs:
     if: always()
     steps:
       - name: Download failure digests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         if: always()
         continue-on-error: true
         with:

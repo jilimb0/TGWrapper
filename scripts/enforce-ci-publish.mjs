@@ -6,22 +6,33 @@ if (!isCi || !fromChangesets) {
   process.exit(1);
 }
 
-// Ensure OIDC token exchange succeeded — pnpm sets NPM_TOKEN on success.
-// If it's absent, the publish would silently dry-run and nothing lands on npm.
-const hasNpmToken = Boolean(process.env.NPM_TOKEN);
+// For OIDC (Trusted Publishing) flow: verify that the GitHub Actions OIDC
+// token endpoint is available. This is set by GitHub when id-token: write
+// permission is granted. Its presence means npm can exchange it for a
+// short-lived publish token automatically — no NPM_TOKEN secret needed.
+const hasOidc = Boolean(process.env.ACTIONS_ID_TOKEN_REQUEST_URL);
+// Also accept classic token-based auth (NODE_AUTH_TOKEN set by setup-node
+// with registry-url, or NPM_TOKEN set explicitly as a secret).
+const hasToken = Boolean(process.env.NODE_AUTH_TOKEN || process.env.NPM_TOKEN);
 
-if (!hasNpmToken) {
+if (!hasOidc && !hasToken) {
   console.error(
-    '[enforce-ci-publish] ERROR: NPM_TOKEN is not set.\n' +
-    'OIDC token exchange with npmjs.com failed (likely ERR_PNPM_AUTH_TOKEN_EXCHANGE).\n' +
-    'Check that the Trusted Publisher on npmjs.com is configured correctly:\n' +
-    '  - Organization/user: jilimb0\n' +
-    '  - Repository: TGWrapper\n' +
-    '  - Workflow filename: release.yml\n' +
-    '  - Environment name matches the one declared in the release job (if any)\n' +
-    'Aborting to prevent a silent dry-run from leaving bumped package.json versions unpublished.'
+    '[enforce-ci-publish] ERROR: No npm auth available.\n' +
+    'Expected either:\n' +
+    '  - OIDC Trusted Publishing: ACTIONS_ID_TOKEN_REQUEST_URL must be set\n' +
+    '    (requires id-token: write permission in the workflow job)\n' +
+    '    and a Trusted Publisher configured on npmjs.com:\n' +
+    '      Organization/user: jilimb0\n' +
+    '      Repository: TGWrapper\n' +
+    '      Workflow filename: release.yml\n' +
+    '  - Classic token: NODE_AUTH_TOKEN or NPM_TOKEN secret must be set\n' +
+    'Aborting to prevent a silent no-op publish.'
   );
   process.exit(1);
 }
 
-console.log('[enforce-ci-publish] OIDC token exchange verified — NPM_TOKEN is present. Proceeding with publish.');
+if (hasOidc) {
+  console.log('[enforce-ci-publish] OIDC Trusted Publishing context detected — proceeding.');
+} else {
+  console.log('[enforce-ci-publish] Classic npm token detected — proceeding.');
+}

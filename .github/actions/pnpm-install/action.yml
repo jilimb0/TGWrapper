@@ -36,6 +36,7 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
         cache: pnpm
+        registry-url: 'https://registry.npmjs.org'
 
     - name: Install dependencies
       shell: bash

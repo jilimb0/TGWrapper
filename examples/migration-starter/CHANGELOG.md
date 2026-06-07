@@ -1,5 +1,13 @@
 # @tgwrapper/starter-migration
 
+## 0.2.2
+
+### Patch Changes
+
+- 20d6e70: Upgrade
+- Updated dependencies [20d6e70]
+  - @tgwrapper/core@0.16.1
+
 ## 0.2.1
 
 ### Patch Changes

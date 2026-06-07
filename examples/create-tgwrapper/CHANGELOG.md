@@ -1,5 +1,15 @@
 # @tgwrapper/create
 
+## 0.1.2
+
+### Patch Changes
+
+- 20d6e70: Upgrade
+- Updated dependencies [20d6e70]
+  - @tgwrapper/starter-migration@0.2.2
+  - @tgwrapper/starter-standard-bot@0.2.2
+  - @tgwrapper/starter-support-bot@0.2.2
+
 ## 0.1.1
 
 ### Patch Changes

@@ -103,7 +103,7 @@ jobs:
             core.setOutput('issue_number', String(created.data.number));
       - name: Create PR for baseline sync
         if: steps.baseline_check.outcome == 'failure'
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@v7.0.8
         with:
           commit-message: "chore(telegram): sync Bot API baseline"
           branch: "chore/telegram-baseline-sync"
@@ -140,7 +140,7 @@ jobs:
               echo "Telegram Bot API baseline is already up to date."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4.6.2
         if: always() && hashFiles('baseline-watchdog.log') != ''
         with:
           name: telegram-api-watchdog-log

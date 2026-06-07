@@ -73,7 +73,7 @@ jobs:
             tail -n 120 .artifacts/error.log
             echo '```'
           } > .artifacts/failure-summary.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4.6.2
         if: steps.run_release_verify.outcome == 'failure' || steps.run_publish_dry_run.outcome == 'failure'
         with:
           name: release-readiness-verify
@@ -135,7 +135,7 @@ jobs:
             tail -n 120 .artifacts/error.log
             echo '```'
           } > .artifacts/failure-summary.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4.6.2
         if: steps.run_reliability.outcome == 'failure'
         with:
           name: release-readiness-reliability
@@ -153,7 +153,7 @@ jobs:
     if: always()
     steps:
       - name: Download failure digests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v4.6.2
         if: always()
         continue-on-error: true
         with:

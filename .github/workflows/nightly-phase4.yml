@@ -68,7 +68,7 @@ jobs:
             echo "- redis integration completed"
             echo "- benchmark + trend completed"
           } >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4.6.2
         if: always() && (hashFiles('benchmark/reports/latest.json') != '' || hashFiles('benchmark/reports/baseline.json') != '' || hashFiles('.artifacts/nightly-reliability.log') != '')
         with:
           name: phase4-benchmark-report

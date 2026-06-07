@@ -3,7 +3,6 @@
   "version": "0.2.1",
   "type": "module",
   "description": "Production-ready Telegram bot starter for TGWrapper with Redis state and observability",
-  "main": "dist/bot.js",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
@@ -24,7 +23,6 @@
     "template"
   ],
   "files": [
-    "dist",
     "src",
     "README.md",
     "CHANGELOG.md",

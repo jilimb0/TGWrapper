@@ -71,6 +71,7 @@
     "release:version": "changeset version",
     "release:publish": "changeset publish",
     "test:published-smoke": "node scripts/published-smoke.mjs",
+    "test:published-smoke:strict": "PUBLISHED_SMOKE_STRICT=true node scripts/published-smoke.mjs",
     "verify:release:ci": "pnpm changeset:lint && pnpm telegram:baseline:check && pnpm telegram:schema:types:check && pnpm telegram:schema:payloads:check && pnpm telegram:schema:results:check && pnpm test && pnpm typecheck:compat && pnpm -r typecheck && pnpm build && pnpm -r --filter=!./examples/** build && pnpm api:snapshot:check && pnpm pack:size && pnpm pack:starters",
     "verify:release": "node scripts/verify-release.mjs",
     "benchmark:trend:release": "BENCHMARK_MIN_RATIO=0.55 BENCHMARK_MIN_UPS=180000 node scripts/check-benchmark-trend.mjs",

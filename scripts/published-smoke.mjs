@@ -150,13 +150,14 @@ if (typeof RedisSessionAdapter !== 'function') {
     await run('npx', ['tsc', '--noEmit'], tempDir);
     await run('npx', ['tsc'], tempDir);
     await run('node', ['dist/smoke.js'], tempDir);
-    // Run create-tgwrapper from the locally installed binary so it can resolve
-    // @tgwrapper/starter-* from the same node_modules (npm init @tgwrapper runs
-    // from the npm cache and cannot find the sibling starter packages).
-    const createBin = join(tempDir, 'node_modules', '.bin', 'create-tgwrapper');
-    await run(createBin, ['smoke-standard', '--template', 'standard'], tempDir);
-    await run(createBin, ['smoke-support', '--template', 'support'], tempDir);
-    await run(createBin, ['smoke-migration', '--template', 'migration'], tempDir);
+    // Use the local create-tgwrapper binary from the monorepo so that:
+    //   1. We always test the current (possibly unreleased) version of the scaffolder.
+    //   2. findTemplateRoot can locate starter packages installed in tempDir/node_modules
+    //      via the monorepo source path, which is always candidate #1.
+    const localCreateBin = join(rootDir, 'examples', 'create-tgwrapper', 'bin', 'create-tgwrapper.mjs');
+    await run('node', [localCreateBin, 'smoke-standard', '--template', 'standard'], tempDir);
+    await run('node', [localCreateBin, 'smoke-support', '--template', 'support'], tempDir);
+    await run('node', [localCreateBin, 'smoke-migration', '--template', 'migration'], tempDir);
     console.log('Published smoke passed.');
   } finally {
     await rm(tempDir, { recursive: true, force: true });

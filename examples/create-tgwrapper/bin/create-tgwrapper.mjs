@@ -115,7 +115,10 @@ function findTemplateRoot(template) {
   const candidates = [
     resolve(currentDir, '..', '..', template.source),
     resolve(currentDir, '..', 'node_modules', template.packageName),
-    resolve(currentDir, '..', '..', '..', template.source)
+    resolve(currentDir, '..', '..', '..', template.source),
+    // When installed as a peer in node_modules (e.g. tempDir/node_modules/@tgwrapper/create),
+    // sibling packages live at node_modules/@tgwrapper/<pkg-name>
+    resolve(currentDir, '..', '..', '..', template.packageName)
   ];
 
   for (const candidate of candidates) {

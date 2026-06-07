@@ -48,16 +48,18 @@ const starters = [
   }
 ];
 
+const publishedVersions = JSON.parse(readFileSync('scripts/release-versions.json', 'utf8')).publishedVersions;
+
 const expectedLibVersions = {
-  '@tgwrapper/core': withCaret(readPackageVersion('package.json')),
-  '@tgwrapper/adapter-redis': withCaret(readPackageVersion('packages/adapter-redis/package.json')),
-  '@tgwrapper/observability': withCaret(readPackageVersion('packages/observability/package.json'))
+  '@tgwrapper/core': publishedVersions['@tgwrapper/core'],
+  '@tgwrapper/adapter-redis': publishedVersions['@tgwrapper/adapter-redis'],
+  '@tgwrapper/observability': publishedVersions['@tgwrapper/observability']
 };
 
 const expectedStarterVersions = {
-  '@tgwrapper/starter-migration': withCaret(readPackageVersion('examples/migration-starter/package.json')),
-  '@tgwrapper/starter-standard-bot': withCaret(readPackageVersion('examples/standard-bot/package.json')),
-  '@tgwrapper/starter-support-bot': withCaret(readPackageVersion('examples/support-bot/package.json'))
+  '@tgwrapper/starter-migration': publishedVersions['@tgwrapper/starter-migration'],
+  '@tgwrapper/starter-standard-bot': publishedVersions['@tgwrapper/starter-standard-bot'],
+  '@tgwrapper/starter-support-bot': publishedVersions['@tgwrapper/starter-support-bot']
 };
 let failed = false;
 

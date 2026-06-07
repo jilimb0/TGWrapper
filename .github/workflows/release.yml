@@ -24,7 +24,7 @@ jobs:
 
       - name: Upgrade npm for trusted publishing
         run: |
-          npm i -g npm@11.8.0
+          sudo npm i -g npm@11.8.0
           npm -v
 
       # Release job always uses --no-frozen-lockfile:

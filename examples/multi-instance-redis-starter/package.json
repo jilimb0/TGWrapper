@@ -7,9 +7,9 @@
     "test": "tsc --noEmit"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.16.1",
-    "@tgwrapper/adapter-redis": "^0.8.1",
-    "@tgwrapper/observability": "^0.9.1",
+    "@tgwrapper/core": "^0.16.0",
+    "@tgwrapper/adapter-redis": "^0.8.0",
+    "@tgwrapper/observability": "^0.9.0",
     "ioredis": "^5.9.3"
   },
   "devDependencies": {

@@ -24,6 +24,9 @@ jobs:
       - uses: actions/setup-node@v6
         with:
           node-version: 22
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
       - name: Run published smoke
         run: |
           set -euo pipefail

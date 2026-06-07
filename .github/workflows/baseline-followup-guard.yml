@@ -70,7 +70,7 @@ jobs:
               echo "Baseline follow-up requirements are satisfied."
             fi
           } >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4.6.2
+      - uses: actions/upload-artifact@v7
         if: always() && hashFiles('baseline-followup.log') != ''
         with:
           name: baseline-followup-log

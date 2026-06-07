@@ -72,7 +72,7 @@ jobs:
             echo ""
             echo "Published package smoke validation completed."
           } >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v4.6.2
+      - uses: actions/upload-artifact@v7
         if: always() && hashFiles('.artifacts/**') != ''
         with:
           name: published-smoke-log

@@ -25,7 +25,10 @@ const root = new URL('..', import.meta.url).pathname;
 const useLocal = process.argv.includes('--local');
 const useNpm = process.argv.includes('--from-npm');
 
-const packageDirs = collectPackageDirs(join(root, 'packages'));
+const packageDirs = [
+  ...collectPackageDirs(join(root, 'packages')),
+  ...collectPackageDirs(join(root, 'examples')),
+];
 const packageNames = [];
 
 for (const dir of packageDirs) {
@@ -89,7 +92,9 @@ for (const example of examples) {
     if (!pkg[depField]) continue;
     for (const [name, range] of Object.entries(pkg[depField])) {
       if (!resolvedVersions[name]) continue;
-      const canonical = `^${resolvedVersions[name]}`;
+      // In local mode use workspace:^ so CI never hits npm for unpublished versions.
+      // In published mode (default/--from-npm) use ^version for the released PR.
+      const canonical = useLocal ? 'workspace:^' : `^${resolvedVersions[name]}`;
       if (range !== canonical) {
         console.log(`  ${example}: ${name} ${range} → ${canonical}`);
         pkg[depField][name] = canonical;

@@ -34,9 +34,13 @@ jobs:
           # Use --no-frozen-lockfile when lockfile is genuinely out of sync with
           # package.json (e.g. Version Packages commits that bump specifiers).
           # --frozen-lockfile is used everywhere else to catch accidental drift.
-          if pnpm install --frozen-lockfile 2>&1 | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
-            echo "Lockfile outdated or unpublished deps (Version Packages commit) — regenerating without frozen lockfile."
-            pnpm install --no-frozen-lockfile
+          INSTALL_OUT="$(pnpm install --frozen-lockfile 2>&1)" || INSTALL_EXIT=$?
+          if echo "${INSTALL_OUT}" | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
+            echo "Lockfile outdated or unpublished deps detected (Version Packages commit) — regenerating without examples."
+            pnpm install --no-frozen-lockfile --filter '!./examples/**'
+          elif [ "${INSTALL_EXIT:-0}" != "0" ]; then
+            echo "${INSTALL_OUT}"
+            exit "${INSTALL_EXIT}"
           fi
       - name: Check changeset requirement
         id: run_check
@@ -84,9 +88,13 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: |
-          if pnpm install --frozen-lockfile 2>&1 | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
-            echo "Lockfile outdated or unpublished deps (Version Packages commit) — regenerating without frozen lockfile."
-            pnpm install --no-frozen-lockfile
+          INSTALL_OUT="$(pnpm install --frozen-lockfile 2>&1)" || INSTALL_EXIT=$?
+          if echo "${INSTALL_OUT}" | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
+            echo "Lockfile outdated or unpublished deps detected (Version Packages commit) — regenerating without examples."
+            pnpm install --no-frozen-lockfile --filter '!./examples/**'
+          elif [ "${INSTALL_EXIT:-0}" != "0" ]; then
+            echo "${INSTALL_OUT}"
+            exit "${INSTALL_EXIT}"
           fi
       - name: Verify toolchain
         id: run_verify
@@ -135,9 +143,13 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: |
-          if pnpm install --frozen-lockfile 2>&1 | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
-            echo "Lockfile outdated or unpublished deps (Version Packages commit) — regenerating without frozen lockfile."
-            pnpm install --no-frozen-lockfile
+          INSTALL_OUT="$(pnpm install --frozen-lockfile 2>&1)" || INSTALL_EXIT=$?
+          if echo "${INSTALL_OUT}" | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
+            echo "Lockfile outdated or unpublished deps detected (Version Packages commit) — regenerating without examples."
+            pnpm install --no-frozen-lockfile --filter '!./examples/**'
+          elif [ "${INSTALL_EXIT:-0}" != "0" ]; then
+            echo "${INSTALL_OUT}"
+            exit "${INSTALL_EXIT}"
           fi
       - name: Release integrity checks
         id: run_release_integrity
@@ -200,9 +212,13 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: |
-          if pnpm install --frozen-lockfile 2>&1 | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
-            echo "Lockfile outdated or unpublished deps (Version Packages commit) — regenerating without frozen lockfile."
-            pnpm install --no-frozen-lockfile
+          INSTALL_OUT="$(pnpm install --frozen-lockfile 2>&1)" || INSTALL_EXIT=$?
+          if echo "${INSTALL_OUT}" | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
+            echo "Lockfile outdated or unpublished deps detected (Version Packages commit) — regenerating without examples."
+            pnpm install --no-frozen-lockfile --filter '!./examples/**'
+          elif [ "${INSTALL_EXIT:-0}" != "0" ]; then
+            echo "${INSTALL_OUT}"
+            exit "${INSTALL_EXIT}"
           fi
       - name: Redis integration tests
         id: run_redis_integration

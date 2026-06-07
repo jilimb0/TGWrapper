@@ -4,6 +4,12 @@
 
 ### Patch Changes
 
+- 20d6e70: Upgrade
+
+## 0.16.1
+
+### Patch Changes
+
 - 8fc3cfe: Upgrade packages product readiness
 
 ## 0.16.1

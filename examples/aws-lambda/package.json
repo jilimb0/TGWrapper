@@ -7,10 +7,10 @@
     "remove": "serverless remove"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.16.1"
+    "@tgwrapper/core": "^0.16.0"
   },
   "devDependencies": {
     "serverless": "^4.6.2",
-    "serverless-esbuild": "^1.55.1"
+    "serverless-esbuild": "^1.57.2"
   }
 }

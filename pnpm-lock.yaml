@@ -40,7 +40,7 @@ importers:
         version: link:../../packages/observability
       ioredis:
         specifier: ^5.9.3
-        version: 5.11.0
+        version: 5.11.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -97,7 +97,7 @@ importers:
         version: link:../../packages/observability
       ioredis:
         specifier: ^5.9.3
-        version: 5.11.0
+        version: 5.11.1
       telegraf:
         specifier: ^4.16.3
         version: 4.16.3
@@ -125,7 +125,7 @@ importers:
         version: link:../../packages/observability
       ioredis:
         specifier: ^5.9.3
-        version: 5.11.0
+        version: 5.11.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -147,7 +147,7 @@ importers:
         version: link:../../packages/observability
       ioredis:
         specifier: ^5.9.3
-        version: 5.11.0
+        version: 5.11.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -205,7 +205,7 @@ importers:
         version: link:../../packages/observability
       ioredis:
         specifier: ^5.9.3
-        version: 5.11.0
+        version: 5.11.1
     devDependencies:
       '@types/node':
         specifier: ^25.6.0
@@ -230,7 +230,7 @@ importers:
         version: link:../../packages/observability
       ioredis:
         specifier: ^5.9.3
-        version: 5.11.0
+        version: 5.11.1
     devDependencies:
       '@types/node':
         specifier: ^25.6.0
@@ -256,7 +256,7 @@ importers:
     dependencies:
       ioredis:
         specifier: ^5.9.3
-        version: 5.11.0
+        version: 5.11.1
     devDependencies:
       typescript:
         specifier: 6.0.3
@@ -1696,8 +1696,8 @@ packages:
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
 
-  ioredis@5.11.0:
-    resolution: {integrity: sha512-EZBErytyVovD8f6pDfG3Kb37N6Y3lmDA9NNj+4+IP13CzzHGeX+OyeRM2Um13khRzoBSzzL+5lVnCX8V2RLeMg==}
+  ioredis@5.11.1:
+    resolution: {integrity: sha512-ehuGcf94bQXhfagULNXrJdfnWO38v070jxSx/qE87Kjzmu2fU7ro5EFAb+OPituLqgfyuQaym5DlrNydW2sJ9A==}
     engines: {node: '>=12.22.0'}
 
   is-binary-path@2.1.0:
@@ -3853,7 +3853,7 @@ snapshots:
 
   inherits@2.0.4: {}
 
-  ioredis@5.11.0:
+  ioredis@5.11.1:
     dependencies:
       '@ioredis/commands': 1.10.0
       cluster-key-slot: 1.1.1

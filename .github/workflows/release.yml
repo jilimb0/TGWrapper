@@ -104,6 +104,9 @@ jobs:
       - name: OIDC publish preflight
         run: |
           set -euo pipefail
+          # Starters (kind=starter) contain workspace:^ deps that npm/pnpm
+          # cannot resolve before the libraries are published. Skip them here —
+          # changesets/action will publish them after libraries are live.
           while IFS= read -r d; do
             NAME="$(node -e "console.log(require('./${d}/package.json').name)")"
             VERSION="$(node -e "console.log(require('./${d}/package.json').version)")"
@@ -112,8 +115,10 @@ jobs:
               continue
             fi
             echo "OIDC dry-run publish in ${d} for ${NAME}@${VERSION}"
-            (cd "${d}" && pnpm publish --access public --dry-run --no-git-checks)
-          done < <(node scripts/list-publishable-packages.mjs --dirs)
+            # Use npm (not pnpm) — npm natively supports OIDC Trusted Publishing.
+            # pnpm has its own token-exchange path that returns 404 for npmjs.com.
+            (cd "${d}" && npm publish --access public --dry-run)
+          done < <(node scripts/list-publishable-packages.mjs --dirs --kind library --kind scaffolder)
 
       - name: Release summary
         if: always()
@@ -143,7 +148,7 @@ jobs:
       - uses: changesets/action@v1
         id: changesets
         with:
-          publish: pnpm -r publish --access public --no-git-checks
+          publish: node scripts/ci-publish.mjs
           version: bash scripts/changeset-version.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

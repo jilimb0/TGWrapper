@@ -4,12 +4,23 @@ import { publishablePackages } from './publishable-packages.mjs';
 
 const mode = process.argv[2] ?? '--json';
 
+// Optional --kind <kind> filters (repeatable, e.g. --kind library --kind scaffolder)
+const kindArgs = [];
+for (let i = 2; i < process.argv.length; i++) {
+  if (process.argv[i] === '--kind' && process.argv[i + 1]) {
+    kindArgs.push(process.argv[++i]);
+  }
+}
+const packages = kindArgs.length
+  ? publishablePackages.filter((p) => kindArgs.includes(p.kind))
+  : publishablePackages;
+
 if (mode === '--dirs') {
-  console.log(publishablePackages.map((pkg) => pkg.dir).join('\n'));
+  console.log(packages.filter(p => p.dir).map((pkg) => pkg.dir).join('\n'));
 } else if (mode === '--names') {
-  console.log(publishablePackages.map((pkg) => pkg.name).join('\n'));
+  console.log(packages.map((pkg) => pkg.name).join('\n'));
 } else if (mode === '--metadata') {
-  const metadata = publishablePackages.map((pkg) => {
+  const metadata = packages.map((pkg) => {
     const manifestPath = pkg.dir === '.' ? 'package.json' : `${pkg.dir}/package.json`;
     const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
     return {
@@ -24,5 +35,5 @@ if (mode === '--dirs') {
   });
   console.log(JSON.stringify(metadata, null, 2));
 } else {
-  console.log(JSON.stringify(publishablePackages, null, 2));
+  console.log(JSON.stringify(packages, null, 2));
 }

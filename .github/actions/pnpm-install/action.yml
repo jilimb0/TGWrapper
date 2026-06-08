@@ -36,7 +36,12 @@ runs:
       with:
         node-version: ${{ inputs.node-version }}
         cache: pnpm
-        registry-url: 'https://registry.npmjs.org'
+        # registry-url is intentionally omitted here.
+        # When registry-url is set, setup-node writes NODE_AUTH_TOKEN into the
+        # runner's .npmrc as a static _authToken. This overrides OIDC Trusted
+        # Publishing during the release job and causes 401/404 errors on npm
+        # publish. The release job uses OIDC directly (npm's built-in token
+        # exchange), so no pre-written _authToken is needed.
 
     - name: Install dependencies
       shell: bash

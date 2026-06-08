@@ -10,6 +10,12 @@
  * npm natively supports Trusted Publishing via the ACTIONS_ID_TOKEN_REQUEST_URL
  * environment variable that GitHub Actions exposes when id-token: write is set.
  *
+ * changesets/action performs the OIDC token exchange itself and writes the
+ * resulting bearer token into the .npmrc pointed to by NPM_CONFIG_USERCONFIG
+ * before calling this script. We must therefore:
+ *   1. Inherit the full process environment so NPM_CONFIG_USERCONFIG reaches npm.
+ *   2. Not override NPM_CONFIG_USERCONFIG — changesets/action already set it.
+ *
  * Starters (kind=starter) may still contain workspace:^ deps at publish time
  * if changesets/action didn't bump them. They are published last, after
  * libraries are live, so npm can resolve the deps from the registry.
@@ -31,6 +37,7 @@ function publishPackage(pkg) {
   try {
     const remote = execFileSync('npm', ['view', `${name}@${version}`, 'version'], {
       encoding: 'utf8',
+      env: process.env,
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();
     if (remote === version) {
@@ -45,7 +52,15 @@ function publishPackage(pkg) {
   execFileSync(
     'npm',
     ['publish', '--access', 'public'],
-    { cwd: pkg.dir === '.' ? process.cwd() : `${process.cwd()}/${pkg.dir}`, stdio: 'inherit' },
+    {
+      cwd: pkg.dir === '.' ? process.cwd() : `${process.cwd()}/${pkg.dir}`,
+      // Explicitly inherit the full environment so that:
+      //   - NPM_CONFIG_USERCONFIG reaches npm (set by changesets/action to the
+      //     .npmrc that contains the OIDC-exchanged bearer token)
+      //   - ACTIONS_ID_TOKEN_REQUEST_URL / TOKEN are available for enforce-ci-publish
+      env: process.env,
+      stdio: 'inherit',
+    },
   );
   console.log(`✅ ${name}@${version} published.`);
 }

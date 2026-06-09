@@ -173,9 +173,31 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # Write a flag artifact so published-smoke can decide whether to run.
+      # changesets/action sets outputs.published to a non-empty JSON array
+      # only when it actually called the publish script and packages went out.
+      - name: Write publish flag
+        if: always()
+        run: |
+          mkdir -p .artifacts/publish-flag
+          PUBLISHED='${{ steps.changesets.outputs.published }}'
+          if [ -n "${PUBLISHED}" ] && [ "${PUBLISHED}" != "[]" ]; then
+            echo "published=true" > .artifacts/publish-flag/flag.txt
+          else
+            echo "published=false" > .artifacts/publish-flag/flag.txt
+          fi
+          cat .artifacts/publish-flag/flag.txt
+
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: publish-flag
+          path: .artifacts/publish-flag
+          if-no-files-found: ignore
+
       - name: Confirm packages live on npm
         id: npm_confirm
-        if: always()
+        if: steps.changesets.outputs.published != '' && steps.changesets.outputs.published != '[]'
         run: |
           set -euo pipefail
           ALL_PUBLISHED=true

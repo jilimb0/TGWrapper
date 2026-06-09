@@ -1,5 +1,13 @@
 # @tgwrapper/starter-migration
 
+## 0.2.3
+
+### Patch Changes
+
+- 8922ff7: ver upgrade
+- Updated dependencies [8922ff7]
+  - @tgwrapper/core@0.16.2
+
 ## 0.2.2
 
 ### Patch Changes

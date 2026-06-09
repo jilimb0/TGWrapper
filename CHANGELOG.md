@@ -1,5 +1,11 @@
 # @tgwrapper/core
 
+## 0.16.2
+
+### Patch Changes
+
+- 8922ff7: ver upgrade
+
 ## 0.16.1
 
 ### Patch Changes

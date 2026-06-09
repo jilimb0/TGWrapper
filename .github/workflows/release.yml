@@ -35,6 +35,7 @@ jobs:
       # versions which are not yet on npm at this stage of the pipeline.
       - uses: ./.github/actions/pnpm-install
         with:
+          node-version: "24"
           frozen: "false"
 
       - name: Tooling versions
@@ -223,6 +224,6 @@ jobs:
           git push origin "${BRANCH}"
           gh pr create \
             --title "chore: sync example deps after release" \
-            --body "Automated PR: updates examples to latest published @tgwrapper/* versions and regenerates lockfile." \
+            --body "Automated PR: updates example deps to latest published @tgwrapper/* versions and regenerates lockfile." \
             --base main \
             --head "${BRANCH}"

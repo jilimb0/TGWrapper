@@ -8,14 +8,49 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: published-smoke-${{ github.event_name }}-${{ github.event.workflow_run.head_sha || github.sha }}
   cancel-in-progress: true
 
 jobs:
-  published-smoke:
+  check-published:
+    # Only relevant for workflow_run triggers; workflow_dispatch always proceeds.
     if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository) }}
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.flag.outputs.should_run }}
+    steps:
+      - name: Download publish flag
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4
+        with:
+          name: publish-flag
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+          path: .publish-flag
+        continue-on-error: true
+
+      - name: Read flag
+        id: flag
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
+            echo "workflow_dispatch: forcing smoke run"
+          elif [ -f .publish-flag/flag.txt ]; then
+            VAL="$(cat .publish-flag/flag.txt | grep -oP 'published=\K.*')"
+            echo "should_run=${VAL}" >> "$GITHUB_OUTPUT"
+            echo "publish flag: ${VAL}"
+          else
+            # Artifact missing (e.g. release failed before writing it) — skip.
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            echo "publish flag artifact not found, skipping smoke"
+          fi
+
+  published-smoke:
+    needs: check-published
+    if: needs.check-published.outputs.should_run == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6

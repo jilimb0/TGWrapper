@@ -30,14 +30,14 @@ importers:
   examples/ai-bot-starter:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: workspace:^
-        version: link:../../packages/adapter-redis
+        specifier: ^0.8.1
+        version: 0.8.1
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.16.1
+        version: 0.16.1
       '@tgwrapper/observability':
-        specifier: workspace:^
-        version: link:../../packages/observability
+        specifier: ^0.9.1
+        version: 0.9.1
       ioredis:
         specifier: ^5.9.3
         version: 5.11.1
@@ -52,8 +52,8 @@ importers:
   examples/aws-lambda:
     dependencies:
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.16.1
+        version: 0.16.1
     devDependencies:
       serverless:
         specifier: ^4.6.2
@@ -65,8 +65,8 @@ importers:
   examples/cloudflare-worker:
     dependencies:
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.16.1
+        version: 0.16.1
     devDependencies:
       wrangler:
         specifier: ^4.75.0
@@ -75,26 +75,26 @@ importers:
   examples/create-tgwrapper:
     dependencies:
       '@tgwrapper/starter-migration':
-        specifier: workspace:^
-        version: link:../migration-starter
+        specifier: ^0.2.2
+        version: 0.2.2
       '@tgwrapper/starter-standard-bot':
-        specifier: workspace:^
-        version: link:../standard-bot
+        specifier: ^0.2.2
+        version: 0.2.2
       '@tgwrapper/starter-support-bot':
-        specifier: workspace:^
-        version: link:../support-bot
+        specifier: ^0.2.2
+        version: 0.2.2
 
   examples/migration-starter:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: workspace:^
-        version: link:../../packages/adapter-redis
+        specifier: ^0.8.1
+        version: 0.8.1
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.16.1
+        version: 0.16.1
       '@tgwrapper/observability':
-        specifier: workspace:^
-        version: link:../../packages/observability
+        specifier: ^0.9.1
+        version: 0.9.1
       ioredis:
         specifier: ^5.9.3
         version: 5.11.1
@@ -115,14 +115,14 @@ importers:
   examples/moderation-bot:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: workspace:^
-        version: link:../../packages/adapter-redis
+        specifier: ^0.8.1
+        version: 0.8.1
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.16.1
+        version: 0.16.1
       '@tgwrapper/observability':
-        specifier: workspace:^
-        version: link:../../packages/observability
+        specifier: ^0.9.1
+        version: 0.9.1
       ioredis:
         specifier: ^5.9.3
         version: 5.11.1
@@ -137,14 +137,14 @@ importers:
   examples/multi-instance-redis-starter:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: workspace:^
-        version: link:../../packages/adapter-redis
+        specifier: ^0.8.1
+        version: 0.8.1
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.16.1
+        version: 0.16.1
       '@tgwrapper/observability':
-        specifier: workspace:^
-        version: link:../../packages/observability
+        specifier: ^0.9.1
+        version: 0.9.1
       ioredis:
         specifier: ^5.9.3
         version: 5.11.1
@@ -159,8 +159,8 @@ importers:
   examples/node-http:
     dependencies:
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.16.1
+        version: 0.16.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -169,8 +169,8 @@ importers:
   examples/polling-starter:
     dependencies:
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.16.1
+        version: 0.16.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -182,8 +182,8 @@ importers:
   examples/serverless-webhook-starter:
     dependencies:
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.16.1
+        version: 0.16.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -195,14 +195,14 @@ importers:
   examples/standard-bot:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: workspace:^
-        version: link:../../packages/adapter-redis
+        specifier: ^0.8.1
+        version: 0.8.1
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.16.1
+        version: 0.16.1
       '@tgwrapper/observability':
-        specifier: workspace:^
-        version: link:../../packages/observability
+        specifier: ^0.9.1
+        version: 0.9.1
       ioredis:
         specifier: ^5.9.3
         version: 5.11.1
@@ -220,14 +220,14 @@ importers:
   examples/support-bot:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: workspace:^
-        version: link:../../packages/adapter-redis
+        specifier: ^0.8.1
+        version: 0.8.1
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.16.1
+        version: 0.16.1
       '@tgwrapper/observability':
-        specifier: workspace:^
-        version: link:../../packages/observability
+        specifier: ^0.9.1
+        version: 0.9.1
       ioredis:
         specifier: ^5.9.3
         version: 5.11.1
@@ -245,8 +245,8 @@ importers:
   examples/template-bot:
     dependencies:
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.16.1
+        version: 0.16.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -1162,6 +1162,27 @@ packages:
 
   '@telegraf/types@7.1.0':
     resolution: {integrity: sha512-kGevOIbpMcIlCDeorKGpwZmdH7kHbqlk/Yj6dEpJMKEQw5lk0KVQY0OLXaCswy8GqlIVLd5625OB+rAntP9xVw==}
+
+  '@tgwrapper/adapter-redis@0.8.1':
+    resolution: {integrity: sha512-3KKGBAiQahR4qNI1r/HMBGdzkKFlyD63fyLqNYirnhOm65oNn69xPRTYH/v8evkNgt2ukUKjJ8dHqzT3Ujmscg==}
+    engines: {node: '>=22.13'}
+
+  '@tgwrapper/core@0.16.1':
+    resolution: {integrity: sha512-zqOUtvZ1XOEq2h6tu8yxARUo45eWtS+dd/tKoyPwKUKwMQ88K6uefvmjudwQaQKC+2ro/g/Mt74ngmpB3DZhpA==}
+    engines: {node: '>=22.13'}
+
+  '@tgwrapper/observability@0.9.1':
+    resolution: {integrity: sha512-e7+ASm30gxYojOix24/8+s15/i+Rrtmms83EVbm9IdnjriE2r2pRhZm2KCZuXlYxQ2NefxVimblGKHPW7g1fSg==}
+    engines: {node: '>=22.13'}
+
+  '@tgwrapper/starter-migration@0.2.2':
+    resolution: {integrity: sha512-erHsDy/20wa+k42fqYX88gBBzVY6Nr/9bNtiAALNGo3e939bEW0OgWvoSPj4ZzpZndgToU7ZqAT23TrIAKyLbA==}
+
+  '@tgwrapper/starter-standard-bot@0.2.2':
+    resolution: {integrity: sha512-HO0D/6rrmrung/6Hi3tziEiDdxbMTBQcxmqDHtZ557urw4vqSzxeEKE3j23upCF1ks4wODdDUhD7o/qDhwreRQ==}
+
+  '@tgwrapper/starter-support-bot@0.2.2':
+    resolution: {integrity: sha512-CqN+vbCPheiOqq5QDbkFXyrzPCkdFfST/Uw57tWmiri8ELRTxadFdrfoSKMG37P1qKEmLIyNTJjMUa43OozNpw==}
 
   '@tybys/wasm-util@0.10.2':
     resolution: {integrity: sha512-RoBvJ2X0wuKlWFIjrwffGw1IqZHKQqzIchKaadZZfnNpsAYp2mM0h36JtPCjNDAHGgYez/15uMBpfGwchhiMgg==}
@@ -3249,6 +3270,45 @@ snapshots:
   '@standard-schema/spec@1.1.0': {}
 
   '@telegraf/types@7.1.0': {}
+
+  '@tgwrapper/adapter-redis@0.8.1':
+    dependencies:
+      ioredis: 5.11.1
+    transitivePeerDependencies:
+      - supports-color
+
+  '@tgwrapper/core@0.16.1': {}
+
+  '@tgwrapper/observability@0.9.1': {}
+
+  '@tgwrapper/starter-migration@0.2.2':
+    dependencies:
+      '@tgwrapper/adapter-redis': link:packages/adapter-redis
+      '@tgwrapper/core': 'link:'
+      '@tgwrapper/observability': link:packages/observability
+      ioredis: 5.11.1
+      telegraf: 4.16.3
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
+  '@tgwrapper/starter-standard-bot@0.2.2':
+    dependencies:
+      '@tgwrapper/adapter-redis': link:packages/adapter-redis
+      '@tgwrapper/core': 'link:'
+      '@tgwrapper/observability': link:packages/observability
+      ioredis: 5.11.1
+    transitivePeerDependencies:
+      - supports-color
+
+  '@tgwrapper/starter-support-bot@0.2.2':
+    dependencies:
+      '@tgwrapper/adapter-redis': link:packages/adapter-redis
+      '@tgwrapper/core': 'link:'
+      '@tgwrapper/observability': link:packages/observability
+      ioredis: 5.11.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@tybys/wasm-util@0.10.2':
     dependencies:

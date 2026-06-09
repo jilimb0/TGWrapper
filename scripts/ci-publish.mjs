@@ -11,6 +11,9 @@
  *     exchange natively. This requires:
  *       1. `id-token: write` permission in the workflow (already set).
  *       2. A Trusted Publisher configured on npmjs.com for each package.
+ *       3. NPM_CONFIG_PROVENANCE=true  ← REQUIRED: npm only activates the
+ *          OIDC path when provenance is enabled. Without it npm falls back
+ *          to the classic _authToken path and returns ENEEDAUTH.
  *     npm detects ACTIONS_ID_TOKEN_REQUEST_URL and handles the exchange.
  *     No manual token exchange is needed or correct here.
  *
@@ -73,11 +76,15 @@ function publishPackage(pkg) {
 
   const publishEnv = {
     ...process.env,
-    // Disable provenance — the repo is private so npm would reject it.
-    NPM_CONFIG_PROVENANCE: 'false',
+    // REQUIRED for OIDC Trusted Publishing: npm only activates the OIDC
+    // token-exchange path when provenance is enabled. With provenance=false
+    // npm skips OIDC entirely and falls back to _authToken → ENEEDAUTH.
+    NPM_CONFIG_PROVENANCE: 'true',
   };
   if (hasNpmToken) {
     publishEnv.NPM_CONFIG__AUTHTOKEN = process.env.NPM_TOKEN;
+    // When using a static token, provenance can be disabled.
+    publishEnv.NPM_CONFIG_PROVENANCE = 'false';
   }
   // When using OIDC: no token injection needed. npm CLI reads
   // ACTIONS_ID_TOKEN_REQUEST_URL + ACTIONS_ID_TOKEN_REQUEST_TOKEN from the

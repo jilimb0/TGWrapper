@@ -25,6 +25,8 @@ jobs:
           sudo npm i -g npm@11.8.0
           npm -v
       - uses: ./.github/actions/pnpm-install
+        with:
+          node-version: "24"
       - name: Release gates
         id: run_release_gates
         continue-on-error: true
@@ -77,6 +79,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/pnpm-install
+        with:
+          node-version: "24"
       - name: Reliability gates
         id: run_reliability_gates
         continue-on-error: true

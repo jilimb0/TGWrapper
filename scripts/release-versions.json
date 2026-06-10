@@ -1,11 +1,11 @@
 {
   "publishedVersions": {
-    "@tgwrapper/core": "^0.16.1",
+    "@tgwrapper/core": "^0.16.2",
     "@tgwrapper/adapter-redis": "^0.8.1",
     "@tgwrapper/observability": "^0.9.1",
-    "@tgwrapper/starter-migration": "^0.2.2",
-    "@tgwrapper/starter-standard-bot": "^0.2.2",
-    "@tgwrapper/starter-support-bot": "^0.2.2",
-    "@tgwrapper/create": "^0.1.2"
+    "@tgwrapper/starter-migration": "^0.2.3",
+    "@tgwrapper/starter-standard-bot": "^0.2.3",
+    "@tgwrapper/starter-support-bot": "^0.2.3",
+    "@tgwrapper/create": "^0.1.3"
   }
 }

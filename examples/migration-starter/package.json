@@ -38,9 +38,9 @@
     "start:after": "tsx src/bot-after.ts"
   },
   "dependencies": {
-    "@tgwrapper/core": "workspace:^",
-    "@tgwrapper/adapter-redis": "workspace:^",
-    "@tgwrapper/observability": "workspace:^",
+    "@tgwrapper/core": "^0.16.3",
+    "@tgwrapper/adapter-redis": "^0.8.2",
+    "@tgwrapper/observability": "^0.9.2",
     "ioredis": "^5.9.3",
     "telegraf": "^4.16.3"
   },

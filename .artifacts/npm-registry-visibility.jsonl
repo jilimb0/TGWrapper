@@ -1,0 +1,760 @@
+{
+  "_id": "@tgwrapper/core@0.16.3",
+  "_rev": "4-49c107de5ad77b6166c07ddedc68c714",
+  "name": "@tgwrapper/core",
+  "dist-tags": {
+    "latest": "0.16.3"
+  },
+  "versions": [
+    "0.16.0",
+    "0.16.1",
+    "0.16.2",
+    "0.16.3"
+  ],
+  "time": {
+    "created": "2026-06-05T01:51:02.626Z",
+    "modified": "2026-06-10T08:39:57.602Z",
+    "0.16.0": "2026-06-05T01:51:02.976Z",
+    "0.16.1": "2026-06-09T19:36:26.114Z",
+    "0.16.2": "2026-06-09T20:34:33.245Z",
+    "0.16.3": "2026-06-10T08:39:57.260Z"
+  },
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper#readme",
+  "keywords": [
+    "telegram",
+    "bot",
+    "framework",
+    "fsm",
+    "serverless"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jilimb0/TGWrapper.git"
+  },
+  "description": "Serverless-first Telegram bot framework without external bot libraries",
+  "maintainers": [
+    "jilimb0 <opanasenko.mo@gmail.com>"
+  ],
+  "readmeFilename": "README.md",
+  "version": "0.16.3",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/jilimb0"
+  },
+  "type": "module",
+  "main": "./dist-cjs/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js"
+    }
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "build": "pnpm build:esm && pnpm build:cjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "typecheck:compat": "tsc -p tsconfig.type-tests.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:integration": "pnpm --filter @tgwrapper/adapter-redis test:integration",
+    "test:load": "vitest run test/load/throughput.load.test.ts",
+    "test:chaos": "vitest run test/chaos/multi-tenant.chaos.test.ts",
+    "test:phase4": "pnpm test:load && pnpm test:chaos && pnpm test:integration",
+    "benchmark": "pnpm build && node benchmark/run-benchmark.mjs",
+    "benchmark:trend": "node scripts/check-benchmark-trend.mjs",
+    "pack:size": "node scripts/check-package-size-budget.mjs",
+    "pack:starters": "node scripts/check-starter-packages.mjs",
+    "pack:starters:ci": "node scripts/check-starter-packages.mjs --skip-version-checks",
+    "telegram:baseline:check": "node scripts/check-telegram-api-baseline.mjs",
+    "telegram:baseline:latest": "node scripts/sync-telegram-api-baseline.mjs --check",
+    "telegram:baseline:sync": "node scripts/sync-telegram-api-baseline.mjs --write",
+    "telegram:baseline:followup:check": "node scripts/check-baseline-followup.mjs origin/main",
+    "telegram:types:stub": "node scripts/generate-telegram-type-stubs.mjs",
+    "telegram:schema:fetch": "node scripts/fetch-telegram-schema.mjs --out=docs/telegram-api-schema.latest.json",
+    "telegram:schema:fetch:ci": "node scripts/fetch-telegram-schema.mjs --out=docs/telegram-api-schema.latest.json --allow-network-failure",
+    "telegram:schema:fetch:local": "node scripts/fetch-telegram-schema.mjs --from-local --out=docs/telegram-api-schema.latest.json",
+    "telegram:schema:completeness:check": "node scripts/check-telegram-schema-completeness.mjs",
+    "telegram:schema:drift:report": "node scripts/diff-telegram-schema.mjs --latest=docs/telegram-api-schema.latest.json --snapshot=docs/telegram-api-schema.snapshot.json --report=docs/telegram-api-schema.drift-report.json",
+    "telegram:schema:drift:check": "node scripts/diff-telegram-schema.mjs --latest=docs/telegram-api-schema.latest.json --snapshot=docs/telegram-api-schema.snapshot.json --report=docs/telegram-api-schema.drift-report.json --check",
+    "telegram:schema:snapshot:update": "node scripts/promote-telegram-schema-snapshot.mjs",
+    "telegram:schema:types:generate": "node scripts/generate-telegram-schema-types.mjs",
+    "telegram:schema:types:check": "node scripts/check-telegram-schema-types-generated.mjs",
+    "telegram:schema:payloads:generate": "node scripts/generate-telegram-schema-payloads.mjs",
+    "telegram:schema:payloads:check": "node scripts/check-telegram-schema-payloads-generated.mjs",
+    "telegram:schema:results:generate": "node scripts/generate-telegram-schema-results.mjs",
+    "telegram:schema:results:check": "node scripts/check-telegram-schema-results-generated.mjs",
+    "telegram:schema:release:gate": "node scripts/check-telegram-schema-release-gate.mjs",
+    "docs": "typedoc src/index.ts --out docs/api",
+    "api:snapshot:check": "node scripts/check-api-snapshot.mjs",
+    "api:snapshot:update": "node scripts/update-api-snapshot.mjs",
+    "prepublishOnly": "node scripts/enforce-ci-publish.mjs",
+    "release:status": "changeset status",
+    "changeset:lint": "node scripts/lint-changesets.mjs",
+    "release:version": "changeset version",
+    "release:publish": "changeset publish",
+    "test:published-smoke": "node scripts/published-smoke.mjs",
+    "test:published-smoke:strict": "PUBLISHED_SMOKE_STRICT=true node scripts/published-smoke.mjs",
+    "verify:release:ci": "pnpm changeset:lint && pnpm telegram:baseline:check && pnpm telegram:schema:types:check && pnpm telegram:schema:payloads:check && pnpm telegram:schema:results:check && pnpm test && pnpm typecheck:compat && pnpm -r typecheck && pnpm build && pnpm -r --filter=!./examples/** build && pnpm api:snapshot:check && pnpm pack:size && pnpm pack:starters:ci",
+    "verify:release": "node scripts/verify-release.mjs",
+    "benchmark:trend:release": "BENCHMARK_MIN_RATIO=0.55 BENCHMARK_MIN_UPS=180000 node scripts/check-benchmark-trend.mjs",
+    "telegram:schema:coverage:full:check": "node scripts/check-telegram-schema-full-coverage.mjs",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "verify:precommit": "node scripts/check-precommit-deps.mjs",
+    "hooks:install": "git config core.hooksPath .githooks",
+    "release:versions:check": "node scripts/check-release-versions-latest.mjs",
+    "release:versions:sync": "node scripts/sync-release-versions.mjs",
+    "sync:examples:published": "node scripts/sync-examples.mjs",
+    "sync:examples:npm": "node scripts/sync-examples.mjs --from-npm"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.31.0",
+    "typedoc": "^0.28.19",
+    "typescript": "6.0.3",
+    "vite": "8.0.16",
+    "vitest": "^4.1.8"
+  },
+  "packageManager": "pnpm@11.5.2+sha512.71c631e382066efc25625d5cf029075de07b61b37f6e27350fbd84b1bda5864c8c1967adc280776b45c30a715c0359a3be08fef42d5bb09e2b99029979692916",
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "3395b26324038dbbe6a876fda1302752da5981be",
+  "_nodeVersion": "24.16.0",
+  "_npmVersion": "11.13.0",
+  "dist": {
+    "integrity": "sha512-xNlRomHxx9VkE1pu05WmzoS3+iOAhKd1rHh00sAKfks427OtZXfnu78DEePEZdIhe4av7qG8ZcEf5CGEFi2llQ==",
+    "shasum": "a31990eeae42eb1f9fd82243df2f60e0ff527722",
+    "tarball": "https://registry.npmjs.org/@tgwrapper/core/-/core-0.16.3.tgz",
+    "fileCount": 105,
+    "unpackedSize": 236483,
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@tgwrapper%2fcore@0.16.3",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "signatures": [
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEUCIEln+yRUCsPTUh9c4gd5sknLJsHaqpsevcCR6GfaS11tAiEArP+G96JZKMFE1NxABlXx2ESOY4nE5MwZWRsyj8RMJBU="
+      }
+    ]
+  },
+  "_npmUser": "GitHub Actions <npm-oidc-no-reply@github.com>",
+  "directories": {},
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages-npm-production",
+    "tmp": "tmp/core_0.16.3_1781080797126_0.25982600437721204"
+  },
+  "_hasShrinkwrap": false
+}
+{
+  "_id": "@tgwrapper/adapter-redis@0.8.2",
+  "_rev": "3-8069d17131cecc7047f3bbb0e87eaf7b",
+  "name": "@tgwrapper/adapter-redis",
+  "dist-tags": {
+    "latest": "0.8.2"
+  },
+  "versions": [
+    "0.8.0",
+    "0.8.1",
+    "0.8.2"
+  ],
+  "time": {
+    "created": "2026-06-05T01:51:05.333Z",
+    "modified": "2026-06-10T08:40:01.673Z",
+    "0.8.0": "2026-06-05T01:51:05.630Z",
+    "0.8.1": "2026-06-09T19:36:41.347Z",
+    "0.8.2": "2026-06-10T08:40:01.406Z"
+  },
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/packages/adapter-redis#readme",
+  "keywords": [
+    "telegram",
+    "bot",
+    "redis",
+    "ratelimit",
+    "session",
+    "fsm",
+    "tgwrapper"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jilimb0/TGWrapper.git"
+  },
+  "description": "Redis storage adapter for TGWrapper providing distributed sessions, caching namespaces, and rate limiters",
+  "maintainers": [
+    "jilimb0 <opanasenko.mo@gmail.com>"
+  ],
+  "readmeFilename": "README.md",
+  "version": "0.8.2",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/jilimb0"
+  },
+  "type": "module",
+  "main": "./dist-cjs/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js"
+    }
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "build": "pnpm build:esm && pnpm build:cjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:integration": "vitest run test/redis.integration.test.ts",
+    "prepublishOnly": "node ../../scripts/enforce-ci-publish.mjs",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json"
+  },
+  "dependencies": {
+    "ioredis": "^5.9.3"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "vitest": "^4.1.8"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "3395b26324038dbbe6a876fda1302752da5981be",
+  "_nodeVersion": "24.16.0",
+  "_npmVersion": "11.13.0",
+  "dist": {
+    "integrity": "sha512-9tXvmoZc5pqHWqzJAmWcSddAVUWyBkJlWv3BZDXmAurlwD0a9zQl1Gid4aWcmCEK9c/PbEoiLJeNiGj12ZbEKA==",
+    "shasum": "348dd07e043429ec22a3a005a0f05275beee00e7",
+    "tarball": "https://registry.npmjs.org/@tgwrapper/adapter-redis/-/adapter-redis-0.8.2.tgz",
+    "fileCount": 5,
+    "unpackedSize": 47882,
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@tgwrapper%2fadapter-redis@0.8.2",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "signatures": [
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEUCIQDfoMPdD8sH82yMNMOH8Pp8smMNBA38yMQaqwyJ4sMGXAIgcfM5Ur7zSpLzTexN50NoOIPALHB2z76T2AtU030lFlk="
+      }
+    ]
+  },
+  "_npmUser": "GitHub Actions <npm-oidc-no-reply@github.com>",
+  "directories": {},
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages-npm-production",
+    "tmp": "tmp/adapter-redis_0.8.2_1781080801272_0.7603986303619072"
+  },
+  "_hasShrinkwrap": false
+}
+{
+  "_id": "@tgwrapper/observability@0.9.2",
+  "_rev": "3-9c83de372d0cd112dd3cc22dfc5211f9",
+  "name": "@tgwrapper/observability",
+  "dist-tags": {
+    "latest": "0.9.2"
+  },
+  "versions": [
+    "0.9.0",
+    "0.9.1",
+    "0.9.2"
+  ],
+  "time": {
+    "created": "2026-06-05T01:51:07.735Z",
+    "modified": "2026-06-10T08:40:06.397Z",
+    "0.9.0": "2026-06-05T01:51:08.040Z",
+    "0.9.1": "2026-06-09T19:36:50.568Z",
+    "0.9.2": "2026-06-10T08:40:06.092Z"
+  },
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/packages/observability#readme",
+  "keywords": [
+    "telegram",
+    "bot",
+    "observability",
+    "metrics",
+    "tracing",
+    "opentelemetry",
+    "prometheus",
+    "tgwrapper"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jilimb0/TGWrapper.git"
+  },
+  "description": "First-party telemetry, logging, metrics, and trace correlation for TGWrapper",
+  "maintainers": [
+    "jilimb0 <opanasenko.mo@gmail.com>"
+  ],
+  "readmeFilename": "README.md",
+  "version": "0.9.2",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/jilimb0"
+  },
+  "type": "module",
+  "main": "./dist-cjs/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist-cjs/index.js"
+    }
+  },
+  "sideEffects": false,
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "build": "pnpm build:esm && pnpm build:cjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "node ../../scripts/enforce-ci-publish.mjs",
+    "build:esm": "tsc -p tsconfig.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "@types/node": "^25.6.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "gitHead": "3395b26324038dbbe6a876fda1302752da5981be",
+  "_nodeVersion": "24.16.0",
+  "_npmVersion": "11.13.0",
+  "dist": {
+    "integrity": "sha512-qQHwa2Oh8NEYQqJ0iBZfyuOZV/gMxEUkTgcTLjQUT/jbK8OIP1HyXC5k1R3ecrLvqakobWATxhy2F1Oyr7THJQ==",
+    "shasum": "52d581c7297a028e057a5172c03abcfd93fd788b",
+    "tarball": "https://registry.npmjs.org/@tgwrapper/observability/-/observability-0.9.2.tgz",
+    "fileCount": 8,
+    "unpackedSize": 117233,
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@tgwrapper%2fobservability@0.9.2",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "signatures": [
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEUCICzn4nYQ/6DX+2fcJZGaUo6MXsumQSdrv5wI8clSWTu0AiEAnbxwRjvk6jDctIYnFCgRpea1I9OjqFEG5gG8DoEJ0Bw="
+      }
+    ]
+  },
+  "_npmUser": "GitHub Actions <npm-oidc-no-reply@github.com>",
+  "directories": {},
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages-npm-production",
+    "tmp": "tmp/observability_0.9.2_1781080805960_0.842153851714442"
+  },
+  "_hasShrinkwrap": false
+}
+{
+  "_id": "@tgwrapper/starter-migration@0.2.4",
+  "_rev": "4-ed6908a6c160784492506a5bcc44e188",
+  "name": "@tgwrapper/starter-migration",
+  "dist-tags": {
+    "latest": "0.2.4"
+  },
+  "versions": [
+    "0.2.0",
+    "0.2.2",
+    "0.2.3",
+    "0.2.4"
+  ],
+  "time": {
+    "created": "2026-06-05T02:37:13.617Z",
+    "modified": "2026-06-10T08:40:11.732Z",
+    "0.2.0": "2026-06-05T02:37:14.015Z",
+    "0.2.2": "2026-06-09T19:37:01.798Z",
+    "0.2.3": "2026-06-09T20:34:38.698Z",
+    "0.2.4": "2026-06-10T08:40:11.458Z"
+  },
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/examples/migration-starter#readme",
+  "keywords": [
+    "telegram",
+    "bot",
+    "tgwrapper",
+    "starter",
+    "migration",
+    "telegraf",
+    "grammy"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jilimb0/TGWrapper.git",
+    "directory": "examples/migration-starter"
+  },
+  "description": "Migration starter for moving Telegraf or grammY bots to TGWrapper",
+  "maintainers": [
+    "jilimb0 <opanasenko.mo@gmail.com>"
+  ],
+  "readmeFilename": "README.md",
+  "version": "0.2.4",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start:before": "tsx src/bot-before.ts",
+    "start:after": "tsx src/bot-after.ts"
+  },
+  "dependencies": {
+    "@tgwrapper/core": "^0.16.3",
+    "@tgwrapper/adapter-redis": "^0.8.2",
+    "@tgwrapper/observability": "^0.9.2",
+    "ioredis": "^5.9.3",
+    "telegraf": "^4.16.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "6.0.3",
+    "tsx": "^4.20.5"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "gitHead": "3395b26324038dbbe6a876fda1302752da5981be",
+  "_nodeVersion": "24.16.0",
+  "_npmVersion": "11.13.0",
+  "dist": {
+    "integrity": "sha512-WeDRds+R3jWhZ28NrT1gxw7i47vvKayZqHTN9b2z+2BRKWfAPd8ig/WKk+HPjHxxrvnNUBs1ZbxpNlda123RMA==",
+    "shasum": "107d5ee8430df2aaa64a9233eea749151125e1c0",
+    "tarball": "https://registry.npmjs.org/@tgwrapper/starter-migration/-/starter-migration-0.2.4.tgz",
+    "fileCount": 7,
+    "unpackedSize": 12932,
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@tgwrapper%2fstarter-migration@0.2.4",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "signatures": [
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEYCIQCY3Cd/9Q0F4bwruZr2HbNhvN+/67L/ZEZytEuAnFsdbQIhANk+F+RnHXPyI1/GbDVVKNTof+oxv57kSAUGQDWUkcxO"
+      }
+    ]
+  },
+  "_npmUser": "GitHub Actions <npm-oidc-no-reply@github.com>",
+  "directories": {},
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages-npm-production",
+    "tmp": "tmp/starter-migration_0.2.4_1781080811289_0.334662715777309"
+  },
+  "_hasShrinkwrap": false
+}
+{
+  "_id": "@tgwrapper/starter-standard-bot@0.2.4",
+  "_rev": "4-7598fcbdbac19978f2369a10ba543df1",
+  "name": "@tgwrapper/starter-standard-bot",
+  "dist-tags": {
+    "latest": "0.2.4"
+  },
+  "versions": [
+    "0.2.0",
+    "0.2.2",
+    "0.2.3",
+    "0.2.4"
+  ],
+  "time": {
+    "created": "2026-06-05T02:37:16.007Z",
+    "modified": "2026-06-10T08:40:19.827Z",
+    "0.2.0": "2026-06-05T02:37:16.346Z",
+    "0.2.2": "2026-06-09T19:37:09.437Z",
+    "0.2.3": "2026-06-09T20:34:43.026Z",
+    "0.2.4": "2026-06-10T08:40:19.542Z"
+  },
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/examples/standard-bot#readme",
+  "keywords": [
+    "telegram",
+    "bot",
+    "tgwrapper",
+    "starter",
+    "redis",
+    "observability",
+    "template"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jilimb0/TGWrapper.git",
+    "directory": "examples/standard-bot"
+  },
+  "description": "Production-ready Telegram bot starter for TGWrapper with Redis state and observability",
+  "maintainers": [
+    "jilimb0 <opanasenko.mo@gmail.com>"
+  ],
+  "readmeFilename": "README.md",
+  "version": "0.2.4",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/bot.ts"
+  },
+  "dependencies": {
+    "@tgwrapper/core": "^0.16.3",
+    "@tgwrapper/adapter-redis": "^0.8.2",
+    "@tgwrapper/observability": "^0.9.2",
+    "ioredis": "^5.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "6.0.3",
+    "tsx": "^4.20.5"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "gitHead": "3395b26324038dbbe6a876fda1302752da5981be",
+  "_nodeVersion": "24.16.0",
+  "_npmVersion": "11.13.0",
+  "dist": {
+    "integrity": "sha512-oLiHCw/oSeG96YAPRfBrbJ9T7Fqz6sW0ckaiFnMuF67plu7YQuKQyINUURXXzFTrRtTr6hxm+bDV+GcTii/C5Q==",
+    "shasum": "bfbb7306865e366e4bfd669d1df8c83c02f31f30",
+    "tarball": "https://registry.npmjs.org/@tgwrapper/starter-standard-bot/-/starter-standard-bot-0.2.4.tgz",
+    "fileCount": 6,
+    "unpackedSize": 10175,
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@tgwrapper%2fstarter-standard-bot@0.2.4",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "signatures": [
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEUCIQDgsByNEDEgo0pvhllG5RRFnyLk3isO63PdhhBrdlDysgIgLI+Za+adugzWFZt1k/WTsnlppQm59DAR9Y03NW+W+vY="
+      }
+    ]
+  },
+  "_npmUser": "GitHub Actions <npm-oidc-no-reply@github.com>",
+  "directories": {},
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages-npm-production",
+    "tmp": "tmp/starter-standard-bot_0.2.4_1781080819418_0.13772250922937057"
+  },
+  "_hasShrinkwrap": false
+}
+{
+  "_id": "@tgwrapper/starter-support-bot@0.2.4",
+  "_rev": "4-d0593ce860d359816c45ebb74295c97e",
+  "name": "@tgwrapper/starter-support-bot",
+  "dist-tags": {
+    "latest": "0.2.4"
+  },
+  "versions": [
+    "0.2.0",
+    "0.2.2",
+    "0.2.3",
+    "0.2.4"
+  ],
+  "time": {
+    "created": "2026-06-05T02:37:18.222Z",
+    "modified": "2026-06-10T08:40:24.879Z",
+    "0.2.0": "2026-06-05T02:37:18.623Z",
+    "0.2.2": "2026-06-09T19:37:18.856Z",
+    "0.2.3": "2026-06-09T20:34:47.780Z",
+    "0.2.4": "2026-06-10T08:40:24.605Z"
+  },
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/examples/support-bot#readme",
+  "keywords": [
+    "telegram",
+    "bot",
+    "tgwrapper",
+    "starter",
+    "support",
+    "routing",
+    "redis"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jilimb0/TGWrapper.git",
+    "directory": "examples/support-bot"
+  },
+  "description": "Support queue bot starter for TGWrapper with stateful routing and observability",
+  "maintainers": [
+    "jilimb0 <opanasenko.mo@gmail.com>"
+  ],
+  "readmeFilename": "README.md",
+  "version": "0.2.4",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/bot.ts"
+  },
+  "dependencies": {
+    "@tgwrapper/core": "^0.16.3",
+    "@tgwrapper/adapter-redis": "^0.8.2",
+    "@tgwrapper/observability": "^0.9.2",
+    "ioredis": "^5.9.3"
+  },
+  "devDependencies": {
+    "@types/node": "^25.6.0",
+    "typescript": "6.0.3",
+    "tsx": "^4.20.5"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "gitHead": "3395b26324038dbbe6a876fda1302752da5981be",
+  "_nodeVersion": "24.16.0",
+  "_npmVersion": "11.13.0",
+  "dist": {
+    "integrity": "sha512-0xEEb7XFFwBdRWf1gAW/2xXBrHWVDBQzmsS3LPC80Oh5OkqdB5QbRtqLbx4y1j7bp3UFsB+paQ/PSI3zgeDV2Q==",
+    "shasum": "fcfc699b6015e8adcf0c57252b35482541fdd069",
+    "tarball": "https://registry.npmjs.org/@tgwrapper/starter-support-bot/-/starter-support-bot-0.2.4.tgz",
+    "fileCount": 6,
+    "unpackedSize": 9990,
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@tgwrapper%2fstarter-support-bot@0.2.4",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "signatures": [
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEUCIQDxsLh9ybrydtp9UBwwguRbKj5mohh3AC/rIOTERWqTqwIgOi8CCBzM369zpzNRWr33v4tvVoJfnWRfSaMJwiwObgc="
+      }
+    ]
+  },
+  "_npmUser": "GitHub Actions <npm-oidc-no-reply@github.com>",
+  "directories": {},
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages-npm-production",
+    "tmp": "tmp/starter-support-bot_0.2.4_1781080824477_0.09871122099075014"
+  },
+  "_hasShrinkwrap": false
+}
+{
+  "_id": "@tgwrapper/create@0.1.4",
+  "_rev": "4-b6aa4163b5142f36f6f82fdb5e4483f1",
+  "name": "@tgwrapper/create",
+  "dist-tags": {
+    "latest": "0.1.4"
+  },
+  "versions": [
+    "0.1.0",
+    "0.1.2",
+    "0.1.3",
+    "0.1.4"
+  ],
+  "time": {
+    "created": "2026-06-05T02:37:20.342Z",
+    "modified": "2026-06-10T08:40:29.423Z",
+    "0.1.0": "2026-06-05T02:37:20.662Z",
+    "0.1.2": "2026-06-09T19:37:28.535Z",
+    "0.1.3": "2026-06-09T20:34:54.584Z",
+    "0.1.4": "2026-06-10T08:40:29.098Z"
+  },
+  "bugs": {
+    "url": "https://github.com/jilimb0/TGWrapper/issues"
+  },
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/examples/create-tgwrapper#readme",
+  "keywords": [
+    "telegram",
+    "bot",
+    "tgwrapper",
+    "scaffold",
+    "starter",
+    "template"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jilimb0/TGWrapper.git",
+    "directory": "examples/create-tgwrapper"
+  },
+  "description": "Official TGWrapper project scaffolder for starter templates",
+  "maintainers": [
+    "jilimb0 <opanasenko.mo@gmail.com>"
+  ],
+  "readmeFilename": "README.md",
+  "version": "0.1.4",
+  "type": "module",
+  "bin": {
+    "create-tgwrapper": "bin/create-tgwrapper.mjs"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@tgwrapper/starter-migration": "^0.2.4",
+    "@tgwrapper/starter-standard-bot": "^0.2.4",
+    "@tgwrapper/starter-support-bot": "^0.2.4"
+  },
+  "gitHead": "3395b26324038dbbe6a876fda1302752da5981be",
+  "_nodeVersion": "24.16.0",
+  "_npmVersion": "11.13.0",
+  "dist": {
+    "integrity": "sha512-lq+Zmm7JGZc+0wCxU3ZGNP8eU+weWnBeAZqlzfvtpEuukp73evYUHDRWMODP9t1HXYaFNyh1LTV09EwK3Kf1jg==",
+    "shasum": "6b18ded2278f955a027814cc31bbb711c6d7ff96",
+    "tarball": "https://registry.npmjs.org/@tgwrapper/create/-/create-0.1.4.tgz",
+    "fileCount": 4,
+    "unpackedSize": 8291,
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/@tgwrapper%2fcreate@0.1.4",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "signatures": [
+      {
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U",
+        "sig": "MEUCIGLSf33dSReoii8b3YVeoDMxBWHpEBM0gWzClivh0tSfAiEAi+r8nP7BSi8mrVOa8edlbvb4vsRPoFmfQ1iTTvkqwCU="
+      }
+    ]
+  },
+  "_npmUser": "GitHub Actions <npm-oidc-no-reply@github.com>",
+  "directories": {},
+  "_npmOperationalInternal": {
+    "host": "s3://npm-registry-packages-npm-production",
+    "tmp": "tmp/create_0.1.4_1781080828965_0.36209486685853065"
+  },
+  "_hasShrinkwrap": false
+}

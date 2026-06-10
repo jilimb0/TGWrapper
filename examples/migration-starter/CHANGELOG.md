@@ -1,5 +1,15 @@
 # @tgwrapper/starter-migration
 
+## 0.2.5
+
+### Patch Changes
+
+- 7b4d99c: Enhance docs, refactor
+- Updated dependencies [7b4d99c]
+  - @tgwrapper/adapter-redis@0.8.3
+  - @tgwrapper/observability@0.9.3
+  - @tgwrapper/core@0.16.4
+
 ## 0.2.4
 
 ### Patch Changes

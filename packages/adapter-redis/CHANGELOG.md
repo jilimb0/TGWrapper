@@ -1,5 +1,11 @@
 # @tgwrapper/adapter-redis
 
+## 0.8.3
+
+### Patch Changes
+
+- 7b4d99c: Enhance docs, refactor
+
 ## 0.8.2
 
 ### Patch Changes

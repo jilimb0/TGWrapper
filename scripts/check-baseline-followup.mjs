@@ -17,7 +17,13 @@ function matchesAny(path, patterns) {
   });
 }
 
-const baseRef = process.argv[2] ?? 'origin/main';
+// Support --check-pr flag (used by baseline-followup-guard workflow);
+// when present, resolve base ref from GITHUB_BASE_REF env if available.
+const args = process.argv.slice(2);
+const checkPrMode = args.includes('--check-pr');
+const baseRef = checkPrMode
+  ? (process.env.GITHUB_BASE_REF ? `origin/${process.env.GITHUB_BASE_REF}` : 'origin/main')
+  : (args[0] ?? 'origin/main');
 const changedFiles = getChangedFiles(baseRef);
 
 if (changedFiles.length === 0) {

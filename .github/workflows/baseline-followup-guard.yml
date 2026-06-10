@@ -5,7 +5,7 @@ on:
   pull_request:
     paths:
       - '.github/telegram-api-baseline.yml'
-      - 'scripts/telegram-baseline-followup.mjs'
+      - 'scripts/check-baseline-followup.mjs'
       - '.github/workflows/baseline-followup-guard.yml'
 
 permissions:
@@ -25,6 +25,6 @@ jobs:
       - uses: pnpm/action-setup@v6
       - run: pnpm install --frozen-lockfile
       - name: Check baseline follow-up issue freshness
-        run: node scripts/telegram-baseline-followup.mjs --check-pr
+        run: node scripts/check-baseline-followup.mjs --check-pr
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

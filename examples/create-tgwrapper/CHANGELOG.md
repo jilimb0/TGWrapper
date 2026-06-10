@@ -1,5 +1,15 @@
 # @tgwrapper/create
 
+## 0.1.5
+
+### Patch Changes
+
+- 7b4d99c: Enhance docs, refactor
+- Updated dependencies [7b4d99c]
+  - @tgwrapper/starter-migration@0.2.5
+  - @tgwrapper/starter-standard-bot@0.2.5
+  - @tgwrapper/starter-support-bot@0.2.5
+
 ## 0.1.4
 
 ### Patch Changes

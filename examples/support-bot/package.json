@@ -37,9 +37,9 @@
     "start": "tsx src/bot.ts"
   },
   "dependencies": {
-    "@tgwrapper/core": "workspace:^",
-    "@tgwrapper/adapter-redis": "workspace:^",
-    "@tgwrapper/observability": "workspace:^",
+    "@tgwrapper/core": "^0.16.4",
+    "@tgwrapper/adapter-redis": "^0.8.3",
+    "@tgwrapper/observability": "^0.9.3",
     "ioredis": "^5.9.3"
   },
   "devDependencies": {

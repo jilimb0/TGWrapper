@@ -188,6 +188,26 @@ function publishPackage(pkg) {
     });
     console.log(`✅ ${name}@${version} published.`);
     publishedVersions[name] = `^${version}`;
+  } catch (err) {
+    // TLOG_CREATE_ENTRY_ERROR (409) means an identical entry already exists in
+    // the Sigstore transparency log. This happens when a package is retried
+    // after a partial run — npm already published (the tarball is on the
+    // registry) but the process exited before recording success. Treat it as
+    // "already published" rather than a fatal error.
+    const stderr = String(err?.stderr ?? '');
+    const stdout = String(err?.stdout ?? '');
+    const combined = stderr + stdout;
+    if (
+      combined.includes('TLOG_CREATE_ENTRY_ERROR') ||
+      combined.includes('an equivalent entry already exists')
+    ) {
+      console.log(
+        `⏭  ${name}@${version} already on transparency log — treating as published.`,
+      );
+      publishedVersions[name] = `^${version}`;
+    } else {
+      throw err;
+    }
   } finally {
     // Always restore the source manifest — whether publish succeeded or failed.
     writeFileSync(manifestPath, originalManifest, 'utf8');

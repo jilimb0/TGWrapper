@@ -11,14 +11,20 @@
 
 ## ⚡ Quick Start
 
-```typescript
-import { createBotClient } from '@tgwrapper/core';
+Requirements
 
-const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'polling' });
-bot.on('message', async (msg) => {
-  if ('text' in msg) await bot.sendMessage(msg.chat.id, `Echo: ${msg.text}`);
-});
-await bot.start();
+- Node.js `>=22.13`
+- `pnpm` (workspace-aware package manager)
+- Redis when you need distributed state or multi-instance coordination
+
+```typescript
+import { createBotClient } from "@tgwrapper/core"
+
+const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: "polling" })
+bot.on("message", async (msg) => {
+  if ("text" in msg) await bot.sendMessage(msg.chat.id, `Echo: ${msg.text}`)
+})
+await bot.start()
 ```
 
 ```bash
@@ -33,6 +39,7 @@ pnpm build && pnpm test       # validate types + tests
 ## 🧭 Choose Your Path
 
 Whether you're starting a new bot or migrating an existing production workload, choose the path that fits you:
+
 - **[Quick Start Guide](./docs/QUICK_START.md)** — Run your first bot in under 5 minutes (no Redis, no telemetry, zero config).
 - **[Grow with TGWrapper](./docs/GROW_WITH_TGWRAPPER.md)** — Learn how to take a simple bot to production step-by-step.
 - **[Tutorial Ladder](./docs/TUTORIALS.md)** — Structured step-by-step path from echo bots to AI-native applications.
@@ -72,21 +79,23 @@ If any of those sound familiar — this is where you land next.
 
 Direct operational evidence backing the framework's reliability:
 
-| Gate / Quality Metric | Status / Evidence |
-| :--- | :--- |
-| **Comprehensive Tests** | `100% Passed` — 21 test files / 57 integration & FSM fuzz tests. |
-| **Drift Watchdog** | `Active` — Weekly automated checks against Telegram upstream schemas. |
-| **Benchmark Performance** | `Validated with caveats` — Synthetic core benchmark profiles have reached up to 180,000 updates/sec excluding Telegram API, Redis, user handlers, exporters, and network. |
-| **Disaster Recovery** | `Verified` — Chaos drills simulating Redis reconnect storms & network partition splits. |
-| **Runtime Portability** | `Capability-specific` — Core webhook handling targets Node.js, Cloudflare Workers, and AWS Lambda; polling, Redis, observability exporters, and shutdown semantics vary by runtime. |
+| Gate / Quality Metric     | Status / Evidence                                                                                                                                                                   |
+| :------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Comprehensive Tests**   | `100% Passed` — 21 test files / 57 integration & FSM fuzz tests.                                                                                                                    |
+| **Drift Watchdog**        | `Active` — Weekly automated checks against Telegram upstream schemas.                                                                                                               |
+| **Benchmark Performance** | `Validated with caveats` — Synthetic core benchmark profiles have reached up to 180,000 updates/sec excluding Telegram API, Redis, user handlers, exporters, and network.           |
+| **Disaster Recovery**     | `Verified` — Chaos drills simulating Redis reconnect storms & network partition splits.                                                                                             |
+| **Runtime Portability**   | `Capability-specific` — Core webhook handling targets Node.js, Cloudflare Workers, and AWS Lambda; polling, Redis, observability exporters, and shutdown semantics vary by runtime. |
 
 ### 🔬 Proof & Release Safeguards
+
 - **Runtime Portability:** Compatibility is tracked per capability in the [Compatibility Matrix](./docs/COMPATIBILITY_MATRIX.md).
 - **Auto Drift Protection:** Weekly watchdog scripts validate our generated types against the latest official Bot API schema, preventing drift.
 - **Benchmark Budgets:** Core processing budget is monitored with synthetic benchmark gates; see [Proof Map](./docs/PROOF_MAP.md) for reproduction scope.
 - **Disaster Drills:** Automated tests simulate network packet losses, 429 backpressures, and thread locks to verify robust recovery.
 
 ### 👥 Early Adopters in Production
+
 - **FinTech Notification Bot:** Switched from Telegraf to solve message duplicate issues. Runs 3 replicas on Kubernetes using webhook mode and Redis CAS sessions.
 - **AI Coding Companion Bot:** Migrated from Python to track LLM token counts and trace latency per tool-call via `@tgwrapper/observability`.
 - Read more detailed case studies in the [Field Notes](./docs/FIELD_NOTES.md).
@@ -97,13 +106,13 @@ Direct operational evidence backing the framework's reliability:
 
 Choose the right framework for your workload:
 
-| Feature / Workload | **TGWrapper** | **grammY** | **Telegraf** |
-| :--- | :--- | :--- | :--- |
-| **Simple Bot** | ✅ Good (Clean, direct) | ✅ Excellent (Many features) | ✅ Good (Simplicity) |
-| **Distributed / Scaled Bot** | ✅ Strong fit when Redis CAS and shared rate limits matter | ⚠️ Possible with additional design | ⚠️ Possible with additional design |
-| **AI / Conversational Bot** | ✅ Strong fit when multi-turn state and token/latency traces matter | ⚠️ Add your own state safety | ⚠️ Add your own state safety |
-| **Observability-Heavy Bot** | ✅ Built-in hooks for structured logs, metrics, and traces | ⚠️ External instrumentation | ⚠️ External instrumentation |
-| **Serverless Webhooks** | ✅ Core webhook path is designed for fetch-style runtimes | ✅ Supported with runtime adapters | ⚠️ Usually Node-server oriented |
+| Feature / Workload           | **TGWrapper**                                                       | **grammY**                         | **Telegraf**                       |
+| :--------------------------- | :------------------------------------------------------------------ | :--------------------------------- | :--------------------------------- |
+| **Simple Bot**               | ✅ Good (Clean, direct)                                             | ✅ Excellent (Many features)       | ✅ Good (Simplicity)               |
+| **Distributed / Scaled Bot** | ✅ Strong fit when Redis CAS and shared rate limits matter          | ⚠️ Possible with additional design | ⚠️ Possible with additional design |
+| **AI / Conversational Bot**  | ✅ Strong fit when multi-turn state and token/latency traces matter | ⚠️ Add your own state safety       | ⚠️ Add your own state safety       |
+| **Observability-Heavy Bot**  | ✅ Built-in hooks for structured logs, metrics, and traces          | ⚠️ External instrumentation        | ⚠️ External instrumentation        |
+| **Serverless Webhooks**      | ✅ Core webhook path is designed for fetch-style runtimes           | ✅ Supported with runtime adapters | ⚠️ Usually Node-server oriented    |
 
 ---
 
@@ -111,19 +120,19 @@ Choose the right framework for your workload:
 
 Choose the canonical template matching your architecture:
 
-* **Simple Bot (VPS / Dev):** [`examples/polling-starter`](./examples/polling-starter) — Node.js long-polling, single-process, local iteration.
-* **Distributed / Scaling Bot:** [`examples/multi-instance-redis-starter`](./examples/multi-instance-redis-starter) — Multi-node deployment, shared state, distributed rate limits.
-* **Serverless / Edge Bot:** [`examples/serverless-webhook-starter`](./examples/serverless-webhook-starter) — AWS Lambda, Cloudflare Workers, edge-native webhooks.
+- **Simple Bot (VPS / Dev):** [`examples/polling-starter`](./examples/polling-starter) — Node.js long-polling, single-process, local iteration.
+- **Distributed / Scaling Bot:** [`examples/multi-instance-redis-starter`](./examples/multi-instance-redis-starter) — Multi-node deployment, shared state, distributed rate limits.
+- **Serverless / Edge Bot:** [`examples/serverless-webhook-starter`](./examples/serverless-webhook-starter) — AWS Lambda, Cloudflare Workers, edge-native webhooks.
 
 ---
 
 ## 📈 Maturity & Stability Matrix
 
-| Package | Current Stability | Adoption / Production Status | Runtime Target | API Stability |
-| :--- | :--- | :--- | :--- | :--- |
-| [**`@tgwrapper/core`**](./README.md) (Core) | `Early Production` | Used in active pilot apps; open for early testing. | Node.js, Cloudflare Workers, AWS Lambda | Stable core surface; minor enhancements ongoing. |
-| [**`@tgwrapper/adapter-redis`**](./packages/adapter-redis/README.md) | `Early Production` | Tested under simulated high concurrency. | Redis server >= 6.2 | Stable API surface. |
-| [**`@tgwrapper/observability`**](./packages/observability/README.md) | `Beta` | Undergoing active validation; feedback welcome. | Node.js AsyncLocalStorage | Evolving; minor trace schema updates possible. |
+| Package                                                              | Notes                                                                                                                                |
+| :------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------- |
+| [**`@tgwrapper/core`**](./README.md) (Core)                          | Stable API surface; see [docs/API_STABILITY.md](./docs/API_STABILITY.md) for the canonical stability policy.                         |
+| [**`@tgwrapper/adapter-redis`**](./packages/adapter-redis/README.md) | Redis-backed coordination layer; see [docs/API_STABILITY.md](./docs/API_STABILITY.md) for stability definitions.                     |
+| [**`@tgwrapper/observability`**](./packages/observability/README.md) | Telemetry layer with evolving trace schema; see [docs/API_STABILITY.md](./docs/API_STABILITY.md) for the canonical stability policy. |
 
 For the platform-wide truth table, see [Platform Guarantees](./docs/PLATFORM_GUARANTEES.md), [Compatibility Matrix](./docs/COMPATIBILITY_MATRIX.md), and [Deployment Profiles](./docs/DEPLOYMENT_PROFILES.md).
 
@@ -151,15 +160,18 @@ Check out our comprehensive **[Grow with TGWrapper](./docs/GROW_WITH_TGWRAPPER.m
 > In multi-instance or serverless deployments, **you must switch to the distributed rate limiter** via the Redis adapter:
 
 ```typescript
-import { RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
+import { RedisKvStore, createRateLimiter } from "@tgwrapper/adapter-redis"
 
-const kv = new RedisKvStore({ redisUrl: process.env.REDIS_URL!, prefix: 'mybot' });
+const kv = new RedisKvStore({
+  redisUrl: process.env.REDIS_URL!,
+  prefix: "mybot",
+})
 const limiter = createRateLimiter(kv, {
-  namespace: 'spam-protection',
+  namespace: "spam-protection",
   windowMs: 60_000,
   limit: 20,
-  blockDurationMs: 30_000
-});
+  blockDurationMs: 30_000,
+})
 ```
 
 ---
@@ -168,21 +180,23 @@ const limiter = createRateLimiter(kv, {
 
 Before adopting TGWrapper, review the architectural boundaries of the core package:
 
-* **No Built-in UI Builder:** Unlike heavy frameworks, TGWrapper does not contain custom templating DSLs or markup generators. You generate raw Telegram markdown/HTML payloads directly.
-* **No Media Download/Upload Server:** The framework wraps standard multipart and file fetch API endpoints but does not ship with automatic file caching or download streaming proxies.
-* **Single-threaded Polling Loop:** While webhook scaling is distributed, polling relies on a single loop. Large workloads on polling should switch to webhook ingestion.
-* **Non-goal: Multi-platform Unified Client:** The project is dedicated specifically to the Telegram Bot API and does not plan to support Discord, Slack, or other platforms.
+- **No Built-in UI Builder:** Unlike heavy frameworks, TGWrapper does not contain custom templating DSLs or markup generators. You generate raw Telegram markdown/HTML payloads directly.
+- **No Media Download/Upload Server:** The framework wraps standard multipart and file fetch API endpoints but does not ship with automatic file caching or download streaming proxies.
+- **Single-threaded Polling Loop:** While webhook scaling is distributed, polling relies on a single loop. Large workloads on polling should switch to webhook ingestion.
+- **Non-goal: Multi-platform Unified Client:** The project is dedicated specifically to the Telegram Bot API and does not plan to support Discord, Slack, or other platforms.
 
 ---
 
 ## 🛡️ Evidence & Validation
 
 We back our quality claims with evidence-driven gates running on every commit:
+
 - **Comprehensive Unit Tests:** 100% pass status on Vitest suite covering FSM state machines, routers, client endpoints, and update processing.
 - **Auto Type-Drift Baseline Check:** Enforced via automated scripts checking code types against upstream Telegram API releases.
 - **Bundle Budget Restrictions:** Monitored on build to keep cold-start latency low on edge platforms.
 
 Verify validation checks locally:
+
 ```bash
 pnpm install
 pnpm build
@@ -194,6 +208,7 @@ pnpm test
 ## 📑 Core Documentation Index
 
 **Getting Started**
+
 - [Quick Start](./docs/QUICK_START.md) — Run your first bot in under 5 minutes.
 - [Grow with TGWrapper](./docs/GROW_WITH_TGWRAPPER.md) — Complete maturity path from dev to production.
 - [Tutorials](./docs/TUTORIALS.md) — Structured step-by-step walkthroughs.
@@ -207,17 +222,20 @@ pnpm test
 - [Project Doctrine](./docs/DOCTRINE.md) — Identity, non-goals, and contribution boundaries.
 
 **Development**
+
 - [Development Guide](./docs/BOT_DEVELOPMENT_GUIDE.md) — Bot architecture, middleware, routing.
 - [Migration Guide from grammY](./docs/MIGRATION_FROM_GRMMY.md) — Smooth codebase porting.
 - [Migration Guide from Telegraf](./docs/MIGRATION_FROM_TELEGRAF.md) — Switch guidelines.
 
 **Production Operations**
+
 - [Production Checklist](./docs/PRODUCTION_CHECKLIST.md) — Ensure reliability before launching.
 - [Redis Runtime Guide](./docs/REDIS_RUNTIME.md) — Topologies, session locking, failure modes.
 - [Telemetry Reference](./docs/TELEMETRY_REFERENCE.md) — Event schemas, metrics, exporters, debugging.
 - [Observability Contract](./docs/OBSERVABILITY_CONTRACT.md) — Monitoring best practices.
 
 **Quality & Evidence**
+
 - [Claims Audit](./docs/CLAIMS_AUDIT.md) — Public claim status, evidence level, and required wording.
 - [Proof Map](./docs/PROOF_MAP.md) — Claim-to-test/workflow/source mapping.
 - [Compatibility Matrix](./docs/COMPATIBILITY_MATRIX.md) — Capability support by runtime.

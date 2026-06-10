@@ -1,6 +1,9 @@
 {
   "name": "example-template-bot",
   "private": true,
+  "engines": {
+    "node": ">=22.13"
+  },
   "type": "module",
   "scripts": {
     "dev:polling": "tsx src/polling.ts",

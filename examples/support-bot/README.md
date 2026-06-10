@@ -1,5 +1,11 @@
 # TGWrapper Support Bot Starter
 
+> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`, Redis `>=6.2`
+>
+> **Use case:** stateful customer support bot with agent assignment, queue routing, and structured logs.
+>
+> **Included:** polling runtime, Redis session adapter, graceful shutdown, and example support routing flow.
+
 Support queue routing template for TGWrapper. It demonstrates stateful support intake, agent assignment, Redis session storage, graceful shutdown, and structured JSON logs.
 
 Use this starter when you want a small app blueprint for:
@@ -30,17 +36,23 @@ pnpm tsx src/bot.ts
 Expected startup output:
 
 ```json
-{"event":"startup","serviceName":"support-routing-service","mode":"polling","redisUrl":"redis://localhost:6379","availableAgents":2}
+{
+  "event": "startup",
+  "serviceName": "support-routing-service",
+  "mode": "polling",
+  "redisUrl": "redis://localhost:6379",
+  "availableAgents": 2
+}
 ```
 
 Send `/support`, then a follow-up message, to exercise the queue routing path.
 
 ## Environment Variables
 
-| Name | Required | Default | Description |
-| --- | --- | --- | --- |
-| `BOT_TOKEN` | yes | none | Telegram bot token from BotFather. |
-| `REDIS_URL` | no | `redis://localhost:6379` | Redis connection used by the session adapter. |
+| Name        | Required | Default                  | Description                                   |
+| ----------- | -------- | ------------------------ | --------------------------------------------- |
+| `BOT_TOKEN` | yes      | none                     | Telegram bot token from BotFather.            |
+| `REDIS_URL` | no       | `redis://localhost:6379` | Redis connection used by the session adapter. |
 
 ## What Gets Installed
 
@@ -55,6 +67,13 @@ The npm package is a project template, not a runtime library. It ships:
 
 Copy the template into your own repository, rename the package, replace `AVAILABLE_AGENTS`, and connect routing decisions to your production support directory.
 
+## What You Still Need to Implement
+
+- Your production support agent directory or database backing store.
+- The business routing rules for assigning requests to agents.
+- Secret management for `BOT_TOKEN` and `REDIS_URL`.
+- Production deployment configuration, including scaling, network access, and log sinks.
+
 ## Manual Copy Fallback
 
 Power users can install this package directly and copy the template files:
@@ -65,7 +84,7 @@ mkdir my-support-bot
 cp -R node_modules/@tgwrapper/starter-support-bot/{src,tsconfig.json,.env.example} my-support-bot/
 ```
 
-## Production Webhook Path
+## How This Maps to Production
 
 This starter uses polling for local development. For production webhook deployment:
 

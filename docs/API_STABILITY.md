@@ -2,25 +2,29 @@
 
 This policy defines API surface classifications, backward compatibility guarantees, and deprecation schedules for the TGWrapper platform.
 
+> This document is the canonical source of truth for package stability language. Package README files should reference this policy rather than repeating manual stability descriptions.
+
 ---
 
 ## 🚦 1. API Stability Classifications
 
 We categorize exported exports and classes into three stability tiers:
 
-| Tier | Stability Level | Compatibility Guarantee | Deprecation Path |
-| :--- | :--- | :--- | :--- |
-| **Stable** | Production-ready | Guaranteed across minor/patch releases. | Minimum 1 major release deprecation window. |
-| **Experimental** | Active feedback loop | May change or be removed in any release. | Can be deprecated/removed in a minor release. |
-| **Internal** | Private framework APIs | No compatibility guarantees. | Not public; subject to change without warning. |
+| Tier             | Stability Level        | Compatibility Guarantee                  | Deprecation Path                               |
+| :--------------- | :--------------------- | :--------------------------------------- | :--------------------------------------------- |
+| **Stable**       | Production-ready       | Guaranteed across minor/patch releases.  | Minimum 1 major release deprecation window.    |
+| **Experimental** | Active feedback loop   | May change or be removed in any release. | Can be deprecated/removed in a minor release.  |
+| **Internal**     | Private framework APIs | No compatibility guarantees.             | Not public; subject to change without warning. |
 
 ### Core Stable Surface
+
 - `createBotClient` options and client method signatures.
 - Standard routing callbacks: `bot.on('message', handler)`.
 - `RedisSessionAdapter` and CAS state contracts.
 - Observability attachment hooks: `attachBotObservability`.
 
 ### Experimental Surface
+
 - Advanced FSM scenes and wizard handlers.
 - Beta telemetry exporters (such as experimental web UI registries).
 

@@ -1,6 +1,8 @@
 # Polling Starter
 
-> **Stability:** Early Production · **Runtime:** Node.js ≥ 18 · **Mode:** Long-polling
+> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx` · **Runtime:** Node.js · **Mode:** Long-polling
+>
+> See [docs/QUICK_START.md](../docs/QUICK_START.md) and [docs/API_STABILITY.md](../docs/API_STABILITY.md). No Redis required.
 
 A clean, self-contained template demonstrating the canonical **polling** mode setup for TGWrapper. Best suited for local development, single-server deployments, and any environment where you maintain persistent process uptime.
 
@@ -8,13 +10,13 @@ A clean, self-contained template demonstrating the canonical **polling** mode se
 
 ## ✨ What This Demonstrates
 
-| Capability | Implementation |
-| :--- | :--- |
-| **Zero-dependency bot runtime** | Core package only — no Redis, no external services |
-| **Typed update handlers** | Full TypeScript inference on all Telegram update shapes |
-| **Graceful shutdown** | `SIGTERM` stops the loop cleanly after the current batch |
-| **Error boundary** | `bot.on('error', ...)` captures runtime and API failures |
-| **Echo + command routing** | `/start` command + catch-all text echo in < 30 lines |
+| Capability                      | Implementation                                           |
+| :------------------------------ | :------------------------------------------------------- |
+| **Zero-dependency bot runtime** | Core package only — no Redis, no external services       |
+| **Typed update handlers**       | Full TypeScript inference on all Telegram update shapes  |
+| **Graceful shutdown**           | `SIGTERM` stops the loop cleanly after the current batch |
+| **Error boundary**              | `bot.on('error', ...)` captures runtime and API failures |
+| **Echo + command routing**      | `/start` command + catch-all text echo in < 30 lines     |
 
 > **When to upgrade:** Once you need persistent state, add the [`multi-instance-redis-starter`](../multi-instance-redis-starter). Once you need edge/serverless, switch to [`serverless-webhook-starter`](../serverless-webhook-starter).
 
@@ -50,6 +52,7 @@ cp .env.example .env
 ```
 
 `.env.example`:
+
 ```env
 # Required — obtain from @BotFather on Telegram
 BOT_TOKEN="your_telegram_bot_token"
@@ -78,21 +81,29 @@ pnpm test
 ```
 
 Manual functional check:
+
 1. Start the bot: `BOT_TOKEN="<token>" pnpm start`
 2. Open Telegram, send `/start` — expect: **"polling-starter ready"**
 3. Send any text message — expect: **"echo: \<your message\>"**
 
 ---
 
+## What You Still Need to Implement
+
+- Production process supervision via `pm2`, `systemd`, or container restart policies.
+- Secret management for `BOT_TOKEN` and any network/tunnel credentials.
+- Optional observability exports for logs, metrics, or tracing beyond the console.
+- Deployment configuration for network access and uptime monitoring.
+
 ## 🚀 Production Notes
 
-| Concern | Recommendation |
-|---|---|
-| Process uptime | Run under `pm2`, `systemd`, or inside a Docker container with `restart: always` |
-| Multiple instances | **Not supported** with polling. Only one instance should poll a given token at a time |
-| Rate limiting | Default in-memory rate limiter is single-process only; switch to Redis adapter for multi-node setups |
-| Observability | Attach `@tgwrapper/observability` to gain structured logs and metrics |
-| Graceful shutdown | `SIGTERM` will stop the polling loop after the current update batch completes |
+| Concern            | Recommendation                                                                                       |
+| ------------------ | ---------------------------------------------------------------------------------------------------- |
+| Process uptime     | Run under `pm2`, `systemd`, or inside a Docker container with `restart: always`                      |
+| Multiple instances | **Not supported** with polling. Only one instance should poll a given token at a time                |
+| Rate limiting      | Default in-memory rate limiter is single-process only; switch to Redis adapter for multi-node setups |
+| Observability      | Attach `@tgwrapper/observability` to gain structured logs and metrics                                |
+| Graceful shutdown  | `SIGTERM` will stop the polling loop after the current update batch completes                        |
 
 ---
 
@@ -117,7 +128,7 @@ polling-starter/
 
 ---
 
-## 🏗️ How This Fits the Architecture
+## 🏗️ How This Maps to Production
 
 ```
 Telegram Bot API

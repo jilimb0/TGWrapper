@@ -1,5 +1,11 @@
 # TGWrapper Standard Bot Starter
 
+> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`, Redis `>=6.2`
+>
+> **Use case:** production-ready polling bot with Redis sessions, rate limiting, and telemetry.
+>
+> **Included:** bot runtime, Redis session and limiter wiring, observability integration, and graceful shutdown.
+
 Production-oriented Telegram bot template for TGWrapper with Redis sessions, distributed rate limiting, graceful shutdown, and structured JSON logs.
 
 Use this starter when you need a baseline app with:
@@ -30,17 +36,23 @@ pnpm tsx src/bot.ts
 Expected startup output:
 
 ```json
-{"event":"startup","serviceName":"standard-bot-service","mode":"polling","redisUrl":"redis://localhost:6379","rateLimit":{"windowMs":60000,"limit":15}}
+{
+  "event": "startup",
+  "serviceName": "standard-bot-service",
+  "mode": "polling",
+  "redisUrl": "redis://localhost:6379",
+  "rateLimit": { "windowMs": 60000, "limit": 15 }
+}
 ```
 
 Send `/start` or `/click` to the bot in Telegram to verify session writes and rate limiting.
 
 ## Environment Variables
 
-| Name | Required | Default | Description |
-| --- | --- | --- | --- |
-| `BOT_TOKEN` | yes | none | Telegram bot token from BotFather. |
-| `REDIS_URL` | no | `redis://localhost:6379` | Redis connection used for sessions and rate limiting. |
+| Name        | Required | Default                  | Description                                           |
+| ----------- | -------- | ------------------------ | ----------------------------------------------------- |
+| `BOT_TOKEN` | yes      | none                     | Telegram bot token from BotFather.                    |
+| `REDIS_URL` | no       | `redis://localhost:6379` | Redis connection used for sessions and rate limiting. |
 
 ## What Gets Installed
 
@@ -55,6 +67,13 @@ The npm package is a project template, not a runtime library. It ships:
 
 Copy the template into your own repository, rename the package, then replace the sample commands, tenant IDs, bot IDs, rate limits, and telemetry sink with your production values.
 
+## What You Still Need to Implement
+
+- Your production Redis topology and credentials management.
+- The business routing, command handling, and session state model.
+- Secret management for `BOT_TOKEN` and `REDIS_URL`.
+- Production observability sinks and log pipeline configuration.
+
 ## Manual Copy Fallback
 
 Power users can install this package directly and copy the template files:
@@ -65,7 +84,7 @@ mkdir my-standard-bot
 cp -R node_modules/@tgwrapper/starter-standard-bot/{src,tsconfig.json,.env.example} my-standard-bot/
 ```
 
-## Production Webhook Path
+## How This Maps to Production
 
 This starter uses polling for local development. For production webhook deployment:
 

@@ -1,5 +1,8 @@
 # Template Bot
 
+> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`
+> **Use case:** minimal dual-mode polling and webhook starter with a basic FSM flow.
+
 Minimal starter template for building Telegram bots with TGWrapper.
 
 ## Includes
@@ -44,3 +47,17 @@ pnpm dev:webhook
 - Router handlers in `src/polling.ts` / `src/server.ts`
 - Session shape (`Data`) and states (`State`)
 - `resolveSessionKey` strategy for your user/tenant model
+
+## What You Still Need to Implement
+
+- Your production command and callback routing strategy.
+- The session key model and tenant/user identity mapping.
+- Secrets management for `BOT_TOKEN` and webhook credentials.
+- Deployment configuration for the runtime environment you choose.
+
+## How This Maps to Production
+
+- Use `src/polling.ts` for local development and testing, not for high-scale webhook-driven production.
+- Use `src/server.ts` as the basis for a Node HTTP webhook deployment when your infrastructure supports it.
+- Externalize the bot token and webhook secret into your secret manager.
+- Add observability and health check endpoints for your runtime platform.

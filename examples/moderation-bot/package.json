@@ -1,6 +1,9 @@
 {
   "name": "moderation-bot-starter",
   "private": true,
+  "engines": {
+    "node": ">=22.13"
+  },
   "type": "module",
   "scripts": {
     "start": "node --import tsx src/bot.ts",

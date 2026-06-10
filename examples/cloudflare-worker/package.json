@@ -1,6 +1,9 @@
 {
   "name": "example-cloudflare-worker",
   "private": true,
+  "engines": {
+    "node": ">=22.13"
+  },
   "type": "module",
   "scripts": {
     "deploy": "wrangler deploy",

@@ -1,6 +1,9 @@
 {
   "name": "example-aws-lambda",
   "private": true,
+  "engines": {
+    "node": ">=22.13"
+  },
   "type": "module",
   "scripts": {
     "deploy": "serverless deploy",

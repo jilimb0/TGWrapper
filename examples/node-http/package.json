@@ -1,6 +1,9 @@
 {
   "name": "example-node-http",
   "private": true,
+  "engines": {
+    "node": ">=22.13"
+  },
   "type": "module",
   "scripts": {
     "dev": "tsx src/server.ts"

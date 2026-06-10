@@ -16,6 +16,9 @@
   "bugs": {
     "url": "https://github.com/jilimb0/TGWrapper/issues"
   },
+  "engines": {
+    "node": ">=22.13"
+  },
   "keywords": [
     "telegram",
     "bot",

@@ -2,6 +2,10 @@
 
 Official TGWrapper project scaffolder.
 
+> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`
+>
+> Use this tool to bootstrap a new TGWrapper project with the recommended starter packages.
+
 ## Quick Start
 
 ```bash
@@ -14,11 +18,11 @@ pnpm start
 
 Available templates:
 
-| Template | Package |
-| --- | --- |
-| `standard` | `@tgwrapper/starter-standard-bot` |
-| `support` | `@tgwrapper/starter-support-bot` |
-| `migration` | `@tgwrapper/starter-migration` |
+| Template    | Package                           |
+| ----------- | --------------------------------- |
+| `standard`  | `@tgwrapper/starter-standard-bot` |
+| `support`   | `@tgwrapper/starter-support-bot`  |
+| `migration` | `@tgwrapper/starter-migration`    |
 
 ## Options
 

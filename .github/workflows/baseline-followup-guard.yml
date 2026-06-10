@@ -1,16 +1,16 @@
-name: Baseline Follow-up Guard
+name: baseline-followup-guard
 
 on:
+  workflow_dispatch:
   pull_request:
-    branches: [main]
+    paths:
+      - '.github/telegram-api-baseline.yml'
+      - 'scripts/check-baseline-followup.mjs'
+      - '.github/workflows/baseline-followup-guard.yml'
 
 permissions:
   contents: read
   pull-requests: write
-
-concurrency:
-  group: baseline-followup-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 jobs:
   guard:
@@ -21,63 +21,10 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
-      - name: Run baseline follow-up check
-        id: followup_check
-        continue-on-error: true
-        run: node scripts/check-baseline-followup.mjs origin/${{ github.base_ref }} | tee baseline-followup.log
-      - name: Ensure needs-follow-up label exists
-        if: steps.followup_check.outcome == 'failure'
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const { owner, repo } = context.repo;
-            try {
-              await github.rest.issues.createLabel({
-                owner,
-                repo,
-                name: 'needs-follow-up',
-                color: 'd93f0b',
-                description: 'Baseline changed without required compatibility follow-up'
-              });
-            } catch (error) {
-              if (error.status !== 422) throw error;
-            }
-      - name: Label PR as needs-follow-up
-        if: steps.followup_check.outcome == 'failure'
-        uses: actions/github-script@v9
-        with:
-          script: |
-            const { owner, repo } = context.repo;
-            await github.rest.issues.addLabels({
-              owner,
-              repo,
-              issue_number: context.issue.number,
-              labels: ['needs-follow-up']
-            });
-      - name: Guard summary
-        if: always()
-        run: |
-          RESULT="${{ steps.followup_check.outcome }}"
-          {
-            echo "## Baseline Follow-up Guard"
-            echo ""
-            echo "Result: ${RESULT}"
-            echo ""
-            if [ "${RESULT}" = "failure" ]; then
-              echo "Baseline changed without the required compatibility follow-up."
-            else
-              echo "Baseline follow-up requirements are satisfied."
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v7
-        if: always() && hashFiles('baseline-followup.log') != ''
-        with:
-          name: baseline-followup-log
-          path: baseline-followup.log
-          if-no-files-found: error
-      - name: Fail guard when follow-up is missing
-        if: steps.followup_check.outcome == 'failure'
-        run: |
-          echo "Baseline was changed without required compatibility follow-up. See check output."
-          exit 1
+          node-version: 24
+      - uses: pnpm/action-setup@v6
+      - run: pnpm install --frozen-lockfile
+      - name: Check baseline follow-up issue freshness
+        run: node scripts/check-baseline-followup.mjs --check-pr
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

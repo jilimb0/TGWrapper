@@ -1,5 +1,11 @@
 # TGWrapper Migration Starter
 
+> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`, Redis `>=6.2`
+>
+> **Use case:** side-by-side migration reference from Telegraf-style handlers to TGWrapper.
+>
+> **Included:** before/after sample entrypoints, Redis session adapter wiring, and production deployment notes.
+
 Template package for migrating a stateful Telegram bot from Telegraf-style handlers to TGWrapper with Redis-backed sessions, Compare-and-Swap writes, and structured logs.
 
 Use this starter when you want a side-by-side migration reference:
@@ -30,15 +36,20 @@ pnpm tsx src/bot-after.ts
 Expected TGWrapper startup output:
 
 ```json
-{"event":"startup","serviceName":"registration-service","mode":"polling","redisUrl":"redis://localhost:6379"}
+{
+  "event": "startup",
+  "serviceName": "registration-service",
+  "mode": "polling",
+  "redisUrl": "redis://localhost:6379"
+}
 ```
 
 ## Environment Variables
 
-| Name | Required | Default | Description |
-| --- | --- | --- | --- |
-| `BOT_TOKEN` | yes | none | Telegram bot token from BotFather. |
-| `REDIS_URL` | no | `redis://localhost:6379` | Redis connection used by the TGWrapper session adapter. |
+| Name        | Required | Default                  | Description                                             |
+| ----------- | -------- | ------------------------ | ------------------------------------------------------- |
+| `BOT_TOKEN` | yes      | none                     | Telegram bot token from BotFather.                      |
+| `REDIS_URL` | no       | `redis://localhost:6379` | Redis connection used by the TGWrapper session adapter. |
 
 ## What Gets Installed
 
@@ -53,6 +64,13 @@ The npm package is a project template, not a library API. It ships:
 - `.env.example`
 
 Copy the files into your own application and then change package name, commands, Redis topology, tenant IDs, bot IDs, telemetry destinations, and handlers.
+
+## What You Still Need to Implement
+
+- Your application-specific session state schema and migration path.
+- The production event flow and webhook/runtime integration.
+- Secret management for `BOT_TOKEN` and `REDIS_URL`.
+- Any stateful user routing or service-specific business logic.
 
 ## Manual Copy Fallback
 
@@ -73,7 +91,7 @@ cp -R node_modules/@tgwrapper/starter-migration/{src,tsconfig.json,.env.example}
 - Attach observability during startup.
 - Handle `SIGINT` and `SIGTERM` to stop polling and close Redis.
 
-## Production Webhook Path
+## How This Maps to Production
 
 This starter uses polling because it is easiest for local migration work. For production:
 

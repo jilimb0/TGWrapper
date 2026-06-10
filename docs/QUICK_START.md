@@ -1,5 +1,11 @@
 # Quick Start — Your First TGWrapper Bot
 
+Requirements
+
+- Node.js `>=22.13`
+- `pnpm` (workspace-aware package manager)
+- `tsx` for local TypeScript execution
+
 Get a working Telegram bot running in under 5 minutes. No Redis. No observability. No configuration files. Just a bot that responds to messages.
 
 ---
@@ -22,29 +28,32 @@ Open Telegram, message [@BotFather](https://t.me/BotFather), run `/newbot`, and 
 Create `bot.ts`:
 
 ```typescript
-import { createBotClient } from '@tgwrapper/core';
+import { createBotClient } from "@tgwrapper/core"
 
 const bot = createBotClient({
-  token: 'YOUR_BOT_TOKEN',  // paste your token here
-  mode: 'polling',
-});
+  token: "YOUR_BOT_TOKEN", // paste your token here
+  mode: "polling",
+})
 
-bot.on('message', async (message) => {
-  if (!('text' in message) || typeof message.text !== 'string') return;
-  const chatId = message.chat.id;
+bot.on("message", async (message) => {
+  if (!("text" in message) || typeof message.text !== "string") return
+  const chatId = message.chat.id
 
-  if (message.text === '/start') {
-    await bot.sendMessage(chatId, '👋 Hello! Send me any message and I will echo it back.');
-    return;
+  if (message.text === "/start") {
+    await bot.sendMessage(
+      chatId,
+      "👋 Hello! Send me any message and I will echo it back.",
+    )
+    return
   }
 
-  await bot.sendMessage(chatId, `You said: ${message.text}`);
-});
+  await bot.sendMessage(chatId, `You said: ${message.text}`)
+})
 
-bot.on('error', (err) => console.error('Bot error:', err));
+bot.on("error", (err) => console.error("Bot error:", err))
 
-console.log('Bot is running...');
-await bot.start();
+console.log("Bot is running...")
+await bot.start()
 ```
 
 ## 4. Run it
@@ -86,6 +95,7 @@ You've got a working bot. Where you go next depends on what you're building:
 ### 🟢 Keep it simple
 
 Your bot handles a few commands, runs on one server, and doesn't need persistent state? You're done with the hard part. Browse the [examples](../examples/) for patterns like:
+
 - Multi-command routing — see [polling-starter](../examples/polling-starter)
 - Callback query buttons — same handler pattern with `bot.on('callback_query', ...)`
 
@@ -93,11 +103,11 @@ Your bot handles a few commands, runs on one server, and doesn't need persistent
 
 Your bot needs to survive restarts, run on multiple instances, or handle real traffic? The production path adds three things incrementally:
 
-| Step | What you add | Why | Time |
-| :--- | :--- | :--- | :--- |
-| **1. Redis sessions** | `@tgwrapper/adapter-redis` | State survives restarts, shared across instances | 10 min |
-| **2. Observability** | `@tgwrapper/observability` | Trace IDs in every log, structured events, metrics | 5 min |
-| **3. Webhook + deploy** | `mode: 'webhook'` | Serverless-ready, edge-native, scales horizontally | 15 min |
+| Step                    | What you add               | Why                                                | Time   |
+| :---------------------- | :------------------------- | :------------------------------------------------- | :----- |
+| **1. Redis sessions**   | `@tgwrapper/adapter-redis` | State survives restarts, shared across instances   | 10 min |
+| **2. Observability**    | `@tgwrapper/observability` | Trace IDs in every log, structured events, metrics | 5 min  |
+| **3. Webhook + deploy** | `mode: 'webhook'`          | Serverless-ready, edge-native, scales horizontally | 15 min |
 
 See [Grow with TGWrapper](./GROW_WITH_TGWRAPPER.md) for the full path from first bot to production deployment.
 

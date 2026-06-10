@@ -1,6 +1,9 @@
 {
   "name": "polling-starter",
   "private": true,
+  "engines": {
+    "node": ">=22.13"
+  },
   "type": "module",
   "scripts": {
     "start": "node --import tsx bot.ts",

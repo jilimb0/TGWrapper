@@ -23,6 +23,8 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/pnpm-install
+        with:
+          node-version: "24"
       - name: Check changeset requirement
         id: run_check
         continue-on-error: true
@@ -56,7 +58,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [22]
+        node-version: [24]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -102,6 +104,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/pnpm-install
+        with:
+          node-version: "24"
       - name: Release integrity checks
         id: run_release_integrity
         continue-on-error: true
@@ -153,6 +157,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: ./.github/actions/pnpm-install
+        with:
+          node-version: "24"
       - name: Redis integration tests
         id: run_redis_integration
         continue-on-error: true

@@ -45,35 +45,35 @@ TGWrapper is a layered monorepo. Each layer has a single, explicit responsibilit
 
 The only required package. Handles the full Telegram Bot API surface without external runtime dependencies.
 
-| Subsystem | Responsibility |
-| :--- | :--- |
-| **BotRuntime** | Owns the update lifecycle: start, stop, graceful shutdown, error propagation. |
-| **FSM Engine** | Provides a deterministic finite-state machine for multi-step conversation flows. State is pluggable (in-memory or Redis-backed). |
-| **Router** | Pattern-matches incoming updates (messages, callbacks, inline queries) and dispatches to registered handlers. |
-| **UpdatePipeline** | Ordered middleware chain applied to every incoming update before handlers run. |
-| **Transport Adapters** | Polling loop and passive webhook ingestion share one `bot.ingest(update)` entrypoint — same handler code runs in both modes. |
-| **Type Schemas** | Fully typed Telegram API request/response surfaces; checked against upstream schema snapshots on every commit. |
+| Subsystem              | Responsibility                                                                                                                   |
+| :--------------------- | :------------------------------------------------------------------------------------------------------------------------------- |
+| **BotRuntime**         | Owns the update lifecycle: start, stop, graceful shutdown, error propagation.                                                    |
+| **FSM Engine**         | Provides a deterministic finite-state machine for multi-step conversation flows. State is pluggable (in-memory or Redis-backed). |
+| **Router**             | Pattern-matches incoming updates (messages, callbacks, inline queries) and dispatches to registered handlers.                    |
+| **UpdatePipeline**     | Ordered middleware chain applied to every incoming update before handlers run.                                                   |
+| **Transport Adapters** | Polling loop and passive webhook ingestion share one `bot.ingest(update)` entrypoint — same handler code runs in both modes.     |
+| **Type Schemas**       | Fully typed Telegram API request/response surfaces; checked against upstream schema snapshots on every commit.                   |
 
 ### Redis Layer (`@tgwrapper/adapter-redis`)
 
 Optional. Plugs into the Core's session and rate-limiter interfaces. Has no dependency on the observability layer.
 
-| Subsystem | Responsibility |
-| :--- | :--- |
+| Subsystem               | Responsibility                                                                                                              |
+| :---------------------- | :-------------------------------------------------------------------------------------------------------------------------- |
 | **RedisSessionAdapter** | Implements the `SessionAdapter` interface. Writes session state using Lua CAS scripts to prevent cross-instance overwrites. |
-| **RedisRateLimiter** | Implements the `RateLimiter` interface. Uses a sliding-window sorted-set counter atomically evaluated per Lua script. |
-| **RedisKvStore** | Generic key-value store primitive used internally by both the session adapter and rate limiter. |
+| **RedisRateLimiter**    | Implements the `RateLimiter` interface. Uses a sliding-window sorted-set counter atomically evaluated per Lua script.       |
+| **RedisKvStore**        | Generic key-value store primitive used internally by both the session adapter and rate limiter.                             |
 
 ### Telemetry Layer (`@tgwrapper/observability`)
 
 Optional. Wraps the Core's lifecycle hooks to capture structured telemetry without modifying handler code.
 
-| Subsystem | Responsibility |
-| :--- | :--- |
-| **attachBotObservability()** | Single call that binds metric counters and log emitters to bot lifecycle events. |
-| **MetricsRegistry** | In-process counter/histogram store. Exportable via Prometheus or OTLP. |
-| **Tracer** | Wraps each update in an `AsyncLocalStorage` boundary, issuing a unique `traceId` propagated through all downstream calls. |
-| **AI/LLM Hooks** | Span helpers for tracing token usage and latency of third-party LLM calls within the active update trace. |
+| Subsystem                    | Responsibility                                                                                                            |
+| :--------------------------- | :------------------------------------------------------------------------------------------------------------------------ |
+| **attachBotObservability()** | Single call that binds metric counters and log emitters to bot lifecycle events.                                          |
+| **MetricsRegistry**          | In-process counter/histogram store. Exportable via Prometheus or OTLP.                                                    |
+| **Tracer**                   | Wraps each update in an `AsyncLocalStorage` boundary, issuing a unique `traceId` propagated through all downstream calls. |
+| **AI/LLM Hooks**             | Span helpers for tracing token usage and latency of third-party LLM calls within the active update trace.                 |
 
 ---
 
@@ -87,6 +87,7 @@ Bot App
 ```
 
 **Rules enforced at build time:**
+
 - Redis Layer has **no dependency** on the Observability Layer.
 - Observability Layer has **no dependency** on the Redis Layer.
 - Neither plugin layer imports from user application code.
@@ -96,16 +97,16 @@ Bot App
 
 ## ⚙️ Runtime Stack
 
-| Layer | Technology | Notes |
-| :--- | :--- | :--- |
-| **Language** | TypeScript 5 (compiled to ESM + CJS dual) | Full type inference; no `any` in public API surface |
-| **Runtime** | Node.js ≥ 18, Cloudflare Workers, AWS Lambda | Single codebase; mode switched via `createBotClient({ mode })` |
-| **Session storage** | In-memory (default) or Redis ≥ 6.2 | Swappable via `SessionAdapter` interface |
-| **Rate limiting** | In-memory (single-process) or Redis sliding window | Swappable via `RateLimiter` interface |
-| **Tracing** | `AsyncLocalStorage` (Node) / global fallback (edge) | No instrumentation agent required |
-| **Metrics export** | Prometheus text format or OTLP JSON | Pull (Prometheus scrape) or push (OTEL Collector) |
-| **Build tooling** | pnpm workspaces + tsup + Vitest | Monorepo with per-package build isolation |
-| **CI** | GitHub Actions (changeset, verify, release, redis-integration) | All gates must pass green before publish |
+| Layer               | Technology                                                     | Notes                                                          |
+| :------------------ | :------------------------------------------------------------- | :------------------------------------------------------------- |
+| **Language**        | TypeScript 5 (compiled to ESM + CJS dual)                      | Full type inference; no `any` in public API surface            |
+| **Runtime**         | Node.js ≥ 22.13, Cloudflare Workers, AWS Lambda                | Single codebase; mode switched via `createBotClient({ mode })` |
+| **Session storage** | In-memory (default) or Redis ≥ 6.2                             | Swappable via `SessionAdapter` interface                       |
+| **Rate limiting**   | In-memory (single-process) or Redis sliding window             | Swappable via `RateLimiter` interface                          |
+| **Tracing**         | `AsyncLocalStorage` (Node) / global fallback (edge)            | No instrumentation agent required                              |
+| **Metrics export**  | Prometheus text format or OTLP JSON                            | Pull (Prometheus scrape) or push (OTEL Collector)              |
+| **Build tooling**   | pnpm workspaces + tsup + Vitest                                | Monorepo with per-package build isolation                      |
+| **CI**              | GitHub Actions (changeset, verify, release, redis-integration) | All gates must pass green before publish                       |
 
 ---
 

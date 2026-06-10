@@ -1,6 +1,8 @@
 # Serverless Webhook Starter
 
-> **Stability:** Early Production · **Runtime:** Node.js ≥ 18, Cloudflare Workers, AWS Lambda · **Mode:** Webhook (passive)
+> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx` · **Runtime:** Node.js, Cloudflare Workers, AWS Lambda · **Mode:** Webhook (passive)
+>
+> See [docs/QUICK_START.md](../docs/QUICK_START.md) and [docs/API_STABILITY.md](../docs/API_STABILITY.md).
 
 A reference template showing how to receive Telegram updates via webhooks in serverless, edge, and event-driven environments. The bot has no background loop — it wakes up only when Telegram POSTs an update.
 
@@ -8,13 +10,13 @@ A reference template showing how to receive Telegram updates via webhooks in ser
 
 ## ✨ What This Demonstrates
 
-| Capability | Implementation |
-| :--- | :--- |
-| **Zero background process** | No polling loop — runs purely on Telegram-triggered HTTP invocations |
+| Capability                    | Implementation                                                                                 |
+| :---------------------------- | :--------------------------------------------------------------------------------------------- |
+| **Zero background process**   | No polling loop — runs purely on Telegram-triggered HTTP invocations                           |
 | **Platform-portable handler** | One `bot.ingest(update)` call works on Cloudflare Workers, AWS Lambda, and Node.js HTTP server |
-| **Cold-start optimized** | Bot client initialized at module scope — reused across warm invocations |
-| **Secret token validation** | `X-Telegram-Bot-Api-Secret-Token` header verification shown in production notes |
-| **Local tunnel dev workflow** | `ngrok` / `localtunnel` setup for iterating without deploying |
+| **Cold-start optimized**      | Bot client initialized at module scope — reused across warm invocations                        |
+| **Secret token validation**   | `X-Telegram-Bot-Api-Secret-Token` header verification shown in production notes                |
+| **Local tunnel dev workflow** | `ngrok` / `localtunnel` setup for iterating without deploying                                  |
 
 > **When to add state:** Combine this with the Redis adapter (see [`multi-instance-redis-starter`](../multi-instance-redis-starter)) to get distributed sessions + rate limiting in serverless mode.
 
@@ -22,12 +24,12 @@ A reference template showing how to receive Telegram updates via webhooks in ser
 
 ## 🌐 Platform Deployment Matrix
 
-| Platform | Adapter | Notes |
-| :--- | :--- | :--- |
-| **Node.js HTTP** | `node:http` / Express | Best for VPS or containerized deployments |
-| **Cloudflare Workers** | `fetch` handler export | Edge-native; see [`examples/cloudflare-worker`](../cloudflare-worker) |
-| **AWS Lambda + API GW** | `handler` export | See [`examples/aws-lambda`](../aws-lambda); initialize bot outside handler |
-| **Vercel / Netlify** | Standard serverless function | Use the Node.js HTTP adapter pattern |
+| Platform                | Adapter                      | Notes                                                                      |
+| :---------------------- | :--------------------------- | :------------------------------------------------------------------------- |
+| **Node.js HTTP**        | `node:http` / Express        | Best for VPS or containerized deployments                                  |
+| **Cloudflare Workers**  | `fetch` handler export       | Edge-native; see [`examples/cloudflare-worker`](../cloudflare-worker)      |
+| **AWS Lambda + API GW** | `handler` export             | See [`examples/aws-lambda`](../aws-lambda); initialize bot outside handler |
+| **Vercel / Netlify**    | Standard serverless function | Use the Node.js HTTP adapter pattern                                       |
 
 ---
 
@@ -60,6 +62,7 @@ cp .env.example .env
 ```
 
 `.env.example`:
+
 ```env
 # Required — obtain from @BotFather on Telegram
 BOT_TOKEN="your_telegram_bot_token"
@@ -100,36 +103,36 @@ curl -X POST "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/setWebhook" \
 ### Cloudflare Workers
 
 ```typescript
-import { createBotClient } from '@tgwrapper/core';
+import { createBotClient } from "@tgwrapper/core"
 
-const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'webhook' });
-await bot.start();
+const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: "webhook" })
+await bot.start()
 
 export default {
   async fetch(request: Request): Promise<Response> {
-    if (request.method !== 'POST') {
-      return new Response('Method Not Allowed', { status: 405 });
+    if (request.method !== "POST") {
+      return new Response("Method Not Allowed", { status: 405 })
     }
-    const update = await request.json();
-    await bot.ingest(update);
-    return new Response('OK', { status: 200 });
-  }
-};
+    const update = await request.json()
+    await bot.ingest(update)
+    return new Response("OK", { status: 200 })
+  },
+}
 ```
 
 ### AWS Lambda (API Gateway)
 
 ```typescript
-import { createBotClient } from '@tgwrapper/core';
+import { createBotClient } from "@tgwrapper/core"
 
-const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'webhook' });
-await bot.start();
+const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: "webhook" })
+await bot.start()
 
 export const handler = async (event: { body: string }) => {
-  const update = JSON.parse(event.body || '{}');
-  await bot.ingest(update);
-  return { statusCode: 200, body: 'OK' };
-};
+  const update = JSON.parse(event.body || "{}")
+  await bot.ingest(update)
+  return { statusCode: 200, body: "OK" }
+}
 ```
 
 > **Note:** Initialize `bot` outside the handler (module scope) to reuse across warm Lambda invocations.
@@ -145,6 +148,7 @@ pnpm test
 ```
 
 Functional integration check:
+
 1. Start the local server: `pnpm start`
 2. Start a tunnel and register the webhook URL (see step 3 above)
 3. Send `/start` in Telegram — expect the bot to respond
@@ -152,15 +156,22 @@ Functional integration check:
 
 ---
 
+## What You Still Need to Implement
+
+- External session storage and state persistence via `@tgwrapper/adapter-redis` if you need user context across invocations.
+- Production webhook registration and secret validation for `X-Telegram-Bot-Api-Secret-Token`.
+- Runtime-specific deployment configuration for Lambda, Workers, or container environments.
+- Observability and logging pipelines for request tracing and error visibility.
+
 ## 🚀 Production Notes
 
-| Concern | Recommendation |
-|---|---|
-| Webhook secret | Always set `WEBHOOK_SECRET` and validate the `X-Telegram-Bot-Api-Secret-Token` header in production |
-| Multiple instances | Webhook mode is naturally horizontal — each serverless instance handles its own invocation |
-| Cold starts | Keep handler initialization in module scope (outside `fetch`/`handler`) to benefit from runtime reuse |
-| Timeout budget | Telegram expects a 200 response within ~60 s; ensure your handler logic is non-blocking |
-| Idempotency | Telegram may retry updates on network failure; make handlers idempotent where state is mutated |
+| Concern            | Recommendation                                                                                        |
+| ------------------ | ----------------------------------------------------------------------------------------------------- |
+| Webhook secret     | Always set `WEBHOOK_SECRET` and validate the `X-Telegram-Bot-Api-Secret-Token` header in production   |
+| Multiple instances | Webhook mode is naturally horizontal — each serverless instance handles its own invocation            |
+| Cold starts        | Keep handler initialization in module scope (outside `fetch`/`handler`) to benefit from runtime reuse |
+| Timeout budget     | Telegram expects a 200 response within ~60 s; ensure your handler logic is non-blocking               |
+| Idempotency        | Telegram may retry updates on network failure; make handlers idempotent where state is mutated        |
 
 ---
 
@@ -186,7 +197,7 @@ serverless-webhook-starter/
 
 ---
 
-## 🏗️ How This Fits the Architecture
+## 🏗️ How This Maps to Production
 
 ```
  Telegram Bot API

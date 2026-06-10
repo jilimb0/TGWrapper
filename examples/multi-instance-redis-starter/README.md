@@ -1,6 +1,8 @@
 # Multi-Instance Redis Starter
 
-> **Stability:** Early Production · **Runtime:** Node.js ≥ 18 + Redis ≥ 6.2 · **Mode:** Polling with distributed coordination
+> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`, Redis `>= 6.2` · **Runtime:** Node.js · **Mode:** Polling with distributed coordination
+>
+> See [docs/QUICK_START.md](../docs/QUICK_START.md) and [docs/API_STABILITY.md](../docs/API_STABILITY.md).
 
 A complete, high-fidelity reference implementation showing how to run **multiple coordinated bot instances** backed by Redis for distributed session management, rate limiting, and structured observability.
 
@@ -10,13 +12,13 @@ This is the template to use when a single polling process is not enough, or when
 
 ## ✨ What This Demonstrates
 
-| Capability | Implementation |
-| :--- | :--- |
-| **Distributed session safety** | `RedisSessionAdapter` with CAS (Compare-and-Swap) via Lua script — no silent overwrites across concurrent instances |
-| **Shared rate limiting** | `RedisRateLimiter` using a sliding-window sorted-set — one counter shared across all nodes |
-| **State persistence across restarts** | Session data survives process kills; users resume where they left off |
-| **Structured observability** | Every update emits a `[TELEMETRY]` trace line with `traceId`, duration, and event type |
-| **Multi-node simulation locally** | Run `pnpm start` in two terminals — both share the same Redis state |
+| Capability                            | Implementation                                                                                                      |
+| :------------------------------------ | :------------------------------------------------------------------------------------------------------------------ |
+| **Distributed session safety**        | `RedisSessionAdapter` with CAS (Compare-and-Swap) via Lua script — no silent overwrites across concurrent instances |
+| **Shared rate limiting**              | `RedisRateLimiter` using a sliding-window sorted-set — one counter shared across all nodes                          |
+| **State persistence across restarts** | Session data survives process kills; users resume where they left off                                               |
+| **Structured observability**          | Every update emits a `[TELEMETRY]` trace line with `traceId`, duration, and event type                              |
+| **Multi-node simulation locally**     | Run `pnpm start` in two terminals — both share the same Redis state                                                 |
 
 > **This is the production-grade template.** Use it whenever you need distributed coordination or state durability.
 
@@ -55,6 +57,7 @@ This is the template to use when a single polling process is not enough, or when
 ```
 
 Key properties:
+
 - **Session safety:** All session writes use `compareAndSet` (CAS) via Lua scripts to prevent overwrite races between concurrent nodes.
 - **Distributed rate limiting:** Sliding-window counter stored in Redis — shared across all nodes.
 - **Structured telemetry:** Every update, error, and state change emits a structured event through the observability layer.
@@ -79,6 +82,7 @@ cp .env.example .env
 ```
 
 `.env.example`:
+
 ```env
 # Required — obtain from @BotFather on Telegram
 BOT_TOKEN="your_telegram_bot_token"
@@ -108,6 +112,7 @@ pnpm test
 ```
 
 Functional integration check:
+
 1. Start Redis: `docker run --name bot-redis -p 6379:6379 -d redis:7-alpine`
 2. Set env vars and run: `BOT_TOKEN="<token>" REDIS_URL="redis://localhost:6379" pnpm start`
 3. Send `/start` → expect acknowledgment with session counter
@@ -117,16 +122,23 @@ Functional integration check:
 
 ---
 
+## What You Still Need to Implement
+
+- Production Redis topology and credentials management (sentinel/cluster for HA as needed).
+- CAS conflict retry strategy for high-concurrency session loads.
+- Exporter wiring for structured telemetry and production logs.
+- Deployment and scaling configuration for multiple instances sharing the same bot token.
+
 ## 🚀 Production Notes
 
-| Concern | Recommendation |
-|---|---|
-| Redis topology | Single-node Redis is fine for most bots; for HA use Redis Sentinel or Redis Cluster (see `docs/REDIS_RUNTIME.md`) |
-| Session TTL | Default is 24 h (`ttlSeconds: 86400`); tune per your user activity patterns |
-| Rate limit window | Default is 20 req/min per user; tune `windowMs` and `limit` to match your bot's policy |
-| CAS conflicts | On high concurrency, CAS writes may conflict; implement a retry loop in production handlers |
-| Observability export | Console logger is shown for brevity; wire a real exporter (OTEL, Datadog) per `docs/TELEMETRY_REFERENCE.md` |
-| Graceful shutdown | Send `SIGTERM`; the polling loop drains the current batch before exit |
+| Concern              | Recommendation                                                                                                    |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Redis topology       | Single-node Redis is fine for most bots; for HA use Redis Sentinel or Redis Cluster (see `docs/REDIS_RUNTIME.md`) |
+| Session TTL          | Default is 24 h (`ttlSeconds: 86400`); tune per your user activity patterns                                       |
+| Rate limit window    | Default is 20 req/min per user; tune `windowMs` and `limit` to match your bot's policy                            |
+| CAS conflicts        | On high concurrency, CAS writes may conflict; implement a retry loop in production handlers                       |
+| Observability export | Console logger is shown for brevity; wire a real exporter (OTEL, Datadog) per `docs/TELEMETRY_REFERENCE.md`       |
+| Graceful shutdown    | Send `SIGTERM`; the polling loop drains the current batch before exit                                             |
 
 ---
 
@@ -153,7 +165,7 @@ multi-instance-redis-starter/
 
 ---
 
-## 🏗️ How This Fits the Architecture
+## 🏗️ How This Maps to Production
 
 ```
  Telegram Bot API

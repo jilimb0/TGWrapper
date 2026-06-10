@@ -3,7 +3,7 @@ name: Telegram API Watchdog
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 8 * * 1"
+    - cron: '0 6 * * *'
 
 permissions:
   contents: write
@@ -12,146 +12,85 @@ permissions:
 
 concurrency:
   group: telegram-api-watchdog
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  baseline-watchdog:
+  watchdog:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
-        with:
-          version: 11.5.1
       - uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: pnpm
-      - name: Install dependencies
-        run: |
-          INSTALL_OUT="$(pnpm install --frozen-lockfile 2>&1)" || INSTALL_EXIT=$?
-          if echo "${INSTALL_OUT}" | grep -qE 'ERR_PNPM_OUTDATED_LOCKFILE|ERR_PNPM_NO_MATCHING_VERSION'; then
-            echo "Lockfile outdated or unpublished deps detected (Version Packages commit) — regenerating without examples."
-            pnpm install --no-frozen-lockfile --filter '!./examples/**'
-          elif [ "${INSTALL_EXIT:-0}" != "0" ]; then
-            echo "${INSTALL_OUT}"
-            exit "${INSTALL_EXIT}"
-          fi
-      - name: Check Telegram API changelog drift
-        id: baseline_check
+          node-version: 24
+      - uses: pnpm/action-setup@v6
+      - name: Install deps
+        run: pnpm install --frozen-lockfile
+      - name: Refresh telegram schema snapshot
+        run: pnpm telegram:schema:fetch:ci
+      - name: Detect drift
+        id: drift
         continue-on-error: true
-        run: pnpm telegram:baseline:latest | tee baseline-watchdog.log
-      - name: Sync baseline to latest changelog version
-        if: steps.baseline_check.outcome == 'failure'
-        run: pnpm telegram:baseline:sync
-      - name: Create or update tracking issue
-        if: steps.baseline_check.outcome == 'failure'
-        id: baseline_issue
-        uses: actions/github-script@v9
+        run: |
+          set -euo pipefail
+          pnpm telegram:schema:drift:check > drift.log 2>&1
+      - name: Compose issue body
+        if: steps.drift.outcome == 'failure'
+        id: body
+        run: |
+          {
+            echo 'body<<EOF'
+            echo '## Telegram API Drift detected'
+            echo ''
+            echo 'The scheduled drift check found differences between the stored snapshot and the latest fetched Telegram Bot API schema.'
+            echo ''
+            echo '### Failure log'
+            echo '```text'
+            tail -n 200 drift.log
+            echo '```'
+            echo ''
+            echo '### Next steps'
+            echo '1. Review the diff in the workflow artifacts.'
+            echo '2. Regenerate snapshots/schema-derived outputs if the upstream change is expected.'
+            echo '3. Update docs/tests and close this issue once handled.'
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+      - name: Create issue
+        if: steps.drift.outcome == 'failure'
+        uses: actions/github-script@v8
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            const title = 'Telegram API drift detected';
+            const body = process.env.ISSUE_BODY;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
-            const title = 'Telegram Bot API baseline upgrade follow-up';
-            const body = [
-              'Automated issue from Telegram API watchdog.',
-              '',
-              'A newer Telegram Bot API version was detected and baseline was synced automatically.',
-              '',
-              '## Required follow-up',
-              '- [ ] update `/Users/jilimbo/Documents/Personal/TGWrapper/src/types/telegram.ts`',
-              '- [ ] update `/Users/jilimbo/Documents/Personal/TGWrapper/test/types/telegram-api-compat.typecheck.ts`',
-              '- [ ] update `/Users/jilimbo/Documents/Personal/TGWrapper/test/telegram-api-compat.contract.test.ts`',
-              '- [ ] update `/Users/jilimbo/Documents/Personal/TGWrapper/test/context.compat.test.ts` and runtime fallback tests',
-              '- [ ] update `/Users/jilimbo/Documents/Personal/TGWrapper/docs/TELEGRAM_API_COMPATIBILITY.md`',
-              '- [ ] run `pnpm verify:release`'
-            ].join('\n');
-
-            const labels = ['telegram-api', 'compat', 'release-blocker'];
-
-            for (const name of labels) {
-              try {
-                await github.rest.issues.createLabel({
-                  owner,
-                  repo,
-                  name,
-                  color: name === 'release-blocker' ? 'b60205' : '1d76db',
-                  description: 'Automatically managed by Telegram API watchdog'
-                });
-              } catch (error) {
-                if (error.status !== 422) throw error;
-              }
-            }
-
-            const existing = await github.paginate(github.rest.issues.listForRepo, {
+            const { data: issues } = await github.rest.issues.listForRepo({
               owner,
               repo,
               state: 'open',
-              labels: labels.join(','),
-              per_page: 100
+              labels: 'telegram-api-drift',
+              per_page: 100,
             });
-
-            const found = existing.find((issue) => issue.title === title && !issue.pull_request);
-            if (found) {
-              await github.rest.issues.update({
-                owner,
-                repo,
-                issue_number: found.number,
-                body
-              });
-              core.setOutput('issue_number', String(found.number));
+            const existing = issues.find((issue) => issue.title === title);
+            if (existing) {
+              core.info(`Drift issue already open: #${existing.number}`);
               return;
             }
-
-            const created = await github.rest.issues.create({
+            await github.rest.issues.create({
               owner,
               repo,
               title,
               body,
-              labels
+              labels: ['telegram-api-drift'],
             });
-            core.setOutput('issue_number', String(created.data.number));
-      - name: Create PR for baseline sync
-        if: steps.baseline_check.outcome == 'failure'
-        uses: peter-evans/create-pull-request@v8.1.1
-        with:
-          commit-message: "chore(telegram): sync Bot API baseline"
-          branch: "chore/telegram-baseline-sync"
-          delete-branch: true
-          title: "chore(telegram): sync Bot API baseline"
-          body: |
-            Automated update from Telegram API watchdog.
-
-            ## What changed
-            - synced `docs/telegram-api-baseline.json` to the latest Bot API version from changelog
-
-            ## Follow-up required before release
-            - [ ] update `/Users/jilimbo/Documents/Personal/TGWrapper/src/types/telegram.ts` for new Bot API entities
-            - [ ] update compatibility tests (`test/types/telegram-api-compat.typecheck.ts`, contract/runtime tests)
-            - [ ] update `/Users/jilimbo/Documents/Personal/TGWrapper/docs/TELEGRAM_API_COMPATIBILITY.md` if behavior changed
-            - [ ] run `pnpm verify:release`
-
-            Closes #${{ steps.baseline_issue.outputs.issue_number }}
-          labels: |
-            dependencies
-            documentation
-      - name: Watchdog summary
+        env:
+          ISSUE_BODY: ${{ steps.body.outputs.body }}
+      - name: Upload drift log
         if: always()
-        run: |
-          RESULT="${{ steps.baseline_check.outcome }}"
-          {
-            echo "## Telegram API Watchdog Summary"
-            echo ""
-            echo "Result: ${RESULT}"
-            echo ""
-            if [ "${RESULT}" = "failure" ]; then
-              echo "A newer Telegram Bot API baseline was detected and follow-up automation was triggered."
-            else
-              echo "Telegram Bot API baseline is already up to date."
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
-      - uses: actions/upload-artifact@v7
-        if: always() && hashFiles('baseline-watchdog.log') != ''
+        uses: actions/upload-artifact@v7
         with:
-          name: telegram-api-watchdog-log
-          path: baseline-watchdog.log
-          if-no-files-found: error
+          name: telegram-api-watchdog
+          path: |
+            drift.log
+            scripts/telegram-api-snapshot.json
+          if-no-files-found: ignore

@@ -10,7 +10,7 @@ function hasTelegramFollowupChangeset() {
   const files = readdirSync(dir).filter((name) => name.endsWith('.md') && name !== 'README.md');
   for (const name of files) {
     const content = readFileSync(resolve(dir, name), 'utf8');
-    if (!/"@jilimb0\/tgwrapper"\s*:\s*"(major|minor|patch)"/.test(content)) {
+    if (!/"@tgwrapper\/core"\s*:\s*"(major|minor|patch)"/.test(content)) {
       continue;
     }
     if (/telegram|bot api|compat|schema/i.test(content)) {

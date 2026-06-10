@@ -13,7 +13,7 @@ if (files.length === 0) {
 }
 
 const invalid = [];
-const supportedScopes = ['@jilimb0/', '@tgwrapper/'];
+const supportedScopes = ['@tgwrapper/'];
 
 for (const file of files) {
   const content = readFileSync(resolve(dir, file), 'utf8');

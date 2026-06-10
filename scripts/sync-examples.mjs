@@ -33,10 +33,10 @@ const packageNames = [];
 
 for (const dir of packageDirs) {
   const pkg = readJSON(join(dir, 'package.json'));
-  if (pkg.name?.startsWith('@tgwrapper/') || pkg.name?.startsWith('@jilimb0/')) packageNames.push({ name: pkg.name, dir });
+  if (pkg.name?.startsWith('@tgwrapper/')) packageNames.push({ name: pkg.name, dir });
 }
 const rootPkg = readJSON(join(root, 'package.json'));
-if (rootPkg.name?.startsWith('@tgwrapper/') || rootPkg.name?.startsWith('@jilimb0/')) packageNames.push({ name: rootPkg.name, dir: root });
+if (rootPkg.name?.startsWith('@tgwrapper/')) packageNames.push({ name: rootPkg.name, dir: root });
 
 const resolvedVersions = {};
 

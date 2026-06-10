@@ -1,5 +1,11 @@
 # @tgwrapper/observability
 
+## 0.9.2
+
+### Patch Changes
+
+- fd432ba: Enhance docs, refactor
+
 ## 0.9.1
 
 ### Patch Changes

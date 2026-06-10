@@ -1,5 +1,11 @@
 # @tgwrapper/core
 
+## 0.16.3
+
+### Patch Changes
+
+- fd432ba: Enhance docs, refactor
+
 ## 0.16.2
 
 ### Patch Changes

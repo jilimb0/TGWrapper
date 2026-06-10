@@ -10,9 +10,9 @@
     "test": "tsc --noEmit"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.16.2",
-    "@tgwrapper/adapter-redis": "^0.8.1",
-    "@tgwrapper/observability": "^0.9.1",
+    "@tgwrapper/core": "workspace:^",
+    "@tgwrapper/adapter-redis": "workspace:^",
+    "@tgwrapper/observability": "workspace:^",
     "ioredis": "^5.9.3"
   },
   "devDependencies": {

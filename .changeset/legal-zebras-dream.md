@@ -1,0 +1,5 @@
+---
+"@tgwrapper/create": patch
+---
+
+fix

@@ -1,5 +1,11 @@
 # @tgwrapper/core
 
+## 0.17.0
+
+### Minor Changes
+
+- 41e8d6f: Telegra API update
+
 ## 0.16.4
 
 ### Patch Changes

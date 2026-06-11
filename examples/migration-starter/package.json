@@ -1,6 +1,6 @@
 {
   "name": "@tgwrapper/starter-migration",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "type": "module",
   "description": "Migration starter for moving Telegraf or grammY bots to TGWrapper",
   "license": "Apache-2.0",
@@ -38,9 +38,9 @@
     "start:after": "tsx src/bot-after.ts"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.16.4",
-    "@tgwrapper/adapter-redis": "^0.8.3",
-    "@tgwrapper/observability": "^0.9.3",
+    "@tgwrapper/core": "workspace:^",
+    "@tgwrapper/adapter-redis": "workspace:^",
+    "@tgwrapper/observability": "workspace:^",
     "ioredis": "^5.9.3",
     "telegraf": "^4.16.3"
   },

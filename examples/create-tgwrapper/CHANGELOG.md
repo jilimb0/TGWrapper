@@ -1,5 +1,11 @@
 # @tgwrapper/create
 
+## 0.1.6
+
+### Patch Changes
+
+- 5c27dc2: fix
+
 ## 0.1.5
 
 ### Patch Changes

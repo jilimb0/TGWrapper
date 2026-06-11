@@ -51,7 +51,7 @@ jobs:
           path: .artifacts/failure-summary.md
           if-no-files-found: error
       - name: Fail job if gate failed
-        if: steps.run_check.outcome == 'failure'
+        if: failure() && steps.run_check.outcome == 'failure'
         run: exit 1
 
   verify:
@@ -96,7 +96,7 @@ jobs:
           path: .artifacts/failure-summary.md
           if-no-files-found: error
       - name: Fail job if gate failed
-        if: steps.run_verify.outcome == 'failure'
+        if: failure() && steps.run_verify.outcome == 'failure'
         run: exit 1
 
   release-integrity:
@@ -139,7 +139,7 @@ jobs:
           path: .artifacts/failure-summary.md
           if-no-files-found: error
       - name: Fail job if gate failed
-        if: steps.run_release_integrity.outcome == 'failure'
+        if: failure() && steps.run_release_integrity.outcome == 'failure'
         run: exit 1
 
   redis-integration:
@@ -187,7 +187,7 @@ jobs:
           path: .artifacts/failure-summary.md
           if-no-files-found: error
       - name: Fail job if gate failed
-        if: steps.run_redis_integration.outcome == 'failure'
+        if: failure() && steps.run_redis_integration.outcome == 'failure'
         run: exit 1
 
   summary:

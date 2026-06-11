@@ -6,6 +6,6 @@
     "@tgwrapper/starter-migration": "^0.2.5",
     "@tgwrapper/starter-standard-bot": "^0.2.5",
     "@tgwrapper/starter-support-bot": "^0.2.5",
-    "@tgwrapper/create": "^0.1.5"
+    "@tgwrapper/create": "^0.1.6"
   }
 }

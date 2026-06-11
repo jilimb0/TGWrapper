@@ -36,8 +36,8 @@
     "access": "public"
   },
   "dependencies": {
-    "@tgwrapper/starter-migration": "workspace:^",
-    "@tgwrapper/starter-standard-bot": "workspace:^",
-    "@tgwrapper/starter-support-bot": "workspace:^"
+    "@tgwrapper/starter-migration": "^0.2.6",
+    "@tgwrapper/starter-standard-bot": "^0.2.6",
+    "@tgwrapper/starter-support-bot": "^0.2.6"
   }
 }

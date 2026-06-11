@@ -9,7 +9,7 @@
     "dev": "tsx src/server.ts"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.16.4"
+    "@tgwrapper/core": "workspace:^"
   },
   "devDependencies": {
     "tsx": "^4.20.5"

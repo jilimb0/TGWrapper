@@ -10,7 +10,7 @@
     "test": "tsc --noEmit"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.17.0"
+    "@tgwrapper/core": "workspace:^"
   },
   "devDependencies": {
     "tsx": "^4.20.5",

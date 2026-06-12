@@ -33,8 +33,8 @@ importers:
         specifier: ^0.8.3
         version: 0.8.3
       '@tgwrapper/core':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.17.1
+        version: 0.17.1
       '@tgwrapper/observability':
         specifier: ^0.9.3
         version: 0.9.3
@@ -52,8 +52,8 @@ importers:
   examples/aws-lambda:
     dependencies:
       '@tgwrapper/core':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.17.1
+        version: 0.17.1
     devDependencies:
       serverless:
         specifier: ^4.6.2
@@ -65,8 +65,8 @@ importers:
   examples/cloudflare-worker:
     dependencies:
       '@tgwrapper/core':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.17.1
+        version: 0.17.1
     devDependencies:
       wrangler:
         specifier: ^4.75.0
@@ -90,8 +90,8 @@ importers:
         specifier: ^0.8.3
         version: 0.8.3
       '@tgwrapper/core':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.17.1
+        version: 0.17.1
       '@tgwrapper/observability':
         specifier: ^0.9.3
         version: 0.9.3
@@ -118,8 +118,8 @@ importers:
         specifier: ^0.8.3
         version: 0.8.3
       '@tgwrapper/core':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.17.1
+        version: 0.17.1
       '@tgwrapper/observability':
         specifier: ^0.9.3
         version: 0.9.3
@@ -140,8 +140,8 @@ importers:
         specifier: ^0.8.3
         version: 0.8.3
       '@tgwrapper/core':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.17.1
+        version: 0.17.1
       '@tgwrapper/observability':
         specifier: ^0.9.3
         version: 0.9.3
@@ -159,8 +159,8 @@ importers:
   examples/node-http:
     dependencies:
       '@tgwrapper/core':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.17.1
+        version: 0.17.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -169,8 +169,8 @@ importers:
   examples/polling-starter:
     dependencies:
       '@tgwrapper/core':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.17.1
+        version: 0.17.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -182,8 +182,8 @@ importers:
   examples/serverless-webhook-starter:
     dependencies:
       '@tgwrapper/core':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.17.1
+        version: 0.17.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -198,8 +198,8 @@ importers:
         specifier: ^0.8.3
         version: 0.8.3
       '@tgwrapper/core':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.17.1
+        version: 0.17.1
       '@tgwrapper/observability':
         specifier: ^0.9.3
         version: 0.9.3
@@ -223,8 +223,8 @@ importers:
         specifier: ^0.8.3
         version: 0.8.3
       '@tgwrapper/core':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.17.1
+        version: 0.17.1
       '@tgwrapper/observability':
         specifier: ^0.9.3
         version: 0.9.3
@@ -245,8 +245,8 @@ importers:
   examples/template-bot:
     dependencies:
       '@tgwrapper/core':
-        specifier: ^0.17.0
-        version: 0.17.0
+        specifier: ^0.17.1
+        version: 0.17.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -1167,8 +1167,8 @@ packages:
     resolution: {integrity: sha512-OVaU5sbrwo4VOsk/GUH3jgfZBV5S6wLZT9tNUfBlgRFVxOERVltxkwK5lP9GtRN9ujhdyHkVft2qR1HBOWS+Bg==}
     engines: {node: '>=22.13'}
 
-  '@tgwrapper/core@0.17.0':
-    resolution: {integrity: sha512-W0s7oDMvu9u3XYzIErYm8NpiO1GeSQmOq0uFHAs9zmLQkUz5C4RE9Fo7dDyvfhoRxnJI6rzVSGWis2TKoAUG0A==}
+  '@tgwrapper/core@0.17.1':
+    resolution: {integrity: sha512-/L/kv5vWkQwjDK+bYaGAeegtCFsZ0ciNOk9SlK5XWZ+Ig/SkJwLavoaM12RWMXGDDGfQlpz40v0Q78Thmah1aQ==}
     engines: {node: '>=22.13'}
 
   '@tgwrapper/observability@0.9.3':
@@ -3280,14 +3280,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tgwrapper/core@0.17.0': {}
+  '@tgwrapper/core@0.17.1': {}
 
   '@tgwrapper/observability@0.9.3': {}
 
   '@tgwrapper/starter-migration@0.2.6':
     dependencies:
       '@tgwrapper/adapter-redis': 0.8.3
-      '@tgwrapper/core': 0.17.0
+      '@tgwrapper/core': 0.17.1
       '@tgwrapper/observability': 0.9.3
       ioredis: 5.11.1
       telegraf: 4.16.3
@@ -3298,7 +3298,7 @@ snapshots:
   '@tgwrapper/starter-standard-bot@0.2.6':
     dependencies:
       '@tgwrapper/adapter-redis': 0.8.3
-      '@tgwrapper/core': 0.17.0
+      '@tgwrapper/core': 0.17.1
       '@tgwrapper/observability': 0.9.3
       ioredis: 5.11.1
     transitivePeerDependencies:
@@ -3307,7 +3307,7 @@ snapshots:
   '@tgwrapper/starter-support-bot@0.2.6':
     dependencies:
       '@tgwrapper/adapter-redis': 0.8.3
-      '@tgwrapper/core': 0.17.0
+      '@tgwrapper/core': 0.17.1
       '@tgwrapper/observability': 0.9.3
       ioredis: 5.11.1
     transitivePeerDependencies:

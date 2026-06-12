@@ -14,10 +14,15 @@ if (methods.length === 0) {
 
 const strictResults = {
   answerCallbackQuery: 'boolean',
+  answerGuestQuery: 'boolean',
   answerInlineQuery: 'boolean',
   answerPreCheckoutQuery: 'boolean',
   answerShippingQuery: 'boolean',
+  approveSuggestedPost: 'boolean',
+  declineSuggestedPost: 'boolean',
+  deleteAllMessageReactions: 'boolean',
   deleteMessage: 'boolean',
+  deleteMessageReaction: 'boolean',
   deleteMessages: 'boolean',
   deleteWebhook: 'boolean',
   getMe: 'import("./telegram.js").User',
@@ -25,6 +30,7 @@ const strictResults = {
   getWebhookInfo: 'UnknownResult',
   sendDocument: 'import("./telegram.js").Message',
   sendInvoice: 'import("./telegram.js").Message',
+  sendLivePhoto: 'import("./telegram.js").Message',
   sendMediaGroup: 'import("./telegram.js").Message[]',
   sendMessage: 'import("./telegram.js").Message',
   sendPhoto: 'import("./telegram.js").Message',

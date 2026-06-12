@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { parseDocForMethods, parseDocForUpdateKeys } from './lib/telegram-doc-parser.mjs';
+import { parseDocForMethods, parseDocForObjects, parseDocForStructuredMethods, parseDocForUpdateKeys } from './lib/telegram-doc-parser.mjs';
 
 const API_DOC_URL = 'https://core.telegram.org/bots/api';
 
@@ -68,9 +68,12 @@ function parseLocalTypes() {
     source: 'local-types',
     source_url: null,
     methods: uniqueSorted([...generatedMethods, ...methods]),
-    update_keys: uniqueSorted([...generatedUpdateKeys, ...fallbackUpdateKeys])
+    update_keys: uniqueSorted([...generatedUpdateKeys, ...fallbackUpdateKeys]),
+    structured_methods: [],
+    objects: []
   };
 }
+
 
 function parseSnapshotFallback() {
   const snapshotPath = resolve(process.cwd(), 'docs/telegram-api-schema.snapshot.json');
@@ -81,6 +84,8 @@ function parseSnapshotFallback() {
   const snapshot = JSON.parse(readFileSync(snapshotPath, 'utf8'));
   const methods = Array.isArray(snapshot.methods) ? uniqueSorted(snapshot.methods) : [];
   const updateKeys = Array.isArray(snapshot.update_keys) ? uniqueSorted(snapshot.update_keys) : [];
+  const structuredMethods = Array.isArray(snapshot.structured_methods) ? snapshot.structured_methods : [];
+  const objects = Array.isArray(snapshot.objects) ? snapshot.objects : [];
   const source = snapshot.source ?? 'unknown';
 
   if (source !== 'telegram-api-doc') {
@@ -94,7 +99,9 @@ function parseSnapshotFallback() {
     source: 'telegram-api-doc',
     source_url: snapshot.source_url ?? API_DOC_URL,
     methods,
-    update_keys: updateKeys
+    update_keys: updateKeys,
+    structured_methods: structuredMethods,
+    objects
   };
 }
 
@@ -107,6 +114,8 @@ async function parseRemoteTypes() {
   const html = await response.text();
   const methods = parseDocForMethods(html);
   const updateKeys = parseDocForUpdateKeys(html);
+  const structuredMethods = parseDocForStructuredMethods(html);
+  const objects = parseDocForObjects(html);
 
   if (methods.length === 0 || updateKeys.length === 0) {
     throw new Error(`Invalid parsed schema from Telegram API page (methods=${methods.length}, update_keys=${updateKeys.length})`);
@@ -116,7 +125,9 @@ async function parseRemoteTypes() {
     source: 'telegram-api-doc',
     source_url: API_DOC_URL,
     methods,
-    update_keys: updateKeys
+    update_keys: updateKeys,
+    structured_methods: structuredMethods,
+    objects
   };
 }
 

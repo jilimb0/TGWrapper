@@ -1,11 +1,12 @@
 /**
  * AUTO-GENERATED FILE. DO NOT EDIT.
  * Source: docs/telegram-api-schema.snapshot.json
- * Generated at: 2026-05-14T20:19:34.068Z
+ * Generated at: 2026-06-12T10:40:33.137Z
  */
 
 export type TelegramApiMethodName =
   | 'answerCallbackQuery'
+  | 'answerChatJoinRequestQuery'
   | 'answerGuestQuery'
   | 'answerInlineQuery'
   | 'answerPreCheckoutQuery'
@@ -112,6 +113,7 @@ export type TelegramApiMethodName =
   | 'sendAnimation'
   | 'sendAudio'
   | 'sendChatAction'
+  | 'sendChatJoinRequestWebApp'
   | 'sendChecklist'
   | 'sendContact'
   | 'sendDice'
@@ -127,6 +129,8 @@ export type TelegramApiMethodName =
   | 'sendPaidMedia'
   | 'sendPhoto'
   | 'sendPoll'
+  | 'sendRichMessage'
+  | 'sendRichMessageDraft'
   | 'sendSticker'
   | 'sendVenue'
   | 'sendVideo'

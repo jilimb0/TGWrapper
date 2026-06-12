@@ -1,6 +1,6 @@
 import type { ApiClient } from './api-client.js';
 import type { JsonObject, SessionEnvelope } from '../types/core.js';
-import type { CallbackQuery, Message, Update } from '../types/telegram.js';
+import type { CallbackQuery, InlineKeyboardMarkup, Message, Update } from '../types/telegram.js';
 
 interface SceneController {
   enter(nextState: string): Promise<void>;
@@ -117,7 +117,7 @@ export class Context<TState extends string, TData extends JsonObject> {
     });
   }
 
-  public async editMessageReplyMarkup(replyMarkup: JsonObject): Promise<unknown> {
+  public async editMessageReplyMarkup(replyMarkup: InlineKeyboardMarkup): Promise<unknown> {
     const targetMessage = this.update.callback_query?.message ?? this.primaryMessage;
     if (!targetMessage) {
       throw new Error('Cannot edit reply markup: update has no resolvable message.');

@@ -7,10 +7,15 @@ export type UnknownResult = Record<string, unknown>;
 
 export type StrictTelegramApiMethodResults = {
   answerCallbackQuery: boolean;
+  answerGuestQuery: boolean;
   answerInlineQuery: boolean;
   answerPreCheckoutQuery: boolean;
   answerShippingQuery: boolean;
+  approveSuggestedPost: boolean;
+  declineSuggestedPost: boolean;
+  deleteAllMessageReactions: boolean;
   deleteMessage: boolean;
+  deleteMessageReaction: boolean;
   deleteMessages: boolean;
   deleteWebhook: boolean;
   getMe: import("./telegram.js").User;
@@ -18,6 +23,7 @@ export type StrictTelegramApiMethodResults = {
   getWebhookInfo: UnknownResult;
   sendDocument: import("./telegram.js").Message;
   sendInvoice: import("./telegram.js").Message;
+  sendLivePhoto: import("./telegram.js").Message;
   sendMediaGroup: import("./telegram.js").Message[];
   sendMessage: import("./telegram.js").Message;
   sendPhoto: import("./telegram.js").Message;
@@ -33,13 +39,14 @@ export type StrictTelegramApiMethodResultName = keyof StrictTelegramApiMethodRes
 
 export type TelegramApiMethodResults = {
   answerCallbackQuery: boolean;
-  answerGuestQuery: UnknownResult;
+  answerChatJoinRequestQuery: UnknownResult;
+  answerGuestQuery: boolean;
   answerInlineQuery: boolean;
   answerPreCheckoutQuery: boolean;
   answerShippingQuery: boolean;
   answerWebAppQuery: UnknownResult;
   approveChatJoinRequest: UnknownResult;
-  approveSuggestedPost: UnknownResult;
+  approveSuggestedPost: boolean;
   banChatMember: UnknownResult;
   banChatSenderChat: UnknownResult;
   close: UnknownResult;
@@ -54,14 +61,14 @@ export type TelegramApiMethodResults = {
   createInvoiceLink: UnknownResult;
   createNewStickerSet: UnknownResult;
   declineChatJoinRequest: UnknownResult;
-  declineSuggestedPost: UnknownResult;
-  deleteAllMessageReactions: UnknownResult;
+  declineSuggestedPost: boolean;
+  deleteAllMessageReactions: boolean;
   deleteBusinessMessages: UnknownResult;
   deleteChatPhoto: UnknownResult;
   deleteChatStickerSet: UnknownResult;
   deleteForumTopic: UnknownResult;
   deleteMessage: boolean;
-  deleteMessageReaction: UnknownResult;
+  deleteMessageReaction: boolean;
   deleteMessages: boolean;
   deleteMyCommands: UnknownResult;
   deleteStickerFromSet: UnknownResult;
@@ -139,6 +146,7 @@ export type TelegramApiMethodResults = {
   sendAnimation: UnknownResult;
   sendAudio: UnknownResult;
   sendChatAction: UnknownResult;
+  sendChatJoinRequestWebApp: UnknownResult;
   sendChecklist: UnknownResult;
   sendContact: UnknownResult;
   sendDice: UnknownResult;
@@ -146,7 +154,7 @@ export type TelegramApiMethodResults = {
   sendGame: UnknownResult;
   sendGift: UnknownResult;
   sendInvoice: import("./telegram.js").Message;
-  sendLivePhoto: UnknownResult;
+  sendLivePhoto: import("./telegram.js").Message;
   sendLocation: UnknownResult;
   sendMediaGroup: import("./telegram.js").Message[];
   sendMessage: import("./telegram.js").Message;
@@ -154,6 +162,8 @@ export type TelegramApiMethodResults = {
   sendPaidMedia: UnknownResult;
   sendPhoto: import("./telegram.js").Message;
   sendPoll: import("./telegram.js").Message;
+  sendRichMessage: UnknownResult;
+  sendRichMessageDraft: UnknownResult;
   sendSticker: import("./telegram.js").Message;
   sendVenue: UnknownResult;
   sendVideo: UnknownResult;

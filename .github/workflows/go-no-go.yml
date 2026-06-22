@@ -19,7 +19,7 @@ jobs:
     env:
       NPM_PUBLISH_PROVENANCE: "false"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Upgrade npm for trusted publishing parity
         run: |
           sudo npm i -g npm@11.8.0
@@ -77,7 +77,7 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/pnpm-install
         with:
           node-version: "24"

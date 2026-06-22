@@ -18,7 +18,7 @@ jobs:
   watchdog:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v6
         with:
           node-version: 24
@@ -56,7 +56,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
       - name: Create issue
         if: steps.drift.outcome == 'failure'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

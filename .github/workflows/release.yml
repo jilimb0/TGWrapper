@@ -21,7 +21,7 @@ jobs:
       NPM_PUBLISH_PROVENANCE: "false"
       CHANGESETS_RELEASE: "1"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Upgrade npm for trusted publishing
         run: |

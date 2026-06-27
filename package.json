@@ -27,7 +27,7 @@
   },
   "sideEffects": false,
   "engines": {
-    "node": ">=22.13"
+    "node": ">=26.0"
   },
   "scripts": {
     "build": "pnpm build:esm && pnpm build:cjs",

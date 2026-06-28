@@ -15,9 +15,13 @@ describe('TreeRouter', () => {
     router.use(async (ctx) => {
       ctx.trace.push('fallback');
     }, 1);
-    router.command('/start', async (ctx) => {
-      ctx.trace.push('start');
-    }, 100);
+    router.command(
+      '/start',
+      async (ctx) => {
+        ctx.trace.push('start');
+      },
+      100,
+    );
 
     const ctx: TestContext = { trace: [], command: '/start' };
     const handled = await router.dispatch(ctx);
@@ -28,19 +32,23 @@ describe('TreeRouter', () => {
 
   it('uses scene handlers with state-first priority', async () => {
     const router = new TreeRouter<TestContext>();
-    router.regex(/hello/i, async (ctx) => {
-      ctx.trace.push('regex');
-    }, 50);
+    router.regex(
+      /hello/i,
+      async (ctx) => {
+        ctx.trace.push('regex');
+      },
+      50,
+    );
     router.scene('await_name', [
       async (ctx) => {
         ctx.trace.push('scene');
-      }
+      },
     ]);
 
     const ctx: TestContext = {
       trace: [],
       text: 'hello',
-      currentState: 'await_name'
+      currentState: 'await_name',
     };
 
     await router.dispatch(ctx);

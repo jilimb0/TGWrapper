@@ -1,9 +1,9 @@
-import type { BotClient, BotEventHandler, BotEventName } from '../core/bot-client.js';
 import type { BinaryInput } from '../core/api-client.js';
-import type { TelegramApiMethodPayloads } from '../types/telegram.payloads.generated.js';
-import { createCallbackUpdate, createMessageUpdate } from './update-factory.js';
+import type { BotClient, BotEventHandler, BotEventName } from '../core/bot-client.js';
 import type { Update } from '../types/telegram.js';
+import type { TelegramApiMethodPayloads } from '../types/telegram.payloads.generated.js';
 import type { TelegramApiMethodResults as MethodResults } from '../types/telegram.results.generated.js';
+import { createCallbackUpdate, createMessageUpdate } from './update-factory.js';
 
 export interface MockBotCall {
   method: string;
@@ -18,12 +18,15 @@ export class MockBotClient implements BotClient {
     error: new Set(),
     api_call: new Set(),
     api_result: new Set(),
-    api_error: new Set()
+    api_error: new Set(),
   };
   private readonly callsLog: MockBotCall[] = [];
   private running = false;
 
-  public on<TEvent extends BotEventName>(event: TEvent, handler: BotEventHandler<TEvent>): () => void {
+  public on<TEvent extends BotEventName>(
+    event: TEvent,
+    handler: BotEventHandler<TEvent>,
+  ): () => void {
     (this.handlers[event] as Set<BotEventHandler<TEvent>>).add(handler);
     return () => {
       (this.handlers[event] as Set<BotEventHandler<TEvent>>).delete(handler);
@@ -65,15 +68,15 @@ export class MockBotClient implements BotClient {
       createMessageUpdate({
         chatId,
         userId,
-        text: command
-      })
+        text: command,
+      }),
     );
   }
 
   public async sendMessage(
     chatId: number | string,
     text: string,
-    extra: Omit<TelegramApiMethodPayloads['sendMessage'], 'chat_id' | 'text'> = {}
+    extra: Omit<TelegramApiMethodPayloads['sendMessage'], 'chat_id' | 'text'> = {},
   ): Promise<MethodResults['sendMessage']> {
     this.callsLog.push({ method: 'sendMessage', payload: { chat_id: chatId, text, ...extra } });
     return true as unknown as MethodResults['sendMessage'];
@@ -82,31 +85,43 @@ export class MockBotClient implements BotClient {
   public async sendDocument(
     chatId: number | string,
     document: BinaryInput,
-    extra: Omit<TelegramApiMethodPayloads['sendDocument'], 'chat_id' | 'document'> = {}
+    extra: Omit<TelegramApiMethodPayloads['sendDocument'], 'chat_id' | 'document'> = {},
   ): Promise<MethodResults['sendDocument']> {
-    this.callsLog.push({ method: 'sendDocument', payload: { chat_id: chatId, document, ...extra } });
+    this.callsLog.push({
+      method: 'sendDocument',
+      payload: { chat_id: chatId, document, ...extra },
+    });
     return true as unknown as MethodResults['sendDocument'];
   }
 
   public async answerCallbackQuery(
     callbackQueryId: string,
-    extra: Omit<TelegramApiMethodPayloads['answerCallbackQuery'], 'callback_query_id'> = {}
+    extra: Omit<TelegramApiMethodPayloads['answerCallbackQuery'], 'callback_query_id'> = {},
   ): Promise<MethodResults['answerCallbackQuery']> {
-    this.callsLog.push({ method: 'answerCallbackQuery', payload: { callback_query_id: callbackQueryId, ...extra } });
+    this.callsLog.push({
+      method: 'answerCallbackQuery',
+      payload: { callback_query_id: callbackQueryId, ...extra },
+    });
     return true as unknown as MethodResults['answerCallbackQuery'];
   }
 
   public async editMessageText(
-    payload: TelegramApiMethodPayloads['editMessageText']
+    payload: TelegramApiMethodPayloads['editMessageText'],
   ): Promise<MethodResults['editMessageText']> {
-    this.callsLog.push({ method: 'editMessageText', payload: payload as unknown as Record<string, unknown> });
+    this.callsLog.push({
+      method: 'editMessageText',
+      payload: payload as unknown as Record<string, unknown>,
+    });
     return true as unknown as MethodResults['editMessageText'];
   }
 
   public async editMessageReplyMarkup(
-    payload: TelegramApiMethodPayloads['editMessageReplyMarkup']
+    payload: TelegramApiMethodPayloads['editMessageReplyMarkup'],
   ): Promise<MethodResults['editMessageReplyMarkup']> {
-    this.callsLog.push({ method: 'editMessageReplyMarkup', payload: payload as unknown as Record<string, unknown> });
+    this.callsLog.push({
+      method: 'editMessageReplyMarkup',
+      payload: payload as unknown as Record<string, unknown>,
+    });
     return true as unknown as MethodResults['editMessageReplyMarkup'];
   }
 
@@ -126,7 +141,10 @@ export class MockBotClient implements BotClient {
   public createMessageUpdate = createMessageUpdate;
   public createCallbackUpdate = createCallbackUpdate;
 
-  private async emit<TEvent extends BotEventName>(event: TEvent, payload: Parameters<BotEventHandler<TEvent>>[0]): Promise<void> {
+  private async emit<TEvent extends BotEventName>(
+    event: TEvent,
+    payload: Parameters<BotEventHandler<TEvent>>[0],
+  ): Promise<void> {
     for (const handler of this.handlers[event]) {
       await handler(payload as never);
     }

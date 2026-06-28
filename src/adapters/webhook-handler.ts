@@ -15,7 +15,7 @@ export class WebhookHandler {
     this.updateHandler = updateHandler;
     this.options = {
       secretToken: options.secretToken,
-      secretHeader: options.secretHeader ?? 'x-telegram-bot-api-secret-token'
+      secretHeader: options.secretHeader ?? 'x-telegram-bot-api-secret-token',
     };
   }
 
@@ -54,13 +54,16 @@ export class WebhookHandler {
     return {
       status,
       headers: {
-        'content-type': 'application/json; charset=utf-8'
+        'content-type': 'application/json; charset=utf-8',
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
     };
   }
 
-  private readHeader(headers: Record<string, string | undefined>, name: string): string | undefined {
+  private readHeader(
+    headers: Record<string, string | undefined>,
+    name: string,
+  ): string | undefined {
     return headers[name] ?? headers[name.toLowerCase()] ?? headers[name.toUpperCase()];
   }
 }

@@ -1,12 +1,12 @@
-import { CircuitOpenError } from './errors.js';
 import type { CircuitBreakerOptions } from '../types/core.js';
+import { CircuitOpenError } from './errors.js';
 
 type CircuitState = 'closed' | 'open' | 'half_open';
 
 const DEFAULT_CIRCUIT: CircuitBreakerOptions = {
   failureThreshold: 5,
   cooldownMs: 15_000,
-  halfOpenMaxRequests: 1
+  halfOpenMaxRequests: 1,
 };
 
 export class CircuitBreaker {
@@ -63,7 +63,7 @@ export class CircuitBreaker {
   public snapshot(): { state: CircuitState; failures: number } {
     return {
       state: this.state,
-      failures: this.failures
+      failures: this.failures,
     };
   }
 }

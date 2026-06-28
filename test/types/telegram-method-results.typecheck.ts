@@ -9,7 +9,7 @@ type _SetGameScoreResult = ReturnType<ApiMethods['setGameScore']>;
 const _sendMessageResult: _SendMessageResult = {
   message_id: 1,
   date: 1,
-  chat: { id: 1, type: 'private' }
+  chat: { id: 1, type: 'private' },
 };
 
 const _getUpdatesResult: _GetUpdatesResult = [
@@ -19,15 +19,15 @@ const _getUpdatesResult: _GetUpdatesResult = [
       message_id: 1,
       date: 1,
       chat: { id: 1, type: 'private' },
-      text: 'hello'
-    }
-  } as Update
+      text: 'hello',
+    },
+  } as Update,
 ];
 
 const _getMeResult: _GetMeResult = {
   id: 1,
   is_bot: true,
-  first_name: 'bot'
+  first_name: 'bot',
 } as User;
 
 const _setWebhookResult: _SetWebhookResult = true;
@@ -40,12 +40,12 @@ const _badSendMessageResult: _SendMessageResult = true;
 
 const _badGetUpdatesResult: _GetUpdatesResult = {
   // @ts-expect-error getUpdates result is Update[]
-  update_id: 1
+  update_id: 1,
 };
 
 // @ts-expect-error getMe result is User
 const _badGetMeResult: _GetMeResult = {
-  ok: true
+  ok: true,
 };
 
 void _sendMessageResult;

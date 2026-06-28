@@ -1,6 +1,6 @@
-import type { ApiClient } from './api-client.js';
 import type { JsonObject, SessionEnvelope } from '../types/core.js';
 import type { CallbackQuery, InlineKeyboardMarkup, Message, Update } from '../types/telegram.js';
+import type { ApiClient } from './api-client.js';
 
 interface SceneController {
   enter(nextState: string): Promise<void>;
@@ -99,7 +99,7 @@ export class Context<TState extends string, TData extends JsonObject> {
       chat_id: targetMessage.chat.id,
       message_id: targetMessage.message_id,
       text,
-      ...extra
+      ...extra,
     });
   }
 
@@ -113,7 +113,7 @@ export class Context<TState extends string, TData extends JsonObject> {
       chat_id: targetMessage.chat.id,
       message_id: targetMessage.message_id,
       caption,
-      ...extra
+      ...extra,
     });
   }
 
@@ -126,7 +126,7 @@ export class Context<TState extends string, TData extends JsonObject> {
     return this.apiClient.editMessageReplyMarkup({
       chat_id: targetMessage.chat.id,
       message_id: targetMessage.message_id,
-      reply_markup: replyMarkup
+      reply_markup: replyMarkup,
     });
   }
 

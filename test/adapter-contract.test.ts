@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
+import type { ApiGatewayV2Event } from '../src/adapters/aws-lambda-handler.js';
 import { AwsLambdaHandler } from '../src/adapters/aws-lambda-handler.js';
 import { CloudflareWorkerHandler } from '../src/adapters/cloudflare-worker-handler.js';
+import type {
+  NodeLikeIncomingMessage,
+  NodeLikeServerResponse,
+} from '../src/adapters/node-http-handler.js';
 import { NodeHttpHandler } from '../src/adapters/node-http-handler.js';
 import { WebhookHandler } from '../src/adapters/webhook-handler.js';
-import type { ApiGatewayV2Event } from '../src/adapters/aws-lambda-handler.js';
-import type { NodeLikeIncomingMessage, NodeLikeServerResponse } from '../src/adapters/node-http-handler.js';
 
 const secretHeader = 'x-telegram-bot-api-secret-token';
 const secretToken = 'sec';
@@ -15,8 +18,8 @@ const validUpdate = {
     date: Math.floor(Date.now() / 1000),
     chat: { id: 1, type: 'private' as const },
     from: { id: 1, is_bot: false, first_name: 'u' },
-    text: 'hello'
-  }
+    text: 'hello',
+  },
 };
 
 class FakeNodeRequest implements NodeLikeIncomingMessage {
@@ -35,7 +38,10 @@ class FakeNodeRequest implements NodeLikeIncomingMessage {
     this.rawBody = rawBody;
   }
 
-  public on(event: 'data' | 'end' | 'error', listener: ((chunk: unknown) => void) | (() => void) | ((error: Error) => void)): void {
+  public on(
+    event: 'data' | 'end' | 'error',
+    listener: ((chunk: unknown) => void) | (() => void) | ((error: Error) => void),
+  ): void {
     if (event === 'data') {
       this.listeners.data = listener as (chunk: unknown) => void;
     }
@@ -72,9 +78,9 @@ function buildWebhookHandler() {
     {
       handleUpdate: async () => {
         return;
-      }
+      },
     },
-    { secretToken }
+    { secretToken },
   );
 }
 
@@ -90,16 +96,16 @@ describe('Adapter contract', () => {
       rawPath: '/webhook',
       rawQueryString: '',
       headers: {
-        [secretHeader]: secretToken
+        [secretHeader]: secretToken,
       },
       requestContext: {
         http: {
           method: 'POST',
-          path: '/webhook'
-        }
+          path: '/webhook',
+        },
       },
       body: rawBody,
-      isBase64Encoded: false
+      isBase64Encoded: false,
     };
     const lambdaResult = await lambda.handle(lambdaEvent);
     expect(lambdaResult.statusCode).toBe(200);
@@ -110,10 +116,10 @@ describe('Adapter contract', () => {
         method: 'POST',
         headers: {
           [secretHeader]: secretToken,
-          'content-type': 'application/json'
+          'content-type': 'application/json',
         },
-        body: rawBody
-      })
+        body: rawBody,
+      }),
     );
     expect(workerResponse.status).toBe(200);
 
@@ -139,7 +145,7 @@ describe('Adapter contract', () => {
       headers: { [secretHeader]: 'bad' },
       requestContext: { http: { method: 'POST', path: '/webhook' } },
       body: rawBody,
-      isBase64Encoded: false
+      isBase64Encoded: false,
     });
     expect(lambdaResult.statusCode).toBe(401);
 
@@ -148,8 +154,8 @@ describe('Adapter contract', () => {
       new Request('https://example.com/webhook', {
         method: 'POST',
         headers: { [secretHeader]: 'bad' },
-        body: rawBody
-      })
+        body: rawBody,
+      }),
     );
     expect(workerResponse.status).toBe(401);
 

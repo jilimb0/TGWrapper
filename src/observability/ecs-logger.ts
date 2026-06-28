@@ -29,7 +29,7 @@ export class EcsJsonLogger implements Logger {
       'labels.tenant_id': this.context.tenantId,
       'labels.bot_id': this.context.botId,
       'labels.request_id': event.requestId,
-      ...this.toFlatData(event.data)
+      ...this.toFlatData(event.data),
     };
 
     this.sink.write(JSON.stringify(this.stripUndefined(payload)));

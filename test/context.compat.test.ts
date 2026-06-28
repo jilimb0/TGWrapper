@@ -3,7 +3,10 @@ import { ApiClient } from '../src/core/api-client.js';
 import { Context } from '../src/core/context.js';
 import type { Update } from '../src/types/telegram.js';
 
-function makeContext(update: Update, calls: Array<{ method: string; payload: Record<string, unknown> }>) {
+function makeContext(
+  update: Update,
+  calls: Array<{ method: string; payload: Record<string, unknown> }>,
+) {
   return new Context({
     update,
     session: {
@@ -11,19 +14,19 @@ function makeContext(update: Update, calls: Array<{ method: string; payload: Rec
       data: { seen: 0 },
       version: 0,
       encrypted: false,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     },
     sceneController: {
       enter: async () => undefined,
-      leave: async () => undefined
+      leave: async () => undefined,
     },
     apiClient: new ApiClient({
       token: 'TEST_TOKEN',
       mockResponder: async (method, payload) => {
         calls.push({ method, payload: payload as Record<string, unknown> });
         return { ok: true };
-      }
-    })
+      },
+    }),
   });
 }
 
@@ -37,8 +40,8 @@ describe('Context compatibility fallbacks', () => {
         from: { id: 77, is_bot: false, first_name: 'A' },
         date: 1,
         old_chat_member: { status: 'member', user: { id: 12, is_bot: false, first_name: 'u' } },
-        new_chat_member: { status: 'member', user: { id: 12, is_bot: false, first_name: 'u' } }
-      }
+        new_chat_member: { status: 'member', user: { id: 12, is_bot: false, first_name: 'u' } },
+      },
     } as unknown as Update;
 
     const ctx = makeContext(update, calls);
@@ -59,8 +62,8 @@ describe('Context compatibility fallbacks', () => {
         edit_date: 2,
         chat: { id: 999, type: 'private', first_name: 'u' },
         from: { id: 42, is_bot: false, first_name: 'U' },
-        text: 'old'
-      }
+        text: 'old',
+      },
     } as unknown as Update;
 
     const ctx = makeContext(update, calls);
@@ -78,8 +81,8 @@ describe('Context compatibility fallbacks', () => {
         id: 'iq',
         from: { id: 700, is_bot: false, first_name: 'inline' },
         query: 'q',
-        offset: ''
-      }
+        offset: '',
+      },
     } as unknown as Update;
 
     const ctx = makeContext(update, []);
@@ -95,8 +98,8 @@ describe('Context compatibility fallbacks', () => {
         user_chat_id: 42,
         date: 1,
         can_reply: true,
-        is_enabled: true
-      }
+        is_enabled: true,
+      },
     } as unknown as Update;
 
     const ctx = makeContext(update, []);
@@ -108,8 +111,8 @@ describe('Context compatibility fallbacks', () => {
       update_id: 44,
       purchased_paid_media: {
         from: { id: 1001, is_bot: false, first_name: 'payer' },
-        paid_media_payload: 'payload-v2'
-      }
+        paid_media_payload: 'payload-v2',
+      },
     } as unknown as Update;
 
     const ctx = makeContext(update, []);
@@ -123,8 +126,8 @@ describe('Context compatibility fallbacks', () => {
       deleted_business_messages: {
         business_connection_id: 'bc_2',
         chat: { id: 707, type: 'private', first_name: 'biz-chat' },
-        message_ids: [1, 2]
-      }
+        message_ids: [1, 2],
+      },
     } as unknown as Update;
 
     const ctx = makeContext(update, calls);
@@ -144,8 +147,8 @@ describe('Context compatibility fallbacks', () => {
         date: 1,
         chat: { id: 909, type: 'private' },
         from: { id: 111, is_bot: false, first_name: 'guest' },
-        guest_query_id: 'gq_6'
-      }
+        guest_query_id: 'gq_6',
+      },
     } as unknown as Update;
 
     const ctx = makeContext(update, calls);

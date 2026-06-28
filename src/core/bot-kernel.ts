@@ -1,9 +1,9 @@
-import { Context } from './context.js';
-import type { ApiClient } from './api-client.js';
-import type { JsonObject } from '../types/core.js';
 import type { SessionManager } from '../fsm/session-manager.js';
 import type { TreeRouter } from '../router/router.js';
+import type { JsonObject } from '../types/core.js';
 import type { Update } from '../types/telegram.js';
+import type { ApiClient } from './api-client.js';
+import { Context } from './context.js';
 
 interface BotKernelOptions<TState extends string, TData extends JsonObject> {
   apiClient: ApiClient;
@@ -22,9 +22,13 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
   private readonly router: TreeRouter<Context<TState, TData>>;
   private readonly resolveSessionKey: (update: Update) => string | null;
   private readonly transitions: Record<TState, readonly TState[]>;
-  private readonly onTransition: ((from: TState | null, to: TState, sessionKey: string) => Promise<void>) | undefined;
+  private readonly onTransition:
+    | ((from: TState | null, to: TState, sessionKey: string) => Promise<void>)
+    | undefined;
   private readonly onUpdate: ((update: Update, sessionKey: string) => Promise<void>) | undefined;
-  private readonly onError: ((error: unknown, update: Update, sessionKey: string) => Promise<void>) | undefined;
+  private readonly onError:
+    | ((error: unknown, update: Update, sessionKey: string) => Promise<void>)
+    | undefined;
 
   public constructor(options: BotKernelOptions<TState, TData>) {
     this.apiClient = options.apiClient;
@@ -79,8 +83,8 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
                 await previousHooks.onLeave(ctxRef);
               }
               session.current_state = null;
-            }
-          }
+            },
+          },
         });
         ctxRef = ctx;
 
@@ -98,8 +102,13 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
     callbackData?: string;
     currentState?: string | null;
   } {
-    const meta: { command?: string; text?: string; callbackData?: string; currentState?: string | null } = {
-      currentState: ctx.session.current_state
+    const meta: {
+      command?: string;
+      text?: string;
+      callbackData?: string;
+      currentState?: string | null;
+    } = {
+      currentState: ctx.session.current_state,
     };
 
     const text = ctx.message?.text;
@@ -122,13 +131,15 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
 
   private extractCommand(
     text: string | undefined,
-    entities: readonly { type: string; offset: number; length: number }[] | undefined
+    entities: readonly { type: string; offset: number; length: number }[] | undefined,
   ): string | undefined {
     if (!text || !entities) {
       return undefined;
     }
 
-    const commandEntity = entities.find((entity) => entity.type === 'bot_command' && entity.offset === 0);
+    const commandEntity = entities.find(
+      (entity) => entity.type === 'bot_command' && entity.offset === 0,
+    );
     if (!commandEntity) {
       return undefined;
     }

@@ -6,7 +6,12 @@ export interface Router<TContext> {
   callbackData(pattern: RegExp, handler: Handler<TContext>, priority?: number): void;
   state(state: string, handler: Handler<TContext>, priority?: number): void;
   use(handler: Handler<TContext>, priority?: number): void;
-  scene(state: string, handlers: ReadonlyArray<Handler<TContext>>, hooks?: SceneHooks<TContext>, priority?: number): void;
+  scene(
+    state: string,
+    handlers: ReadonlyArray<Handler<TContext>>,
+    hooks?: SceneHooks<TContext>,
+    priority?: number,
+  ): void;
   getSceneHooks(state: string): SceneHooks<TContext> | undefined;
   dispatch(ctx: TContext & RouterContextMeta): Promise<boolean>;
 }
@@ -27,7 +32,7 @@ export class TreeRouter<TContext> implements Router<TContext> {
     this.addRoute({
       priority,
       match: (ctx) => ctx.command === command,
-      handler: handler as Handler<TContext & RouterContextMeta>
+      handler: handler as Handler<TContext & RouterContextMeta>,
     });
   }
 
@@ -35,7 +40,7 @@ export class TreeRouter<TContext> implements Router<TContext> {
     this.addRoute({
       priority,
       match: (ctx) => typeof ctx.text === 'string' && pattern.test(ctx.text),
-      handler: handler as Handler<TContext & RouterContextMeta>
+      handler: handler as Handler<TContext & RouterContextMeta>,
     });
   }
 
@@ -43,7 +48,7 @@ export class TreeRouter<TContext> implements Router<TContext> {
     this.addRoute({
       priority,
       match: (ctx) => typeof ctx.callbackData === 'string' && pattern.test(ctx.callbackData),
-      handler: handler as Handler<TContext & RouterContextMeta>
+      handler: handler as Handler<TContext & RouterContextMeta>,
     });
   }
 
@@ -51,7 +56,7 @@ export class TreeRouter<TContext> implements Router<TContext> {
     this.addRoute({
       priority,
       match: (ctx) => ctx.currentState === state,
-      handler: handler as Handler<TContext & RouterContextMeta>
+      handler: handler as Handler<TContext & RouterContextMeta>,
     });
   }
 
@@ -59,7 +64,7 @@ export class TreeRouter<TContext> implements Router<TContext> {
     state: string,
     handlers: ReadonlyArray<Handler<TContext>>,
     hooks?: SceneHooks<TContext>,
-    priority = 200
+    priority = 200,
   ): void {
     if (hooks) {
       this.sceneHooks.set(state, hooks);
@@ -78,7 +83,7 @@ export class TreeRouter<TContext> implements Router<TContext> {
     this.addRoute({
       priority,
       match: () => true,
-      handler: handler as Handler<TContext & RouterContextMeta>
+      handler: handler as Handler<TContext & RouterContextMeta>,
     });
   }
 

@@ -1,4 +1,4 @@
-import { Telegraf, session } from 'telegraf';
+import { session, Telegraf } from 'telegraf';
 
 // A typical Telegraf bot with stateful handlers and in-memory session.
 // Run this via: pnpm start:before
@@ -34,7 +34,7 @@ bot.command('register', async (ctx) => {
 
 bot.on('text', async (ctx) => {
   const session = (ctx as any).session;
-  
+
   if (session && session.step === 'awaiting_name') {
     session.name = ctx.message.text;
     session.step = 'awaiting_email';

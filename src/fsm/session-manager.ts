@@ -1,5 +1,11 @@
 import { SessionConflictError } from '../core/errors.js';
-import type { JsonObject, MetricsCollector, SessionEnvelope, SessionStorage, VersionedValue } from '../types/core.js';
+import type {
+  JsonObject,
+  MetricsCollector,
+  SessionEnvelope,
+  SessionStorage,
+  VersionedValue,
+} from '../types/core.js';
 
 export interface SessionManagerOptions<TState extends string, TData extends JsonObject> {
   storage: SessionStorage<SessionEnvelope<TState, TData>>;
@@ -44,13 +50,13 @@ export class SessionManager<TState extends string, TData extends JsonObject> {
 
     return {
       value: created,
-      version: created.version
+      version: created.version,
     };
   }
 
   public async runInSession<TResult>(
     sessionKey: string,
-    runner: (session: SessionEnvelope<TState, TData>) => Promise<TResult>
+    runner: (session: SessionEnvelope<TState, TData>) => Promise<TResult>,
   ): Promise<TResult> {
     for (let attempt = 1; attempt <= this.conflictRetries + 1; attempt += 1) {
       const current = await this.load(sessionKey);
@@ -81,7 +87,7 @@ export class SessionManager<TState extends string, TData extends JsonObject> {
       data: this.initialData(),
       version: 1,
       encrypted: !this.encryptionRequired,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
   }
 
@@ -91,7 +97,7 @@ export class SessionManager<TState extends string, TData extends JsonObject> {
       data: { ...session.data },
       version: session.version,
       encrypted: session.encrypted,
-      updated_at: session.updated_at
+      updated_at: session.updated_at,
     };
   }
 

@@ -19,14 +19,17 @@ export class TokenBucketRateLimiter {
   public allow(key: string, nowMs = Date.now()): boolean {
     const state = this.buckets.get(key) ?? {
       tokens: this.config.capacity,
-      lastRefillMs: nowMs
+      lastRefillMs: nowMs,
     };
 
     const elapsedSec = (nowMs - state.lastRefillMs) / 1000;
-    const refilled = Math.min(this.config.capacity, state.tokens + elapsedSec * this.config.refillPerSecond);
+    const refilled = Math.min(
+      this.config.capacity,
+      state.tokens + elapsedSec * this.config.refillPerSecond,
+    );
     const next: BucketState = {
       tokens: refilled,
-      lastRefillMs: nowMs
+      lastRefillMs: nowMs,
     };
 
     if (next.tokens < 1) {

@@ -5,7 +5,7 @@ export function createRuntimeHooks(logger?: Logger, metrics?: MetricsCollector):
     onUpdate: async ({ updateType, tenantKey }) => {
       metrics?.increment('runtime_hook_updates', 1, {
         update_type: updateType,
-        tenant: tenantKey
+        tenant: tenantKey,
       });
       logger?.log({
         level: 'debug',
@@ -13,14 +13,14 @@ export function createRuntimeHooks(logger?: Logger, metrics?: MetricsCollector):
         timestamp: new Date().toISOString(),
         data: {
           update_type: updateType,
-          tenant: tenantKey
-        }
+          tenant: tenantKey,
+        },
       });
     },
     onError: async ({ updateType, tenantKey, error }) => {
       metrics?.increment('runtime_hook_errors', 1, {
         update_type: updateType,
-        tenant: tenantKey
+        tenant: tenantKey,
       });
       logger?.log({
         level: 'error',
@@ -29,9 +29,9 @@ export function createRuntimeHooks(logger?: Logger, metrics?: MetricsCollector):
         data: {
           update_type: updateType,
           tenant: tenantKey,
-          message: error instanceof Error ? error.message : 'unknown'
-        }
+          message: error instanceof Error ? error.message : 'unknown',
+        },
       });
-    }
+    },
   };
 }

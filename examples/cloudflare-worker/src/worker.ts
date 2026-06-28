@@ -1,14 +1,14 @@
+import type { SessionEnvelope } from '@tgwrapper/core';
 import {
   ApiClient,
   BotKernel,
   CloudflareWorkerHandler,
-  Context,
+  type Context,
   MemorySessionStorage,
   SessionManager,
   TreeRouter,
-  WebhookHandler
+  WebhookHandler,
 } from '@tgwrapper/core';
-import type { SessionEnvelope } from '@tgwrapper/core';
 
 type State = 'idle';
 interface Data {
@@ -37,15 +37,20 @@ function getHandler(env: { BOT_TOKEN: string; WEBHOOK_SECRET: string }): Cloudfl
     apiClient: api,
     sessionManager: sessions,
     router,
-    resolveSessionKey: (u) => String(u.message?.from?.id ?? u.callback_query?.from?.id ?? '')
+    resolveSessionKey: (u) => String(u.message?.from?.id ?? u.callback_query?.from?.id ?? ''),
   });
 
-  cloudflareHandler = new CloudflareWorkerHandler(new WebhookHandler(kernel, { secretToken: env.WEBHOOK_SECRET }));
+  cloudflareHandler = new CloudflareWorkerHandler(
+    new WebhookHandler(kernel, { secretToken: env.WEBHOOK_SECRET }),
+  );
   return cloudflareHandler;
 }
 
 export default {
-  async fetch(request: Request, env: { BOT_TOKEN: string; WEBHOOK_SECRET: string }): Promise<Response> {
+  async fetch(
+    request: Request,
+    env: { BOT_TOKEN: string; WEBHOOK_SECRET: string },
+  ): Promise<Response> {
     return getHandler(env).handle(request);
-  }
+  },
 };

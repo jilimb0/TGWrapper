@@ -1,49 +1,82 @@
 # API Stability Policy
 
-This policy defines API surface classifications, backward compatibility guarantees, and deprecation schedules for the TGWrapper platform.
+This document defines the API stability guarantees for `@tgwrapper/*` packages.
 
-> This document is the canonical source of truth for package stability language. Package README files should reference this policy rather than repeating manual stability descriptions.
+## Versioning
 
----
+TGWrapper follows **semantic versioning** (SemVer 2.0.0): `MAJOR.MINOR.PATCH`.
 
-## 🚦 1. API Stability Classifications
+- **MAJOR** — breaking changes to the public API
+- **MINOR** — new features, deprecations (backward-compatible)
+- **PATCH** — bug fixes, internal improvements (fully backward-compatible)
 
-We categorize exported exports and classes into three stability tiers:
+## Public API
 
-| Tier             | Stability Level        | Compatibility Guarantee                  | Deprecation Path                               |
-| :--------------- | :--------------------- | :--------------------------------------- | :--------------------------------------------- |
-| **Stable**       | Production-ready       | Guaranteed across minor/patch releases.  | Minimum 1 major release deprecation window.    |
-| **Experimental** | Active feedback loop   | May change or be removed in any release. | Can be deprecated/removed in a minor release.  |
-| **Internal**     | Private framework APIs | No compatibility guarantees.             | Not public; subject to change without warning. |
+The following exports from `@tgwrapper/core` are considered **stable** and will not break without a MAJOR version bump:
 
-### Core Stable Surface
+### Classes
 
-- `createBotClient` options and client method signatures.
-- Standard routing callbacks: `bot.on('message', handler)`.
-- `RedisSessionAdapter` and CAS state contracts.
-- Observability attachment hooks: `attachBotObservability`.
+- `ApiClient` — Telegram API HTTP client
+- `BotKernel` — Core event processing kernel
+- `Context` — Update context object
+- `CircuitBreaker` — API circuit breaker
+- `SessionManager` — FSM session management
+- `TreeRouter` — Pattern-based message routing
+- `BotRuntime` — Bot lifecycle management
+- `MemorySessionStorage` — In-memory session storage
+- `RedisSessionStorage` — Redis session storage (CAS)
+- `TokenBucketRateLimiter` — In-memory rate limiter
+- `BoundedConcurrencyQueue` — Concurrency limiter
+- `EcsJsonLogger` — ECS-compatible JSON logger
+- `InMemoryMetrics` — Metrics collector
+- `PollingSource` — Long-polling update source
+- `WebhookSource` — Webhook update source
+- `MockApiClient`, `MockBotClient` — Testkit mocks
+- `AwsLambdaHandler`, `CloudflareWorkerHandler`, `NodeHttpHandler`, `WebhookHandler` — Runtime adapters
 
-### Experimental Surface
+### Functions
 
-- Advanced FSM scenes and wizard handlers.
-- Beta telemetry exporters (such as experimental web UI registries).
+- `createBotClient` — High-level bot client factory
+- `isFreshUpdate`, `isValidTelegramUpdate` — Update validation
+- `createCallbackUpdate`, `createMessageUpdate` — Test update factories
+- `createSessionKey`, `createSessionNamespace` — Tenant key helpers
+- `createRuntimeHooks`, `createApiHooks` — Observability hooks
 
----
+### Error Classes
 
-## ⏳ 2. Deprecation Schedule
+- `CircuitOpenError`, `CoreError`, `SessionConflictError`, `TelegramApiError`, `QueueOverflowError`
 
-To ensure a smooth transition path for developers when APIs evolve:
+### Sub-package Stability
 
-1. **Marking Deprecated:** APIs slated for removal are marked with the `@deprecated` JSDoc tag and emit runtime warnings using `console.warn` once per process session.
-2. **Transition Window:** A deprecated API is guaranteed to remain functional for at least one major release cycle (e.g., deprecated in `0.14.x` -> functional in `0.15.x` -> removed in `0.16.0`).
-3. **Documentation:** Every deprecated API must include clear migration recommendations in the JSDoc comments and the release changesets.
+| Package | Status | Notes |
+|---------|--------|-------|
+| `@tgwrapper/core` | Stable (v1.0+) | Public API defined above |
+| `@tgwrapper/adapter-redis` | Stable | Redis storage, rate limiting, caching |
+| `@tgwrapper/observability` | Stable | Tracing, metrics, structured logging |
 
----
+## Beta / Internal Exports
 
-## 📈 Versioning Strategy (Semantic Versioning)
+Symbols not listed in `src/index.ts` are considered **internal** and may change without notice.
 
-TGWrapper follows strict Semantic Versioning (SemVer) rules:
+## Deprecation Process
 
-- **Patch Releases (`x.y.Z`):** Only backward-compatible bug fixes and security patches.
-- **Minor Releases (`x.Y.z`):** New backward-compatible features or API deprecation alerts.
-- **Major Releases (`X.y.z`):** Breaking API changes or removals of deprecated code paths.
+1. A deprecation warning is added in a MINOR release
+2. The deprecated symbol remains for at least 1 MAJOR cycle
+3. Removal happens in the next MAJOR release
+
+## Breaking Changes
+
+The following constitute a breaking change:
+
+- Removing or renaming a public export
+- Changing a function signature
+- Adding a required parameter without a default
+- Removing a type or interface property
+- Changing error class behavior
+
+The following are NOT breaking:
+
+- Adding new exports
+- Adding optional parameters
+- Widening accepted types
+- Bug fixes that change runtime behavior

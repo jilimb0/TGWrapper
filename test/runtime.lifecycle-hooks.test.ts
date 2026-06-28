@@ -8,7 +8,10 @@ class SingleUpdateSource implements UpdateSource {
 
   public async run(onUpdate: (update: Update) => Promise<void>): Promise<void> {
     this.running = true;
-    await onUpdate({ update_id: 1, message: { message_id: 1, date: 1, chat: { id: 1, type: 'private', first_name: 'A' } } } as Update);
+    await onUpdate({
+      update_id: 1,
+      message: { message_id: 1, date: 1, chat: { id: 1, type: 'private', first_name: 'A' } },
+    } as Update);
     while (this.running) {
       await new Promise((resolve) => setTimeout(resolve, 5));
     }
@@ -25,7 +28,7 @@ describe('BotRuntime lifecycle and hooks', () => {
     const runtime = new BotRuntime(source, {
       handleUpdate: async () => {
         await new Promise((resolve) => setTimeout(resolve, 10));
-      }
+      },
     });
 
     expect(runtime.isRunning()).toBe(false);
@@ -49,14 +52,14 @@ describe('BotRuntime lifecycle and hooks', () => {
       {
         handleUpdate: async () => {
           throw new Error('boom');
-        }
+        },
       },
       {
         hooks: {
           onUpdate,
-          onError: onErrorHook
-        }
-      }
+          onError: onErrorHook,
+        },
+      },
     );
 
     runtime.onError(onErrorSubscription);

@@ -3,7 +3,9 @@ import type { CasResult, SessionStorage, VersionedValue } from '../types/core.js
 export interface RedisLikeTransaction {
   get(key: string): Promise<string | null>;
   watch(key: string): Promise<void>;
-  multi(commands: ReadonlyArray<readonly [string, ...string[]]>): Promise<ReadonlyArray<unknown> | null>;
+  multi(
+    commands: ReadonlyArray<readonly [string, ...string[]]>,
+  ): Promise<ReadonlyArray<unknown> | null>;
   unwatch(): Promise<void>;
 }
 
@@ -26,7 +28,9 @@ export interface RedisSessionStorageOptions<TSession extends { version: number }
   crypto?: SessionCrypto<TSession>;
 }
 
-export class RedisSessionStorage<TSession extends { version: number }> implements SessionStorage<TSession> {
+export class RedisSessionStorage<TSession extends { version: number }>
+  implements SessionStorage<TSession>
+{
   private readonly client: RedisLikeClient;
   private readonly namespace: string;
   private readonly ttlSeconds: number | undefined;
@@ -65,11 +69,15 @@ export class RedisSessionStorage<TSession extends { version: number }> implement
 
     return {
       value,
-      version: value.version
+      version: value.version,
     };
   }
 
-  public async compareAndSet(key: string, expectedVersion: number, nextValue: TSession): Promise<CasResult<TSession>> {
+  public async compareAndSet(
+    key: string,
+    expectedVersion: number,
+    nextValue: TSession,
+  ): Promise<CasResult<TSession>> {
     const fullKey = this.formatKey(key);
 
     return this.client.withTransaction(async (tx) => {
@@ -97,8 +105,8 @@ export class RedisSessionStorage<TSession extends { version: number }> implement
           ok: false,
           current: {
             value: current,
-            version: current.version
-          }
+            version: current.version,
+          },
         };
       }
 
@@ -138,7 +146,10 @@ export class RedisSessionStorage<TSession extends { version: number }> implement
     await this.client.set(key, serialized);
   }
 
-  private toSetCommands(key: string, serialized: string): ReadonlyArray<readonly [string, ...string[]]> {
+  private toSetCommands(
+    key: string,
+    serialized: string,
+  ): ReadonlyArray<readonly [string, ...string[]]> {
     if (this.ttlSeconds && this.ttlSeconds > 0) {
       return [['SET', key, serialized, 'EX', String(this.ttlSeconds)]];
     }

@@ -1,15 +1,15 @@
-import { CircuitBreaker } from './circuit-breaker.js';
-import { CircuitOpenError, CoreError, TelegramApiError } from './errors.js';
 import type { ApiClientOptions, JsonObject, RetryOptions } from '../types/core.js';
-import type { TelegramApiMethodName } from '../types/telegram.schema.generated.js';
 import type { TelegramApiMethodPayloads } from '../types/telegram.payloads.generated.js';
 import type { TelegramApiMethodResults } from '../types/telegram.results.generated.js';
+import type { TelegramApiMethodName } from '../types/telegram.schema.generated.js';
+import { CircuitBreaker } from './circuit-breaker.js';
+import { CircuitOpenError, CoreError, TelegramApiError } from './errors.js';
 
 const DEFAULT_RETRY: RetryOptions = {
   maxRetries: 3,
   baseDelayMs: 300,
   maxDelayMs: 5_000,
-  jitterRatio: 0.2
+  jitterRatio: 0.2,
 };
 
 export class ApiClient {
@@ -39,14 +39,17 @@ export class ApiClient {
     this.onApiError = options.onApiError;
   }
 
-  public async callApi<TMethod extends TelegramApiMethodName, TResponse = TelegramApiMethodResults[TMethod]>(
-    method: TMethod,
-    payload: TelegramApiMethodPayloads[TMethod]
-  ): Promise<TResponse> {
+  public async callApi<
+    TMethod extends TelegramApiMethodName,
+    TResponse = TelegramApiMethodResults[TMethod],
+  >(method: TMethod, payload: TelegramApiMethodPayloads[TMethod]): Promise<TResponse> {
     return this.callApiUnsafe(method, payload as JsonObject);
   }
 
-  public async callApiUnsafe<TResponse = unknown>(method: string, payload: JsonObject): Promise<TResponse> {
+  public async callApiUnsafe<TResponse = unknown>(
+    method: string,
+    payload: JsonObject,
+  ): Promise<TResponse> {
     const requestId = crypto.randomUUID();
     const started = Date.now();
 
@@ -56,7 +59,7 @@ export class ApiClient {
           requestId,
           method,
           attempt,
-          payload
+          payload,
         });
         this.circuitBreaker.beforeRequest(Date.now());
         const response = await this.executeRequest<TResponse>(method, payload);
@@ -66,7 +69,7 @@ export class ApiClient {
           requestId,
           method,
           attempt,
-          durationMs
+          durationMs,
         });
 
         this.metrics?.observe('telegram_api_latency_ms', durationMs, { method });
@@ -79,8 +82,8 @@ export class ApiClient {
           data: {
             method,
             attempt,
-            duration_ms: durationMs
-          }
+            duration_ms: durationMs,
+          },
         });
         return response;
       } catch (error: unknown) {
@@ -99,7 +102,7 @@ export class ApiClient {
           durationMs: Date.now() - started,
           retrying: shouldRetry,
           retryDelayMs: retryDelay ?? 0,
-          error
+          error,
         });
         if (shouldRetry) {
           this.metrics?.increment('transport_retries', 1, { method });
@@ -116,8 +119,8 @@ export class ApiClient {
             duration_ms: Date.now() - started,
             retry_ms: retryDelay ?? 0,
             retrying: shouldRetry,
-            message: error instanceof Error ? error.message : 'unknown'
-          }
+            message: error instanceof Error ? error.message : 'unknown',
+          },
         });
 
         if (!shouldRetry) {
@@ -142,15 +145,15 @@ export class ApiClient {
       const body = hasBinary ? await this.toFormData(payload) : JSON.stringify(payload);
       const requestInit: RequestInit = {
         method: 'POST',
-        body
+        body,
       };
       if (!hasBinary) {
         requestInit.headers = {
-          'content-type': 'application/json'
+          'content-type': 'application/json',
         };
       }
       response = await this.fetchImpl(`${this.baseUrl}/bot${this.token}/${method}`, {
-        ...requestInit
+        ...requestInit,
       });
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : 'Unknown network error';
@@ -166,7 +169,11 @@ export class ApiClient {
     };
 
     if (!body.ok) {
-      throw new TelegramApiError(body.error_code ?? response.status, body.description ?? 'Unknown error', body.parameters);
+      throw new TelegramApiError(
+        body.error_code ?? response.status,
+        body.description ?? 'Unknown error',
+        body.parameters,
+      );
     }
 
     if (!('result' in body)) {
@@ -192,7 +199,7 @@ export class ApiClient {
     }
 
     if (this.isRetryable(error)) {
-      const exponential = this.retry.baseDelayMs * Math.pow(2, attempt - 1);
+      const exponential = this.retry.baseDelayMs * 2 ** (attempt - 1);
       const bounded = Math.min(exponential, this.retry.maxDelayMs);
       const jitterFactor = 1 + (Math.random() * 2 - 1) * this.retry.jitterRatio;
       return Math.max(0, Math.floor(bounded * jitterFactor));
@@ -210,40 +217,40 @@ export class ApiClient {
   public async sendDocument(
     chatId: number | string,
     document: BinaryInput,
-    extra: JsonObject = {}
+    extra: JsonObject = {},
   ): Promise<TelegramApiMethodResults['sendDocument']> {
     return this.callApi('sendDocument', {
       chat_id: chatId,
       document,
-      ...extra
+      ...extra,
     } as unknown as TelegramApiMethodPayloads['sendDocument']);
   }
 
   public async sendMessage(
     chatId: number | string,
     text: string,
-    extra: JsonObject = {}
+    extra: JsonObject = {},
   ): Promise<TelegramApiMethodResults['sendMessage']> {
     return this.callApi('sendMessage', {
       chat_id: chatId,
       text,
-      ...extra
+      ...extra,
     } as TelegramApiMethodPayloads['sendMessage']);
   }
 
   public async answerCallbackQuery(
     callbackQueryId: string,
-    extra: JsonObject = {}
+    extra: JsonObject = {},
   ): Promise<TelegramApiMethodResults['answerCallbackQuery']> {
     return this.callApi('answerCallbackQuery', {
       callback_query_id: callbackQueryId,
-      ...extra
+      ...extra,
     } as TelegramApiMethodPayloads['answerCallbackQuery']);
   }
 
   public async getFileLink(fileId: string): Promise<string> {
     const result = await this.callApi<'getFile'>('getFile', {
-      file_id: fileId
+      file_id: fileId,
     } as TelegramApiMethodPayloads['getFile']);
     const path = (result as { file_path?: string }).file_path;
     if (!path) {
@@ -253,25 +260,25 @@ export class ApiClient {
   }
 
   public async editMessageText(
-    payload: TelegramApiMethodPayloads['editMessageText']
+    payload: TelegramApiMethodPayloads['editMessageText'],
   ): Promise<TelegramApiMethodResults['editMessageText']> {
     return this.callApi('editMessageText', payload);
   }
 
   public async editMessageCaption(
-    payload: TelegramApiMethodPayloads['editMessageCaption']
+    payload: TelegramApiMethodPayloads['editMessageCaption'],
   ): Promise<TelegramApiMethodResults['editMessageCaption']> {
     return this.callApi('editMessageCaption', payload);
   }
 
   public async editMessageReplyMarkup(
-    payload: TelegramApiMethodPayloads['editMessageReplyMarkup']
+    payload: TelegramApiMethodPayloads['editMessageReplyMarkup'],
   ): Promise<TelegramApiMethodResults['editMessageReplyMarkup']> {
     return this.callApi('editMessageReplyMarkup', payload);
   }
 
   public async editMessageMedia(
-    payload: TelegramApiMethodPayloads['editMessageMedia']
+    payload: TelegramApiMethodPayloads['editMessageMedia'],
   ): Promise<TelegramApiMethodResults['editMessageMedia']> {
     return this.callApi('editMessageMedia', payload);
   }
@@ -315,7 +322,11 @@ export class ApiClient {
   }
 }
 
-export type BinaryInput = Blob | Uint8Array | ArrayBuffer | AsyncIterable<Uint8Array | ArrayBuffer | string>;
+export type BinaryInput =
+  | Blob
+  | Uint8Array
+  | ArrayBuffer
+  | AsyncIterable<Uint8Array | ArrayBuffer | string>;
 
 function isBinaryInput(value: unknown): value is BinaryInput {
   if (typeof Blob !== 'undefined' && value instanceof Blob) {
@@ -324,7 +335,11 @@ function isBinaryInput(value: unknown): value is BinaryInput {
   if (value instanceof Uint8Array || value instanceof ArrayBuffer) {
     return true;
   }
-  return Boolean(value) && typeof value === 'object' && Symbol.asyncIterator in (value as Record<string, unknown>);
+  return (
+    Boolean(value) &&
+    typeof value === 'object' &&
+    Symbol.asyncIterator in (value as Record<string, unknown>)
+  );
 }
 
 async function toBlob(value: BinaryInput): Promise<Blob> {

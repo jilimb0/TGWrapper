@@ -1,5 +1,5 @@
 import type { WebhookRequest } from '../types/core.js';
-import { WebhookHandler } from './webhook-handler.js';
+import type { WebhookHandler } from './webhook-handler.js';
 
 export interface ApiGatewayV2Event {
   version: string;
@@ -41,14 +41,14 @@ export class AwsLambdaHandler {
       method: event.requestContext.http.method,
       headers: this.normalizeHeaders(event.headers ?? {}),
       rawBody,
-      path: event.rawPath
+      path: event.rawPath,
     };
 
     const response = await this.handler.handle(request);
     return {
       statusCode: response.status,
       headers: response.headers,
-      body: response.body
+      body: response.body,
     };
   }
 

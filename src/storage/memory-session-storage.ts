@@ -1,6 +1,8 @@
 import type { CasResult, SessionStorage, VersionedValue } from '../types/core.js';
 
-export class MemorySessionStorage<TSession extends { version: number }> implements SessionStorage<TSession> {
+export class MemorySessionStorage<TSession extends { version: number }>
+  implements SessionStorage<TSession>
+{
   private readonly store = new Map<string, VersionedValue<TSession>>();
 
   public async get(key: string): Promise<TSession | null> {
@@ -10,7 +12,7 @@ export class MemorySessionStorage<TSession extends { version: number }> implemen
   public async set(key: string, value: TSession): Promise<void> {
     this.store.set(key, {
       value,
-      version: value.version
+      version: value.version,
     });
   }
 
@@ -26,17 +28,21 @@ export class MemorySessionStorage<TSession extends { version: number }> implemen
 
     return {
       value: found.value,
-      version: found.version
+      version: found.version,
     };
   }
 
-  public async compareAndSet(key: string, expectedVersion: number, nextValue: TSession): Promise<CasResult<TSession>> {
+  public async compareAndSet(
+    key: string,
+    expectedVersion: number,
+    nextValue: TSession,
+  ): Promise<CasResult<TSession>> {
     const current = this.store.get(key);
 
     if (!current && expectedVersion === 0) {
       this.store.set(key, {
         value: nextValue,
-        version: nextValue.version
+        version: nextValue.version,
       });
       return { ok: true };
     }
@@ -49,14 +55,14 @@ export class MemorySessionStorage<TSession extends { version: number }> implemen
         ok: false,
         current: {
           value: current.value,
-          version: current.version
-        }
+          version: current.version,
+        },
       };
     }
 
     this.store.set(key, {
       value: nextValue,
-      version: nextValue.version
+      version: nextValue.version,
     });
     return { ok: true };
   }

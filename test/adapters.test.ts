@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import type { ApiGatewayV2Event } from '../src/adapters/aws-lambda-handler.js';
 import { AwsLambdaHandler } from '../src/adapters/aws-lambda-handler.js';
 import { CloudflareWorkerHandler } from '../src/adapters/cloudflare-worker-handler.js';
 import { WebhookHandler } from '../src/adapters/webhook-handler.js';
-import type { ApiGatewayV2Event } from '../src/adapters/aws-lambda-handler.js';
 
 const updatePayload = {
   update_id: 1,
@@ -11,8 +11,8 @@ const updatePayload = {
     date: Math.floor(Date.now() / 1000),
     chat: { id: 1, type: 'private' },
     from: { id: 1, is_bot: false, first_name: 'u' },
-    text: 'hello'
-  }
+    text: 'hello',
+  },
 };
 
 describe('Serverless adapters', () => {
@@ -22,9 +22,9 @@ describe('Serverless adapters', () => {
       {
         handleUpdate: async () => {
           handled = true;
-        }
+        },
       },
-      { secretToken: 'sec' }
+      { secretToken: 'sec' },
     );
 
     const lambda = new AwsLambdaHandler(handler);
@@ -34,16 +34,16 @@ describe('Serverless adapters', () => {
       rawPath: '/webhook',
       rawQueryString: '',
       headers: {
-        'x-telegram-bot-api-secret-token': 'sec'
+        'x-telegram-bot-api-secret-token': 'sec',
       },
       requestContext: {
         http: {
           method: 'POST',
-          path: '/webhook'
-        }
+          path: '/webhook',
+        },
       },
       body: JSON.stringify(updatePayload),
-      isBase64Encoded: false
+      isBase64Encoded: false,
     };
 
     const result = await lambda.handle(event);
@@ -56,9 +56,9 @@ describe('Serverless adapters', () => {
       {
         handleUpdate: async () => {
           throw new Error('must not happen');
-        }
+        },
       },
-      { secretToken: 'sec' }
+      { secretToken: 'sec' },
     );
     const worker = new CloudflareWorkerHandler(handler);
 
@@ -67,10 +67,10 @@ describe('Serverless adapters', () => {
         method: 'POST',
         headers: {
           'x-telegram-bot-api-secret-token': 'bad',
-          'content-type': 'application/json'
+          'content-type': 'application/json',
         },
-        body: JSON.stringify(updatePayload)
-      })
+        body: JSON.stringify(updatePayload),
+      }),
     );
 
     expect(response.status).toBe(401);

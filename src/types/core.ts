@@ -1,6 +1,6 @@
 import type { ApiMethods, Update } from './telegram.js';
-import type { TelegramApiMethodName } from './telegram.schema.generated.js';
 import type { TelegramApiMethodPayloads } from './telegram.payloads.generated.js';
+import type { TelegramApiMethodName } from './telegram.schema.generated.js';
 
 export type JsonValue = string | number | boolean | null | JsonObject | JsonValue[];
 export type JsonObject = { [key: string]: JsonValue | undefined };
@@ -98,7 +98,11 @@ export interface SessionStorage<TSession> {
   set(key: string, value: TSession): Promise<void>;
   delete(key: string): Promise<void>;
   getWithVersion(key: string): Promise<VersionedValue<TSession> | null>;
-  compareAndSet(key: string, expectedVersion: number, nextValue: TSession): Promise<CasResult<TSession>>;
+  compareAndSet(
+    key: string,
+    expectedVersion: number,
+    nextValue: TSession,
+  ): Promise<CasResult<TSession>>;
 }
 
 export interface ContextShortcuts {
@@ -179,4 +183,5 @@ export interface WebhookHandlerOptions {
 }
 
 export type TelegramMethod = keyof ApiMethods;
-export type TelegramMethodPayload<TMethod extends TelegramApiMethodName> = TelegramApiMethodPayloads[TMethod];
+export type TelegramMethodPayload<TMethod extends TelegramApiMethodName> =
+  TelegramApiMethodPayloads[TMethod];

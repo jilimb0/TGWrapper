@@ -12,7 +12,12 @@ export class CoreError extends Error {
   public readonly retryable: boolean;
   public readonly details: JsonObject | undefined;
 
-  public constructor(code: CoreErrorCode, message: string, retryable: boolean, details?: JsonObject) {
+  public constructor(
+    code: CoreErrorCode,
+    message: string,
+    retryable: boolean,
+    details?: JsonObject,
+  ) {
     super(message);
     this.code = code;
     this.retryable = retryable;
@@ -27,11 +32,16 @@ export class TelegramApiError extends CoreError {
   public readonly parameters: JsonObject | undefined;
 
   public constructor(errorCode: number, description: string, parameters?: JsonObject) {
-    super('TELEGRAM_API_ERROR', `Telegram API error ${errorCode}: ${description}`, errorCode === 429, {
-      error_code: errorCode,
-      description,
-      parameters
-    });
+    super(
+      'TELEGRAM_API_ERROR',
+      `Telegram API error ${errorCode}: ${description}`,
+      errorCode === 429,
+      {
+        error_code: errorCode,
+        description,
+        parameters,
+      },
+    );
     this.name = 'TelegramApiError';
     this.errorCode = errorCode;
     this.description = description;
@@ -42,7 +52,7 @@ export class TelegramApiError extends CoreError {
 export class CircuitOpenError extends CoreError {
   public constructor(cooldownMs: number) {
     super('CIRCUIT_OPEN', `Circuit breaker is open. Retry after ${cooldownMs}ms.`, true, {
-      cooldown_ms: cooldownMs
+      cooldown_ms: cooldownMs,
     });
     this.name = 'CircuitOpenError';
   }
@@ -51,7 +61,7 @@ export class CircuitOpenError extends CoreError {
 export class SessionConflictError extends CoreError {
   public constructor(sessionKey: string) {
     super('SESSION_CONFLICT', `Session conflict for key ${sessionKey}`, true, {
-      session_key: sessionKey
+      session_key: sessionKey,
     });
     this.name = 'SessionConflictError';
   }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { BotRuntime } from '../src/runtime/bot-runtime.js';
 import { TokenBucketRateLimiter } from '../src/guards/token-bucket-rate-limiter.js';
+import { BotRuntime } from '../src/runtime/bot-runtime.js';
 import type { MetricsCollector, UpdateSource } from '../src/types/core.js';
 import type { Update } from '../src/types/telegram.js';
 
@@ -29,16 +29,16 @@ describe('BotRuntime fallback behavior', () => {
       const runtime = new BotRuntime(
         new OneShotSource({ update_id: 11 } as Update),
         {
-          handleUpdate: async () => undefined
+          handleUpdate: async () => undefined,
         },
         {
           rateLimiter: new TokenBucketRateLimiter({ capacity: 1, refillPerSecond: 1 }),
           logger: {
             log: (event) => {
               events.push(event.event);
-            }
-          }
-        }
+            },
+          },
+        },
       );
 
       await runtime.start();
@@ -56,18 +56,18 @@ describe('BotRuntime fallback behavior', () => {
       increment: (metric, _value, tags) => {
         increments.push({ metric, tags });
       },
-      observe: () => undefined
+      observe: () => undefined,
     };
 
     const runtime = new BotRuntime(
       new OneShotSource({
         update_id: 10,
-        purchased_paid_media: { paid_media_payload: 'x' }
+        purchased_paid_media: { paid_media_payload: 'x' },
       } as Update),
       {
-        handleUpdate: async () => undefined
+        handleUpdate: async () => undefined,
       },
-      { metrics }
+      { metrics },
     );
 
     await runtime.start();
@@ -76,9 +76,9 @@ describe('BotRuntime fallback behavior', () => {
       expect.arrayContaining([
         expect.objectContaining({
           metric: 'runtime_updates_received',
-          tags: expect.objectContaining({ update_type: 'purchased_paid_media' })
-        })
-      ])
+          tags: expect.objectContaining({ update_type: 'purchased_paid_media' }),
+        }),
+      ]),
     );
   });
 
@@ -88,12 +88,16 @@ describe('BotRuntime fallback behavior', () => {
       increment: (metric, _value, tags) => {
         increments.push({ metric, tags });
       },
-      observe: () => undefined
+      observe: () => undefined,
     };
 
-    const runtime = new BotRuntime(new OneShotSource({ update_id: 1 } as Update), {
-      handleUpdate: async () => undefined
-    }, { metrics });
+    const runtime = new BotRuntime(
+      new OneShotSource({ update_id: 1 } as Update),
+      {
+        handleUpdate: async () => undefined,
+      },
+      { metrics },
+    );
 
     await runtime.start();
 
@@ -101,9 +105,9 @@ describe('BotRuntime fallback behavior', () => {
       expect.arrayContaining([
         expect.objectContaining({
           metric: 'runtime_updates_received',
-          tags: expect.objectContaining({ update_type: 'unknown' })
-        })
-      ])
+          tags: expect.objectContaining({ update_type: 'unknown' }),
+        }),
+      ]),
     );
   });
 
@@ -113,19 +117,23 @@ describe('BotRuntime fallback behavior', () => {
       increment: (metric, _value, tags) => {
         increments.push({ metric, tags });
       },
-      observe: () => undefined
+      observe: () => undefined,
     };
 
-    const runtime = new BotRuntime(new OneShotSource({ update_id: 2 } as Update), {
-      handleUpdate: async () => {
-        throw new Error('boom');
-      }
-    }, {
-      metrics,
-      tenantResolver: () => {
-        throw new Error('tenant parse failed');
-      }
-    });
+    const runtime = new BotRuntime(
+      new OneShotSource({ update_id: 2 } as Update),
+      {
+        handleUpdate: async () => {
+          throw new Error('boom');
+        },
+      },
+      {
+        metrics,
+        tenantResolver: () => {
+          throw new Error('tenant parse failed');
+        },
+      },
+    );
 
     await expect(runtime.start()).rejects.toThrow('boom');
 
@@ -133,9 +141,9 @@ describe('BotRuntime fallback behavior', () => {
       expect.arrayContaining([
         expect.objectContaining({
           metric: 'runtime_handler_errors',
-          tags: expect.objectContaining({ tenant: 'default' })
-        })
-      ])
+          tags: expect.objectContaining({ tenant: 'default' }),
+        }),
+      ]),
     );
   });
 });

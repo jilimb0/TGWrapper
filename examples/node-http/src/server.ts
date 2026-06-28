@@ -1,15 +1,15 @@
 import { createServer } from 'node:http';
+import type { SessionEnvelope } from '@tgwrapper/core';
 import {
   ApiClient,
   BotKernel,
-  Context,
+  type Context,
   MemorySessionStorage,
   NodeHttpHandler,
   SessionManager,
   TreeRouter,
-  WebhookHandler
+  WebhookHandler,
 } from '@tgwrapper/core';
-import type { SessionEnvelope } from '@tgwrapper/core';
 
 type State = 'idle';
 interface Data {
@@ -38,7 +38,7 @@ const kernel = new BotKernel<State, Data>({
   apiClient: api,
   sessionManager: sessions,
   router,
-  resolveSessionKey: (u) => String(u.message?.from?.id ?? u.callback_query?.from?.id ?? '')
+  resolveSessionKey: (u) => String(u.message?.from?.id ?? u.callback_query?.from?.id ?? ''),
 });
 
 const webhook = new WebhookHandler(kernel, { secretToken: secret });

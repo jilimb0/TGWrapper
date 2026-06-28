@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { MockApiClient, createCallbackUpdate, createMessageUpdate } from '../src/index.js';
+import { createCallbackUpdate, createMessageUpdate, MockApiClient } from '../src/index.js';
 
 describe('testkit', () => {
   it('records api calls in MockApiClient', async () => {

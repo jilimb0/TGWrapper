@@ -1,5 +1,5 @@
+import { createRateLimiter, RedisKvStore, RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 import { createBotClient } from '@tgwrapper/core';
-import { RedisKvStore, RedisSessionAdapter, createRateLimiter } from '@tgwrapper/adapter-redis';
 import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 
 // 1. Initial State Definitions
@@ -14,7 +14,7 @@ const MODERATOR_CHAT_ID = process.env.MODERATOR_CHAT_ID!;
 const REDIS_URL = process.env.REDIS_URL || 'redis://127.0.0.1:6379';
 
 if (!process.env.BOT_TOKEN) {
-  console.error("Error: BOT_TOKEN is not defined in environment.");
+  console.error('Error: BOT_TOKEN is not defined in environment.');
   process.exit(1);
 }
 
@@ -24,7 +24,7 @@ const sessionAdapter = new RedisSessionAdapter<TicketSession>({
   redisUrl: REDIS_URL,
   tenantId: 'default',
   botId: 'moderation-bot',
-  ttlSeconds: 86400 // Expire session state after 24h
+  ttlSeconds: 86400, // Expire session state after 24h
 });
 
 const bot = createBotClient({
@@ -33,8 +33,8 @@ const bot = createBotClient({
   // Inject session adapter into the client options
   session: {
     store: sessionAdapter,
-    initialState: () => ({ version: 1, state: 'idle' })
-  }
+    initialState: () => ({ version: 1, state: 'idle' }),
+  },
 });
 
 // 3. Attach Structured Observability Instrumentation
@@ -42,9 +42,9 @@ const metrics = new MetricsRegistry();
 attachBotObservability(bot, {
   metrics,
   logger: {
-    log: (event) => console.log(JSON.stringify({ timestamp: new Date().toISOString(), ...event }))
+    log: (event) => console.log(JSON.stringify({ timestamp: new Date().toISOString(), ...event })),
   },
-  serviceName: 'moderation-support-service'
+  serviceName: 'moderation-support-service',
 });
 
 // 4. Instantiate Anti-Spam Rate Limiter (Max 5 requests per 10 seconds)
@@ -52,7 +52,7 @@ const rateLimiter = createRateLimiter(redisStore, {
   namespace: 'moderation_bot_limiter',
   windowMs: 10_000,
   limit: 5,
-  blockDurationMs: 30_000 // Temporary block for 30s if spammed
+  blockDurationMs: 30_000, // Temporary block for 30s if spammed
 });
 
 // 5. Setup Update Lifecycle Handlers
@@ -65,7 +65,10 @@ bot.on('message', async (message) => {
   // Apply Rate Limit Check
   const rateLimit = await rateLimiter.check(userId);
   if (!rateLimit.allowed) {
-    await bot.sendMessage(chatId, `⚠️ Anti-Spam Lockout. Please wait ${rateLimit.retryAfter} seconds before replying.`);
+    await bot.sendMessage(
+      chatId,
+      `⚠️ Anti-Spam Lockout. Please wait ${rateLimit.retryAfter} seconds before replying.`,
+    );
     return;
   }
 
@@ -76,7 +79,10 @@ bot.on('message', async (message) => {
   // Command: /ticket (Start Flow)
   if (message.text === '/ticket') {
     if (currentState === 'open') {
-      await bot.sendMessage(chatId, "You already have an open support ticket. Please wait for a moderator to respond.");
+      await bot.sendMessage(
+        chatId,
+        'You already have an open support ticket. Please wait for a moderator to respond.',
+      );
       return;
     }
 
@@ -86,14 +92,17 @@ bot.on('message', async (message) => {
       state.ticketId = Math.random().toString(36).slice(2, 9).toUpperCase();
     });
 
-    await bot.sendMessage(chatId, "🎟️ Creating support ticket. Please enter a short description of your issue:");
+    await bot.sendMessage(
+      chatId,
+      '🎟️ Creating support ticket. Please enter a short description of your issue:',
+    );
     return;
   }
 
   // Command: /resolve (Close Active Flow)
   if (message.text === '/resolve') {
     if (currentState !== 'open') {
-      await bot.sendMessage(chatId, "No active ticket found to resolve. Use /ticket to open one.");
+      await bot.sendMessage(chatId, 'No active ticket found to resolve. Use /ticket to open one.');
       return;
     }
 
@@ -103,7 +112,7 @@ bot.on('message', async (message) => {
       state.ticketId = undefined;
     });
 
-    await bot.sendMessage(chatId, "✅ Support ticket resolved. Thank you!");
+    await bot.sendMessage(chatId, '✅ Support ticket resolved. Thank you!');
     return;
   }
 
@@ -122,24 +131,30 @@ bot.on('message', async (message) => {
       try {
         await bot.sendMessage(
           MODERATOR_CHAT_ID,
-          `🎫 **NEW SUPPORT TICKET**\nTicket ID: \`${ticketId}\`\nUser ID: \`${userId}\`\nDescription: "${description}"\n\nResolve using \`/resolve\` command in user chat.`
+          `🎫 **NEW SUPPORT TICKET**\nTicket ID: \`${ticketId}\`\nUser ID: \`${userId}\`\nDescription: "${description}"\n\nResolve using \`/resolve\` command in user chat.`,
         );
       } catch (err) {
-        console.error("Failed to notify moderator chat channel:", err);
+        console.error('Failed to notify moderator chat channel:', err);
       }
     }
 
-    await bot.sendMessage(chatId, `🎫 Ticket \`${ticketId}\` has been opened. Our moderation team will get back to you shortly.\nUse \`/resolve\` to close it.`);
+    await bot.sendMessage(
+      chatId,
+      `🎫 Ticket \`${ticketId}\` has been opened. Our moderation team will get back to you shortly.\nUse \`/resolve\` to close it.`,
+    );
     return;
   }
 
   // Default Echo fallback for general queries
-  await bot.sendMessage(chatId, `Received: "${message.text}". Enter \`/ticket\` to open a support line.`);
+  await bot.sendMessage(
+    chatId,
+    `Received: "${message.text}". Enter \`/ticket\` to open a support line.`,
+  );
 });
 
 bot.on('error', (err) => {
-  console.error("Bot update processor error encountered:", err);
+  console.error('Bot update processor error encountered:', err);
 });
 
-console.log("Starting moderation support bot reference app...");
+console.log('Starting moderation support bot reference app...');
 await bot.start();

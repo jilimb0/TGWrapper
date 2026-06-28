@@ -1,10 +1,10 @@
+import { createRateLimiter, RedisKvStore, RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 import { createBotClient } from '@tgwrapper/core';
-import { RedisSessionAdapter, RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
 import {
   attachBotObservability,
+  getCorrelationContext,
   MetricsRegistry,
   Tracer,
-  getCorrelationContext,
 } from '@tgwrapper/observability';
 
 // ---------------------------------------------------------------------------
@@ -81,56 +81,76 @@ attachBotObservability(bot, {
 async function callOpenAI(
   history: ChatSession['history'],
   signal?: AbortSignal,
-): Promise<{ reply: string; usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number } }> {
-  return tracer.withSpan('ai.chat_completion', async () => {
-    const ctx = getCorrelationContext();
+): Promise<{
+  reply: string;
+  usage: { prompt_tokens: number; completion_tokens: number; total_tokens: number };
+}> {
+  return tracer.withSpan(
+    'ai.chat_completion',
+    async () => {
+      const ctx = getCorrelationContext();
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${OPENAI_API_KEY}`,
-        // Propagate trace ID end-to-end for cross-service debugging
-        ...(ctx.traceId ? { 'X-Trace-Id': ctx.traceId } : {}),
-      },
-      // Hard 30s timeout — prevents the handler from blocking indefinitely
-      signal: signal ?? AbortSignal.timeout(30_000),
-      body: JSON.stringify({
-        model: OPENAI_MODEL,
-        messages: [
-          { role: 'system', content: 'You are a helpful Telegram bot assistant. Keep answers concise.' },
-          ...history,
-        ],
-        max_tokens: 1024,
-      }),
-    });
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          // Propagate trace ID end-to-end for cross-service debugging
+          ...(ctx.traceId ? { 'X-Trace-Id': ctx.traceId } : {}),
+        },
+        // Hard 30s timeout — prevents the handler from blocking indefinitely
+        signal: signal ?? AbortSignal.timeout(30_000),
+        body: JSON.stringify({
+          model: OPENAI_MODEL,
+          messages: [
+            {
+              role: 'system',
+              content: 'You are a helpful Telegram bot assistant. Keep answers concise.',
+            },
+            ...history,
+          ],
+          max_tokens: 1024,
+        }),
+      });
 
-    if (!response.ok) {
-      const errorBody = await response.text().catch(() => 'unknown');
-      throw new Error(`OpenAI API error ${response.status}: ${errorBody}`);
-    }
+      if (!response.ok) {
+        const errorBody = await response.text().catch(() => 'unknown');
+        throw new Error(`OpenAI API error ${response.status}: ${errorBody}`);
+      }
 
-    const data = (await response.json()) as ChatCompletionResponse;
-    const reply = data.choices?.[0]?.message?.content ?? '(empty response)';
-    const usage = data.usage ?? { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
+      const data = (await response.json()) as ChatCompletionResponse;
+      const reply = data.choices?.[0]?.message?.content ?? '(empty response)';
+      const usage = data.usage ?? { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 };
 
-    // Log token usage into the trace context
-    console.log(JSON.stringify({
-      event: 'ai.completion',
-      traceId: ctx.traceId,
-      model: OPENAI_MODEL,
-      prompt_tokens: usage.prompt_tokens,
-      completion_tokens: usage.completion_tokens,
-      total_tokens: usage.total_tokens,
-    }));
+      // Log token usage into the trace context
+      console.log(
+        JSON.stringify({
+          event: 'ai.completion',
+          traceId: ctx.traceId,
+          model: OPENAI_MODEL,
+          prompt_tokens: usage.prompt_tokens,
+          completion_tokens: usage.completion_tokens,
+          total_tokens: usage.total_tokens,
+        }),
+      );
 
-    // Record metric
-    metrics.increment('ai_completions_total', { model: OPENAI_MODEL });
-    metrics.increment('ai_tokens_total', { model: OPENAI_MODEL, type: 'prompt' }, usage.prompt_tokens);
-    metrics.increment('ai_tokens_total', { model: OPENAI_MODEL, type: 'completion' }, usage.completion_tokens);
+      // Record metric
+      metrics.increment('ai_completions_total', { model: OPENAI_MODEL });
+      metrics.increment(
+        'ai_tokens_total',
+        { model: OPENAI_MODEL, type: 'prompt' },
+        usage.prompt_tokens,
+      );
+      metrics.increment(
+        'ai_tokens_total',
+        { model: OPENAI_MODEL, type: 'completion' },
+        usage.completion_tokens,
+      );
 
-    return { reply, usage };
-  }, { model: OPENAI_MODEL });
+      return { reply, usage };
+    },
+    { model: OPENAI_MODEL },
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -158,7 +178,10 @@ bot.on('message', async (message) => {
       history: [],
       totalTokensUsed: 0,
     });
-    await bot.sendMessage(chatId, '🤖 AI Bot ready. Send me a message to start a conversation.\n\nCommands:\n/start — reset conversation\n/tokens — show token usage\n/clear — clear history');
+    await bot.sendMessage(
+      chatId,
+      '🤖 AI Bot ready. Send me a message to start a conversation.\n\nCommands:\n/start — reset conversation\n/tokens — show token usage\n/clear — clear history',
+    );
     return;
   }
 
@@ -167,7 +190,10 @@ bot.on('message', async (message) => {
     const session = await sessionAdapter.get(`chat:${chatId}`);
     const total = session?.totalTokensUsed ?? 0;
     const turns = session?.history?.length ?? 0;
-    await bot.sendMessage(chatId, `📊 Token usage:\n• Total tokens used: ${total}\n• Conversation turns: ${turns}\n• Model: ${OPENAI_MODEL}`);
+    await bot.sendMessage(
+      chatId,
+      `📊 Token usage:\n• Total tokens used: ${total}\n• Conversation turns: ${turns}\n• Model: ${OPENAI_MODEL}`,
+    );
     return;
   }
 
@@ -225,18 +251,19 @@ bot.on('message', async (message) => {
   }
 
   // --- Persist session with CAS ---
-  const writeResult = await sessionAdapter.compareAndSet(
-    `chat:${chatId}`,
-    session.version,
-    { ...session, version: session.version + 1 },
-  );
+  const writeResult = await sessionAdapter.compareAndSet(`chat:${chatId}`, session.version, {
+    ...session,
+    version: session.version + 1,
+  });
 
   if (!writeResult.ok) {
-    console.warn(JSON.stringify({
-      event: 'session.cas_conflict',
-      chatId,
-      expectedVersion: session.version,
-    }));
+    console.warn(
+      JSON.stringify({
+        event: 'session.cas_conflict',
+        chatId,
+        expectedVersion: session.version,
+      }),
+    );
     // Still send the reply — the AI already generated it
   }
 

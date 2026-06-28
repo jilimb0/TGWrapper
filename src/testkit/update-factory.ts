@@ -1,11 +1,8 @@
 import type { Update } from '../types/telegram.js';
 
-export function createMessageUpdate(params: {
-  updateId?: number;
-  userId?: number;
-  chatId?: number;
-  text?: string;
-} = {}): Update {
+export function createMessageUpdate(
+  params: { updateId?: number; userId?: number; chatId?: number; text?: string } = {},
+): Update {
   const updateId = params.updateId ?? 1;
   const userId = params.userId ?? 1;
   const chatId = params.chatId ?? userId;
@@ -19,24 +16,21 @@ export function createMessageUpdate(params: {
       chat: {
         id: chatId,
         type: 'private',
-        first_name: 'Test'
+        first_name: 'Test',
       },
       from: {
         id: userId,
         is_bot: false,
-        first_name: 'User'
+        first_name: 'User',
       },
-      text
-    }
+      text,
+    },
   } as Update;
 }
 
-export function createCallbackUpdate(params: {
-  updateId?: number;
-  userId?: number;
-  chatId?: number;
-  data?: string;
-} = {}): Update {
+export function createCallbackUpdate(
+  params: { updateId?: number; userId?: number; chatId?: number; data?: string } = {},
+): Update {
   const updateId = params.updateId ?? 1;
   const userId = params.userId ?? 1;
   const chatId = params.chatId ?? userId;
@@ -48,7 +42,7 @@ export function createCallbackUpdate(params: {
       from: {
         id: userId,
         is_bot: false,
-        first_name: 'User'
+        first_name: 'User',
       },
       chat_instance: String(chatId),
       data: params.data ?? 'test',
@@ -58,9 +52,9 @@ export function createCallbackUpdate(params: {
         chat: {
           id: chatId,
           type: 'private',
-          first_name: 'Test'
-        }
-      }
-    }
+          first_name: 'Test',
+        },
+      },
+    },
   } as Update;
 }

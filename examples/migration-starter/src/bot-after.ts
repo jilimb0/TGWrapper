@@ -1,5 +1,5 @@
-import { createBotClient } from '@tgwrapper/core';
 import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
+import { createBotClient } from '@tgwrapper/core';
 import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 import { Redis } from 'ioredis';
 
@@ -31,13 +31,13 @@ const sessionStore = new RedisSessionAdapter<RegistrationSession>({
   redis,
   tenantId: 'prod',
   botId: 'register-bot',
-  ttlSeconds: 3600 // 1 hour
+  ttlSeconds: 3600, // 1 hour
 });
 
 // 3. Create client in polling mode (e.g. for development/local running)
 const bot = createBotClient({
   token: process.env.BOT_TOKEN,
-  mode: 'polling'
+  mode: 'polling',
 });
 
 // 4. Attach telemetry (Prometheus metrics & JSON logging with Trace context)
@@ -45,15 +45,15 @@ const metrics = new MetricsRegistry();
 attachBotObservability(bot, {
   metrics,
   logger: {
-    log: (event) => console.log(JSON.stringify(event))
+    log: (event) => console.log(JSON.stringify(event)),
   },
-  serviceName: 'registration-service'
+  serviceName: 'registration-service',
 });
 
 // 5. Bot logic handlers
 bot.on('message', async (message) => {
   if (!('text' in message) || typeof message.text !== 'string') return;
-  
+
   const chatId = message.chat.id;
   const text = message.text;
 
@@ -71,11 +71,10 @@ bot.on('message', async (message) => {
 
   if (text === '/register') {
     session.step = 'awaiting_name';
-    const writeResult = await sessionStore.compareAndSet(
-      `chat:${chatId}`,
-      session.version,
-      { ...session, version: session.version + 1 }
-    );
+    const writeResult = await sessionStore.compareAndSet(`chat:${chatId}`, session.version, {
+      ...session,
+      version: session.version + 1,
+    });
     if (!writeResult.ok) {
       console.warn('Session write conflict on /register');
     }
@@ -86,11 +85,10 @@ bot.on('message', async (message) => {
   if (session.step === 'awaiting_name') {
     session.name = text;
     session.step = 'awaiting_email';
-    const writeResult = await sessionStore.compareAndSet(
-      `chat:${chatId}`,
-      session.version,
-      { ...session, version: session.version + 1 }
-    );
+    const writeResult = await sessionStore.compareAndSet(`chat:${chatId}`, session.version, {
+      ...session,
+      version: session.version + 1,
+    });
     if (!writeResult.ok) {
       console.warn('Session write conflict on name transition');
     }
@@ -103,11 +101,10 @@ bot.on('message', async (message) => {
     // Reset session back to idle
     session.step = 'idle';
     session.name = undefined;
-    const writeResult = await sessionStore.compareAndSet(
-      `chat:${chatId}`,
-      session.version,
-      { ...session, version: session.version + 1 }
-    );
+    const writeResult = await sessionStore.compareAndSet(`chat:${chatId}`, session.version, {
+      ...session,
+      version: session.version + 1,
+    });
     if (!writeResult.ok) {
       console.warn('Session write conflict on email completion');
     }
@@ -120,7 +117,12 @@ bot.on('message', async (message) => {
 });
 
 bot.on('error', (err) => {
-  console.error(JSON.stringify({ event: 'bot.error', message: err instanceof Error ? err.message : String(err) }));
+  console.error(
+    JSON.stringify({
+      event: 'bot.error',
+      message: err instanceof Error ? err.message : String(err),
+    }),
+  );
 });
 
 let isShuttingDown = false;
@@ -143,14 +145,21 @@ process.once('SIGTERM', () => {
 
 // Start polling
 (async () => {
-  console.log(JSON.stringify({
-    event: 'startup',
-    serviceName: 'registration-service',
-    mode: 'polling',
-    redisUrl
-  }));
+  console.log(
+    JSON.stringify({
+      event: 'startup',
+      serviceName: 'registration-service',
+      mode: 'polling',
+      redisUrl,
+    }),
+  );
   await bot.start();
 })().catch((error) => {
-  console.error(JSON.stringify({ event: 'startup.failed', message: error instanceof Error ? error.message : String(error) }));
+  console.error(
+    JSON.stringify({
+      event: 'startup.failed',
+      message: error instanceof Error ? error.message : String(error),
+    }),
+  );
   process.exit(1);
 });

@@ -1,14 +1,14 @@
+import type { ApiGatewayV2Event, ApiGatewayV2Response, SessionEnvelope } from '@tgwrapper/core';
 import {
   ApiClient,
   AwsLambdaHandler,
   BotKernel,
-  Context,
+  type Context,
   MemorySessionStorage,
   SessionManager,
   TreeRouter,
-  WebhookHandler
+  WebhookHandler,
 } from '@tgwrapper/core';
-import type { ApiGatewayV2Event, ApiGatewayV2Response, SessionEnvelope } from '@tgwrapper/core';
 
 type State = 'idle';
 interface Data {
@@ -35,7 +35,7 @@ const kernel = new BotKernel<State, Data>({
   apiClient: api,
   sessionManager: sessions,
   router,
-  resolveSessionKey: (u) => String(u.message?.from?.id ?? u.callback_query?.from?.id ?? '')
+  resolveSessionKey: (u) => String(u.message?.from?.id ?? u.callback_query?.from?.id ?? ''),
 });
 
 const handler = new AwsLambdaHandler(new WebhookHandler(kernel, { secretToken: secret }));

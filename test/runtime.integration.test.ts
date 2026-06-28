@@ -28,7 +28,7 @@ describe('BotRuntime integration', () => {
       handleUpdate: async () => {
         await new Promise((resolve) => setTimeout(resolve, 20));
         completed = true;
-      }
+      },
     });
 
     const startPromise = runtime.start();

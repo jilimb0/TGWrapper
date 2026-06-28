@@ -1,6 +1,6 @@
-import type { TelegramApiMethodName, TelegramUpdateKey } from './telegram.schema.generated.js';
 import type { TelegramApiMethodPayloads } from './telegram.payloads.generated.js';
 import type { TelegramApiMethodResults } from './telegram.results.generated.js';
+import type { TelegramApiMethodName, TelegramUpdateKey } from './telegram.schema.generated.js';
 
 type UnknownObject = Record<string, unknown>;
 
@@ -213,10 +213,15 @@ export type Update = {
   };
 
 export type ApiMethods = Record<string, (payload: UnknownObject) => unknown> & {
-  [K in TelegramApiMethodName]: (payload: TelegramApiMethodPayloads[K]) => TelegramApiMethodResults[K];
+  [K in TelegramApiMethodName]: (
+    payload: TelegramApiMethodPayloads[K],
+  ) => TelegramApiMethodResults[K];
 };
 
 export type SendMessageOptions = Omit<TelegramApiMethodPayloads['sendMessage'], 'chat_id' | 'text'>;
-export type SendDocumentOptions = Omit<TelegramApiMethodPayloads['sendDocument'], 'chat_id' | 'document'>;
+export type SendDocumentOptions = Omit<
+  TelegramApiMethodPayloads['sendDocument'],
+  'chat_id' | 'document'
+>;
 export type EditMessageTextOptions = TelegramApiMethodPayloads['editMessageText'];
 export type EditMessageReplyMarkupOptions = TelegramApiMethodPayloads['editMessageReplyMarkup'];

@@ -22,7 +22,7 @@ export class PollingSource implements UpdateSource {
       limit: options.limit ?? 100,
       timeoutSeconds: options.timeoutSeconds ?? 30,
       dropPendingUpdates: options.dropPendingUpdates ?? true,
-      signal: options.signal
+      signal: options.signal,
     };
   }
 
@@ -33,7 +33,7 @@ export class PollingSource implements UpdateSource {
       const response = await this.apiClient.callApi('getUpdates', {
         offset: this.offset,
         timeout: this.options.timeoutSeconds,
-        limit: this.options.limit
+        limit: this.options.limit,
       });
 
       if (!Array.isArray(response)) {

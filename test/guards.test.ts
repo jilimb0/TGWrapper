@@ -18,7 +18,7 @@ describe('Runtime guards', () => {
     await expect(
       queue.run(async () => {
         return;
-      })
+      }),
     ).rejects.toThrow('Concurrency queue is full');
 
     await first;

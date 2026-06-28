@@ -3,7 +3,7 @@ import { createBotClient } from '@tgwrapper/core';
 const bot = createBotClient({
   token: process.env.BOT_TOKEN!,
   mode: 'polling',
-  polling: { timeoutSeconds: 30, limit: 100 }
+  polling: { timeoutSeconds: 30, limit: 100 },
 });
 
 bot.on('message', async (message) => {

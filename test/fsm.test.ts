@@ -19,7 +19,7 @@ describe('FSM kernel', () => {
     const storage = new MemorySessionStorage<SessionEnvelope<States, SessionData>>();
     const sessionManager = new SessionManager<States, SessionData>({
       storage,
-      initialData: () => ({})
+      initialData: () => ({}),
     });
 
     const router = new TreeRouter<{
@@ -33,14 +33,14 @@ describe('FSM kernel', () => {
 
     const apiClient = new ApiClient({
       token: 'TEST',
-      mockResponder: async () => ({ ok: true })
+      mockResponder: async () => ({ ok: true }),
     });
 
     const kernel = new BotKernel<States, SessionData>({
       apiClient,
       router,
       sessionManager,
-      resolveSessionKey: (update) => String(update.message?.from?.id ?? '')
+      resolveSessionKey: (update) => String(update.message?.from?.id ?? ''),
     });
 
     const update: Update = {
@@ -51,8 +51,8 @@ describe('FSM kernel', () => {
         chat: { id: 1, type: 'private' },
         from: { id: 42, is_bot: false, first_name: 'u' },
         text: '/start',
-        entities: [{ type: 'bot_command', offset: 0, length: 6 }]
-      }
+        entities: [{ type: 'bot_command', offset: 0, length: 6 }],
+      },
     };
     await kernel.handleUpdate(update);
 
@@ -68,14 +68,14 @@ describe('FSM kernel', () => {
     const sessionManager = new SessionManager<States, SessionData>({
       storage,
       initialData: () => ({}),
-      conflictRetries: 1
+      conflictRetries: 1,
     });
 
     const load = await sessionManager.load('42');
     await storage.compareAndSet('42', load.version, {
       ...load.value,
       version: load.version + 1,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     });
 
     await expect(
@@ -84,9 +84,9 @@ describe('FSM kernel', () => {
         await storage.set('42', {
           ...session,
           version: session.version + 10,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         });
-      })
+      }),
     ).rejects.toBeInstanceOf(SessionConflictError);
   });
 });

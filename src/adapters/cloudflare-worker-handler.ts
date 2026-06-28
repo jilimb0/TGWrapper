@@ -1,5 +1,5 @@
 import type { WebhookRequest } from '../types/core.js';
-import { WebhookHandler } from './webhook-handler.js';
+import type { WebhookHandler } from './webhook-handler.js';
 
 export class CloudflareWorkerHandler {
   private readonly handler: WebhookHandler;
@@ -18,13 +18,13 @@ export class CloudflareWorkerHandler {
       method: request.method,
       headers,
       rawBody: await request.text(),
-      path: new URL(request.url).pathname
+      path: new URL(request.url).pathname,
     };
 
     const response = await this.handler.handle(mapped);
     return new Response(response.body, {
       status: response.status,
-      headers: response.headers
+      headers: response.headers,
     });
   }
 }

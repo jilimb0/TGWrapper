@@ -1,5 +1,5 @@
-import { createBotClient } from '@tgwrapper/core';
 import { RedisSessionAdapter } from '@tgwrapper/adapter-redis';
+import { createBotClient } from '@tgwrapper/core';
 import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 import { Redis } from 'ioredis';
 
@@ -24,23 +24,23 @@ interface SupportSession {
 const sessionStore = new RedisSessionAdapter<SupportSession>({
   redis,
   tenantId: 'prod',
-  botId: 'support-bot'
+  botId: 'support-bot',
 });
 
 const bot = createBotClient({
   token: process.env.BOT_TOKEN,
-  mode: 'polling'
+  mode: 'polling',
 });
 
 // Telemetry
 attachBotObservability(bot, {
   metrics: new MetricsRegistry(),
   logger: { log: (e) => console.log(JSON.stringify(e)) },
-  serviceName: 'support-routing-service'
+  serviceName: 'support-routing-service',
 });
 
 // In-memory simple agent directory (in prod, query from a DB/Redis)
-const AVAILABLE_AGENTS = [999991, 999992]; 
+const AVAILABLE_AGENTS = [999991, 999992];
 
 bot.on('message', async (message) => {
   if (!('text' in message) || typeof message.text !== 'string') return;
@@ -56,11 +56,10 @@ bot.on('message', async (message) => {
   // Command: Start a support ticket
   if (text === '/support') {
     session.status = 'waiting_queue';
-    const writeResult = await sessionStore.compareAndSet(
-      `chat:${chatId}`,
-      session.version,
-      { ...session, version: session.version + 1 }
-    );
+    const writeResult = await sessionStore.compareAndSet(`chat:${chatId}`, session.version, {
+      ...session,
+      version: session.version + 1,
+    });
     if (!writeResult.ok) {
       console.warn('Session write conflict on /support');
     }
@@ -75,16 +74,18 @@ bot.on('message', async (message) => {
     session.status = 'in_chat';
     session.assignedAgentId = agentId;
 
-    const writeResult = await sessionStore.compareAndSet(
-      `chat:${chatId}`,
-      session.version,
-      { ...session, version: session.version + 1 }
-    );
+    const writeResult = await sessionStore.compareAndSet(`chat:${chatId}`, session.version, {
+      ...session,
+      version: session.version + 1,
+    });
     if (!writeResult.ok) {
       console.warn('Session write conflict on queue connection');
     }
 
-    await bot.sendMessage(chatId, `You are now connected to Agent #${agentId}. How can they help you?`);
+    await bot.sendMessage(
+      chatId,
+      `You are now connected to Agent #${agentId}. How can they help you?`,
+    );
     return;
   }
 
@@ -100,7 +101,12 @@ bot.on('message', async (message) => {
 });
 
 bot.on('error', (err) => {
-  console.error(JSON.stringify({ event: 'bot.error', message: err instanceof Error ? err.message : String(err) }));
+  console.error(
+    JSON.stringify({
+      event: 'bot.error',
+      message: err instanceof Error ? err.message : String(err),
+    }),
+  );
 });
 
 let isShuttingDown = false;
@@ -122,15 +128,22 @@ process.once('SIGTERM', () => {
 });
 
 (async () => {
-  console.log(JSON.stringify({
-    event: 'startup',
-    serviceName: 'support-routing-service',
-    mode: 'polling',
-    redisUrl,
-    availableAgents: AVAILABLE_AGENTS.length
-  }));
+  console.log(
+    JSON.stringify({
+      event: 'startup',
+      serviceName: 'support-routing-service',
+      mode: 'polling',
+      redisUrl,
+      availableAgents: AVAILABLE_AGENTS.length,
+    }),
+  );
   await bot.start();
 })().catch((error) => {
-  console.error(JSON.stringify({ event: 'startup.failed', message: error instanceof Error ? error.message : String(error) }));
+  console.error(
+    JSON.stringify({
+      event: 'startup.failed',
+      message: error instanceof Error ? error.message : String(error),
+    }),
+  );
   process.exit(1);
 });

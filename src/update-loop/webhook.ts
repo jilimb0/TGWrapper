@@ -1,5 +1,5 @@
-import type { Update } from '../types/telegram.js';
 import type { UpdateSource } from '../types/core.js';
+import type { Update } from '../types/telegram.js';
 import { isValidTelegramUpdate } from './update-validator.js';
 
 export interface WebhookValidationOptions {
@@ -34,7 +34,10 @@ export class WebhookSource implements UpdateSource {
     this.updates.push(update);
   }
 
-  public validateSignature(headers: Record<string, string | undefined>, options: WebhookValidationOptions): boolean {
+  public validateSignature(
+    headers: Record<string, string | undefined>,
+    options: WebhookValidationOptions,
+  ): boolean {
     const current = headers[options.headerName.toLowerCase()] ?? headers[options.headerName];
     return current === options.secretToken;
   }

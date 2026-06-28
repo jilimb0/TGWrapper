@@ -20,7 +20,7 @@ export class MockApiClient extends ApiClient {
           return this.results.get(method);
         }
         return true;
-      }
+      },
     });
   }
 

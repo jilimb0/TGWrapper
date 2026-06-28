@@ -3,12 +3,12 @@ import {
   ApiClient,
   BotKernel,
   BoundedConcurrencyQueue,
-  Context,
+  type Context,
   InMemoryMetrics,
   MemorySessionStorage,
   SessionManager,
   TokenBucketRateLimiter,
-  TreeRouter
+  TreeRouter,
 } from '../../src/index.js';
 import type { SessionEnvelope } from '../../src/types/core.js';
 
@@ -25,8 +25,8 @@ function makeUpdate(updateId: number, userId: number, text: string) {
       date: Math.floor(Date.now() / 1000),
       chat: { id: userId, type: 'private' as const },
       from: { id: userId, is_bot: false, first_name: 'u' },
-      text
-    }
+      text,
+    },
   };
 }
 
@@ -38,7 +38,7 @@ describe('Chaos: multi-tenant contention', () => {
     const api = new ApiClient({
       token: 'TEST',
       mockResponder: async () => ({ ok: true }),
-      metrics
+      metrics,
     });
 
     const storage = new MemorySessionStorage<SessionEnvelope<State, Data>>();
@@ -46,7 +46,7 @@ describe('Chaos: multi-tenant contention', () => {
       storage,
       initialData: () => ({ count: 0 }),
       conflictRetries: 50,
-      metrics
+      metrics,
     });
 
     const router = new TreeRouter<Context<State, Data>>();
@@ -60,7 +60,7 @@ describe('Chaos: multi-tenant contention', () => {
       apiClient: api,
       sessionManager: sessions,
       router,
-      resolveSessionKey: (u) => String(u.message?.from?.id ?? '0')
+      resolveSessionKey: (u) => String(u.message?.from?.id ?? '0'),
     });
 
     const limiter = new TokenBucketRateLimiter({ capacity: 1000, refillPerSecond: 1000 });
@@ -72,14 +72,14 @@ describe('Chaos: multi-tenant contention', () => {
 
     await Promise.all(
       all.map(async (u) => {
-        const tenant = (u.message.from.id < 2000 ? 'tenantA' : 'tenantB');
+        const tenant = u.message.from.id < 2000 ? 'tenantA' : 'tenantB';
         if (!limiter.allow(tenant)) {
           return;
         }
         await queue.run(async () => {
           await kernel.handleUpdate(u);
         });
-      })
+      }),
     );
 
     const userA = await storage.get('1001');

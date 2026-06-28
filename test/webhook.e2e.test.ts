@@ -2,12 +2,12 @@ import { describe, expect, it } from 'vitest';
 import {
   ApiClient,
   BotKernel,
-  Context,
+  type Context,
   MemorySessionStorage,
   NodeHttpHandler,
   SessionManager,
   TreeRouter,
-  WebhookHandler
+  WebhookHandler,
 } from '../src/index.js';
 import type { SessionEnvelope } from '../src/types/core.js';
 
@@ -24,7 +24,7 @@ class MockReq {
   public constructor(body: string, secret: string) {
     this.body = body;
     this.headers = {
-      'x-telegram-bot-api-secret-token': secret
+      'x-telegram-bot-api-secret-token': secret,
     };
   }
 
@@ -61,13 +61,13 @@ describe('Webhook E2E', () => {
       mockResponder: async (method) => {
         calls.push(method);
         return { ok: true };
-      }
+      },
     });
 
     const storage = new MemorySessionStorage<SessionEnvelope<State, Data>>();
     const sessions = new SessionManager<State, Data>({
       storage,
-      initialData: () => ({ hits: 0 })
+      initialData: () => ({ hits: 0 }),
     });
 
     const router = new TreeRouter<Context<State, Data>>();
@@ -80,7 +80,7 @@ describe('Webhook E2E', () => {
       apiClient: api,
       sessionManager: sessions,
       router,
-      resolveSessionKey: (u) => String(u.message?.from?.id ?? '')
+      resolveSessionKey: (u) => String(u.message?.from?.id ?? ''),
     });
 
     const webhook = new WebhookHandler(kernel, { secretToken: 'secret' });
@@ -94,10 +94,10 @@ describe('Webhook E2E', () => {
           date: Math.floor(Date.now() / 1000),
           chat: { id: 1, type: 'private' },
           from: { id: 5, is_bot: false, first_name: 'u' },
-          text: 'hello'
-        }
+          text: 'hello',
+        },
       }),
-      'secret'
+      'secret',
     );
     const res = new MockRes();
 

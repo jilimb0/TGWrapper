@@ -2,11 +2,11 @@ import {
   ApiClient,
   BotKernel,
   BotRuntime,
-  Context,
+  type Context,
   MemorySessionStorage,
   PollingSource,
   SessionManager,
-  TreeRouter
+  TreeRouter,
 } from '../src/index.js';
 import type { SessionEnvelope } from '../src/types/core.js';
 
@@ -25,7 +25,7 @@ const storage = new MemorySessionStorage<SessionEnvelope<AppState, AppSessionDat
 const sessionManager = new SessionManager<AppState, AppSessionData>({
   storage,
   initialData: () => ({}),
-  encryptionRequired: false
+  encryptionRequired: false,
 });
 
 const router = new TreeRouter<Context<AppState, AppSessionData>>();
@@ -60,13 +60,13 @@ const kernel = new BotKernel<AppState, AppSessionData>({
   },
   transitions: {
     await_name: ['done'],
-    done: ['await_name']
-  }
+    done: ['await_name'],
+  },
 });
 
 const source = new PollingSource(apiClient, {
   dropPendingUpdates: true,
-  timeoutSeconds: 25
+  timeoutSeconds: 25,
 });
 
 const runtime = new BotRuntime(source, kernel);

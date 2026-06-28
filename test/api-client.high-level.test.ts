@@ -17,7 +17,7 @@ describe('ApiClient high-level methods and hooks', () => {
           return { file_path: 'path/file.bin' };
         }
         return true;
-      }
+      },
     });
 
     const link = await client.getFileLink('file-id');
@@ -36,9 +36,9 @@ describe('ApiClient high-level methods and hooks', () => {
         return {
           message_id: 1,
           date: 1,
-          chat: { id: 1, type: 'private', first_name: 'A' }
+          chat: { id: 1, type: 'private', first_name: 'A' },
         };
-      }
+      },
     });
 
     const bytes = new TextEncoder().encode('hello');

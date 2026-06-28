@@ -2,19 +2,19 @@ import { describe, expect, it } from 'vitest';
 import {
   ConfigurableLogger,
   ConsoleJsonExporter,
-  ExportManager,
-  MetricsRegistry,
-  OtlpGrpcMetricsExporter,
-  Tracer,
   createDiagnosticsSnapshot,
   createProcessMetricsSampler,
+  ExportManager,
   instrumentDbOperation,
   instrumentQueueJob,
   instrumentTelegramCall,
   instrumentUpdateHandler,
+  MetricsRegistry,
+  OtlpGrpcMetricsExporter,
   redactSensitiveData,
+  Tracer,
   validateObservabilityConfig,
-  withCorrelationContext
+  withCorrelationContext,
 } from '../packages/observability/src/index.js';
 
 describe('observability 0.5.1', () => {
@@ -36,9 +36,13 @@ describe('observability 0.5.1', () => {
       allowedTagKeys: ['service', 'method'],
       deniedTagKeys: ['user_id'],
       hashLabelKeys: ['method'],
-      maxSeriesPerMetric: 2
+      maxSeriesPerMetric: 2,
     });
-    metrics.increment('api_calls_total', 1, { service: 'bot', method: 'sendMessage', user_id: 'u1' });
+    metrics.increment('api_calls_total', 1, {
+      service: 'bot',
+      method: 'sendMessage',
+      user_id: 'u1',
+    });
     metrics.observe('api_duration_ms', 12, { service: 'bot', method: 'sendMessage' });
     metrics.setGauge('queue_depth', 5, { service: 'bot' });
     metrics.addUpDownCounter('workers_busy', 1, { service: 'bot' });
@@ -58,7 +62,7 @@ describe('observability 0.5.1', () => {
         if (calls < 2) {
           throw new Error('temporary');
         }
-      }
+      },
     };
     const manager = new ExportManager({
       exporter,
@@ -67,7 +71,7 @@ describe('observability 0.5.1', () => {
       maxRetries: 2,
       backoffMs: 1,
       timeoutMs: 500,
-      failOpen: true
+      failOpen: true,
     });
     manager.enqueue({ kind: 'metrics', payload: { a: 1 }, createdAt: Date.now() });
     manager.enqueue({ kind: 'metrics', payload: { a: 2 }, createdAt: Date.now() });
@@ -82,7 +86,11 @@ describe('observability 0.5.1', () => {
     const tracer = new Tracer();
     const metrics = new MetricsRegistry();
 
-    const wrapped = instrumentUpdateHandler(tracer, metrics, async (ctx: { ok: boolean }) => ctx.ok);
+    const wrapped = instrumentUpdateHandler(
+      tracer,
+      metrics,
+      async (ctx: { ok: boolean }) => ctx.ok,
+    );
     const ok = await wrapped({ ok: true });
     expect(ok).toBe(true);
 
@@ -90,7 +98,11 @@ describe('observability 0.5.1', () => {
     await instrumentDbOperation(tracer, metrics, 'findUser', async () => ({ id: 1 }), 'users');
     await instrumentQueueJob(tracer, metrics, 'updates', async () => true);
 
-    const cfg = validateObservabilityConfig({ serviceName: 'svc', serviceVersion: '0.5.1', env: 'prod' });
+    const cfg = validateObservabilityConfig({
+      serviceName: 'svc',
+      serviceVersion: '0.5.1',
+      env: 'prod',
+    });
     expect(cfg.ok).toBe(true);
     if (cfg.ok) {
       const snapshot = createDiagnosticsSnapshot({ registry: metrics, tracer, config: cfg.value });
@@ -108,14 +120,14 @@ describe('observability 0.5.1', () => {
     const logger = new ConfigurableLogger({
       level: 'debug',
       sink: (e) => lines.push(e),
-      sampleRateByLevel: { debug: 1 }
+      sampleRateByLevel: { debug: 1 },
     });
 
     logger.log({
       level: 'info',
       event: 'msg',
       timestamp: new Date().toISOString(),
-      data: redactSensitiveData({ token: '123', email: 'a@b.com', message: 'secret-text' })
+      data: redactSensitiveData({ token: '123', email: 'a@b.com', message: 'secret-text' }),
     });
 
     expect(lines.length).toBe(1);
@@ -125,7 +137,9 @@ describe('observability 0.5.1', () => {
   it('console exporter emits JSON lines', async () => {
     const out: string[] = [];
     const exporter = new ConsoleJsonExporter((line) => out.push(line));
-    await exporter.exportBatch([{ kind: 'log', payload: { hello: 'world' }, createdAt: Date.now() }]);
+    await exporter.exportBatch([
+      { kind: 'log', payload: { hello: 'world' }, createdAt: Date.now() },
+    ]);
     expect(out[0]).toContain('hello');
   });
 
@@ -136,7 +150,7 @@ describe('observability 0.5.1', () => {
     const grpc = new OtlpGrpcMetricsExporter(metrics, {
       send: async (payload) => {
         sent = Boolean(payload);
-      }
+      },
     });
     await grpc.export();
     expect(sent).toBe(true);

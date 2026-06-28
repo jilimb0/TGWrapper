@@ -1,6 +1,6 @@
 {
   "name": "@tgwrapper/core",
-  "version": "0.17.1",
+  "version": "0.18.0",
   "description": "Serverless-first Telegram bot framework without external bot libraries",
   "repository": {
     "type": "git",
@@ -27,7 +27,7 @@
   },
   "sideEffects": false,
   "engines": {
-    "node": ">=26.0"
+    "node": ">=24.0"
   },
   "scripts": {
     "prepare": "pnpm build",
@@ -40,6 +40,7 @@
     "test:load": "vitest run test/load/throughput.load.test.ts",
     "test:chaos": "vitest run test/chaos/multi-tenant.chaos.test.ts",
     "test:phase4": "pnpm test:load && pnpm test:chaos && pnpm test:integration",
+    "lint": "biome lint .",
     "benchmark": "pnpm build && node benchmark/run-benchmark.mjs",
     "benchmark:trend": "node scripts/check-benchmark-trend.mjs",
     "pack:size": "node scripts/check-package-size-budget.mjs",
@@ -95,6 +96,7 @@
     "serverless"
   ],
   "devDependencies": {
+    "@biomejs/biome": "^2.5.1",
     "@changesets/cli": "^2.31.0",
     "typedoc": "^0.28.19",
     "typescript": "6.0.3",

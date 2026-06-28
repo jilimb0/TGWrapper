@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach, afterAll } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { RedisSessionAdapter } from '../src/index.js';
 
 interface Session {
@@ -10,7 +10,7 @@ const redisUrl = process.env.REDIS_URL ?? 'redis://127.0.0.1:6379';
 const adapter = new RedisSessionAdapter<Session>({
   redisUrl,
   tenantId: 't1',
-  botId: 'b1'
+  botId: 'b1',
 });
 
 describe('RedisSessionAdapter integration', () => {
@@ -25,19 +25,19 @@ describe('RedisSessionAdapter integration', () => {
   it('commits compareAndSet atomically', async () => {
     const created = await adapter.compareAndSet('u1', 0, {
       version: 1,
-      value: 'a'
+      value: 'a',
     });
     expect(created.ok).toBe(true);
 
     const fail = await adapter.compareAndSet('u1', 0, {
       version: 1,
-      value: 'b'
+      value: 'b',
     });
     expect(fail.ok).toBe(false);
 
     const ok = await adapter.compareAndSet('u1', 1, {
       version: 2,
-      value: 'c'
+      value: 'c',
     });
     expect(ok.ok).toBe(true);
 
@@ -52,13 +52,13 @@ describe('RedisSessionAdapter integration', () => {
     const injectedAdapter = new RedisSessionAdapter<Session>({
       redis: customClient,
       tenantId: 't1',
-      botId: 'b1'
+      botId: 'b1',
     });
 
     await injectedAdapter.delete('u2');
     const res = await injectedAdapter.compareAndSet('u2', 0, {
       version: 1,
-      value: 'custom-client-value'
+      value: 'custom-client-value',
     });
     expect(res.ok).toBe(true);
 

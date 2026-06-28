@@ -3,7 +3,7 @@ import {
   parseDocForMethods,
   parseDocForObjects,
   parseDocForStructuredMethods,
-  parseDocForUpdateKeys
+  parseDocForUpdateKeys,
 } from '../../scripts/lib/telegram-doc-parser.mjs';
 
 describe('telegram doc parser', () => {
@@ -73,7 +73,11 @@ describe('telegram doc parser', () => {
     const methods = parseDocForStructuredMethods(html);
     expect(methods).toHaveLength(1);
     expect(methods[0].name).toBe('sendMessage');
-    expect(methods[0].params[0]).toMatchObject({ name: 'chat_id', type: 'Integer or String', required: true });
+    expect(methods[0].params[0]).toMatchObject({
+      name: 'chat_id',
+      type: 'Integer or String',
+      required: true,
+    });
     expect(methods[0].params[1]).toMatchObject({ name: 'text', type: 'String', required: true });
     expect(methods[0].returns).toContain('sent Message');
   });
@@ -98,7 +102,10 @@ describe('telegram doc parser', () => {
 
     const objects = parseDocForObjects(html);
     expect(objects.map((x) => x.name)).toEqual(['Chat', 'Message']);
-    expect(objects.find((x) => x.name === 'Message')?.fields[0]).toMatchObject({ name: 'message_id', type: 'Integer' });
+    expect(objects.find((x) => x.name === 'Message')?.fields[0]).toMatchObject({
+      name: 'message_id',
+      type: 'Integer',
+    });
   });
 
   it('parses update keys from update section table markup', () => {

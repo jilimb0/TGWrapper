@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { ApiClient } from '../src/core/api-client.js';
 import { Context } from '../src/core/context.js';
-import { isValidTelegramUpdate } from '../src/update-loop/update-validator.js';
 import type { ApiMethods, Update } from '../src/types/telegram.js';
+import { isValidTelegramUpdate } from '../src/update-loop/update-validator.js';
 
 describe('Telegram API compatibility contract', () => {
   it('accepts Update payloads with newer Bot API fields', () => {
@@ -14,30 +14,30 @@ describe('Telegram API compatibility contract', () => {
         user_chat_id: 777,
         date: Math.floor(Date.now() / 1000),
         can_reply: true,
-        is_enabled: true
+        is_enabled: true,
       },
       business_message: {
         message_id: 1,
         date: Math.floor(Date.now() / 1000),
         chat: { id: 42, type: 'private' },
         from: { id: 42, is_bot: false, first_name: 'Alice' },
-        text: 'hello from business'
+        text: 'hello from business',
       },
       deleted_business_messages: {
         business_connection_id: 'bc_1',
         chat: { id: 42, type: 'private' },
-        message_ids: [1]
+        message_ids: [1],
       },
       message_reaction: {
         chat: { id: 42, type: 'private' },
         message_id: 1,
         date: Math.floor(Date.now() / 1000),
         old_reaction: [],
-        new_reaction: []
+        new_reaction: [],
       },
       purchased_paid_media: {
         from: { id: 42, is_bot: false, first_name: 'Alice' },
-        paid_media_payload: 'media-token-v2'
+        paid_media_payload: 'media-token-v2',
       },
       guest_message: {
         message_id: 2,
@@ -45,8 +45,8 @@ describe('Telegram API compatibility contract', () => {
         chat: { id: 42, type: 'private' },
         from: { id: 42, is_bot: false, first_name: 'Alice' },
         guest_query_id: 'gq_2',
-        guest_bot_caller_user: { id: 100, is_bot: true, first_name: 'caller' }
-      }
+        guest_bot_caller_user: { id: 100, is_bot: true, first_name: 'caller' },
+      },
     } as unknown;
 
     expect(isValidTelegramUpdate(update)).toBe(true);
@@ -60,11 +60,11 @@ describe('Telegram API compatibility contract', () => {
         date: Math.floor(Date.now() / 1000),
         chat: { id: 99, type: 'private' },
         from: { id: 99, is_bot: false, first_name: 'Bob' },
-        text: '/start'
+        text: '/start',
       },
       x_future_field: {
-        nested: true
-      }
+        nested: true,
+      },
     } as Update;
 
     const ctx = new Context({
@@ -74,16 +74,16 @@ describe('Telegram API compatibility contract', () => {
         data: { seen: 0 },
         version: 0,
         encrypted: false,
-        updated_at: new Date().toISOString()
+        updated_at: new Date().toISOString(),
       },
       sceneController: {
         enter: async () => undefined,
-        leave: async () => undefined
+        leave: async () => undefined,
       },
       apiClient: new ApiClient({
         token: 'TEST_TOKEN',
-        mockResponder: async () => ({ ok: true })
-      })
+        mockResponder: async () => ({ ok: true }),
+      }),
     });
 
     const passthrough = (ctx.update as Record<string, unknown>).x_future_field as
@@ -99,7 +99,7 @@ describe('Telegram API compatibility contract', () => {
       mockResponder: async (method) => {
         calls.push(method);
         return { ok: true };
-      }
+      },
     });
 
     const method: keyof ApiMethods = 'sendMessageDraft';
@@ -115,7 +115,7 @@ describe('Telegram API compatibility contract', () => {
       mockResponder: async (method) => {
         calls.push(method);
         return { ok: true };
-      }
+      },
     });
 
     const method: keyof ApiMethods = 'verifyUser';
@@ -131,7 +131,7 @@ describe('Telegram API compatibility contract', () => {
       mockResponder: async (method) => {
         calls.push(method);
         return { ok: true };
-      }
+      },
     });
 
     const method: keyof ApiMethods = 'answerGuestQuery';

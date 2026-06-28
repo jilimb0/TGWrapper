@@ -1,5 +1,5 @@
+import { createRateLimiter, RedisKvStore, RedisSessionAdapter } from '@tgwrapper/adapter-redis';
 import { createBotClient } from '@tgwrapper/core';
-import { RedisSessionAdapter, RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
 import { attachBotObservability, MetricsRegistry } from '@tgwrapper/observability';
 import { Redis } from 'ioredis';
 
@@ -29,13 +29,13 @@ const sessionAdapter = new RedisSessionAdapter<UserSession>({
   redis,
   tenantId: 'prod',
   botId: 'standard-bot',
-  ttlSeconds: 86400 // 24 hours
+  ttlSeconds: 86400, // 24 hours
 });
 
 // 3. Initialize the TGWrapper Bot Client
 const bot = createBotClient({
   token: process.env.BOT_TOKEN,
-  mode: 'polling' // Polling for dev. In prod swap to 'webhook'
+  mode: 'polling', // Polling for dev. In prod swap to 'webhook'
 });
 
 // 4. Attach Observability & Structured JSON Logging
@@ -43,9 +43,9 @@ const metrics = new MetricsRegistry();
 attachBotObservability(bot, {
   metrics,
   logger: {
-    log: (event) => console.log(JSON.stringify(event))
+    log: (event) => console.log(JSON.stringify(event)),
   },
-  serviceName: 'standard-bot-service'
+  serviceName: 'standard-bot-service',
 });
 
 // 5. Setup Distributed Rate Limiting (15 requests per minute per user)
@@ -54,7 +54,7 @@ const limiter = createRateLimiter(rateLimitStore, {
   namespace: 'rate-limiting',
   windowMs: 60000,
   limit: 15,
-  blockDurationMs: 10000
+  blockDurationMs: 10000,
 });
 
 // 6. Router logic & Command handlers
@@ -74,7 +74,10 @@ bot.on('message', async (message) => {
 
   // Route: /start
   if (text === '/start') {
-    await bot.sendMessage(chatId, 'Hello! This is a production blueprint bot. Type /click to increment state.');
+    await bot.sendMessage(
+      chatId,
+      'Hello! This is a production blueprint bot. Type /click to increment state.',
+    );
     return;
   }
 
@@ -90,11 +93,10 @@ bot.on('message', async (message) => {
     session.lastMessageTime = Date.now();
 
     // Atomic CAS write
-    const writeResult = await sessionAdapter.compareAndSet(
-      `chat:${chatId}`,
-      session.version,
-      { ...session, version: session.version + 1 }
-    );
+    const writeResult = await sessionAdapter.compareAndSet(`chat:${chatId}`, session.version, {
+      ...session,
+      version: session.version + 1,
+    });
 
     if (!writeResult.ok) {
       console.warn(JSON.stringify({ event: 'session.cas_conflict', chatId }));
@@ -109,7 +111,12 @@ bot.on('message', async (message) => {
 });
 
 bot.on('error', (err) => {
-  console.error(JSON.stringify({ event: 'bot.error', message: err instanceof Error ? err.message : String(err) }));
+  console.error(
+    JSON.stringify({
+      event: 'bot.error',
+      message: err instanceof Error ? err.message : String(err),
+    }),
+  );
 });
 
 let isShuttingDown = false;
@@ -132,15 +139,22 @@ process.once('SIGTERM', () => {
 
 // Start processing
 (async () => {
-  console.log(JSON.stringify({
-    event: 'startup',
-    serviceName: 'standard-bot-service',
-    mode: 'polling',
-    redisUrl,
-    rateLimit: { windowMs: 60000, limit: 15 }
-  }));
+  console.log(
+    JSON.stringify({
+      event: 'startup',
+      serviceName: 'standard-bot-service',
+      mode: 'polling',
+      redisUrl,
+      rateLimit: { windowMs: 60000, limit: 15 },
+    }),
+  );
   await bot.start();
 })().catch((error) => {
-  console.error(JSON.stringify({ event: 'startup.failed', message: error instanceof Error ? error.message : String(error) }));
+  console.error(
+    JSON.stringify({
+      event: 'startup.failed',
+      message: error instanceof Error ? error.message : String(error),
+    }),
+  );
   process.exit(1);
 });

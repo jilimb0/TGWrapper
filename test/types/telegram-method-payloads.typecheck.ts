@@ -9,18 +9,18 @@ type _UploadStickerFilePayload = Parameters<ApiMethods['uploadStickerFile']>[0];
 const _okSendMessage: _SendMessagePayload = {
   chat_id: 1,
   text: 'hello',
-  parse_mode: 'HTML'
+  parse_mode: 'HTML',
 };
 
 const _okGetUpdates: _GetUpdatesPayload = {
   offset: 10,
   timeout: 20,
-  allowed_updates: ['message', 'callback_query']
+  allowed_updates: ['message', 'callback_query'],
 };
 
 const _okSetWebhook: _SetWebhookPayload = {
   url: 'https://example.com/hook',
-  drop_pending_updates: true
+  drop_pending_updates: true,
 };
 
 const _okSendInvoice: _SendInvoicePayload = {
@@ -29,28 +29,28 @@ const _okSendInvoice: _SendInvoicePayload = {
   description: 'desc',
   payload: 'invoice_payload',
   currency: 'USD',
-  prices: []
+  prices: [],
 };
 
 const _okUploadStickerFile: _UploadStickerFilePayload = {
   user_id: 1,
   sticker: 'file_id',
-  sticker_format: 'static'
+  sticker_format: 'static',
 };
 
 // @ts-expect-error missing required text
 const _badSendMessage: _SendMessagePayload = {
-  chat_id: 1
+  chat_id: 1,
 };
 
 const _badGetUpdates: _GetUpdatesPayload = {
   // @ts-expect-error wrong type for allowed_updates
-  allowed_updates: 'message'
+  allowed_updates: 'message',
 };
 
 const _badSetWebhook: _SetWebhookPayload = {
   // @ts-expect-error url must be string
-  url: 42
+  url: 42,
 };
 
 // @ts-expect-error missing required prices
@@ -59,14 +59,14 @@ const _badSendInvoice: _SendInvoicePayload = {
   title: 'Premium',
   description: 'desc',
   payload: 'invoice_payload',
-  currency: 'USD'
+  currency: 'USD',
 };
 
 const _badUploadStickerFile: _UploadStickerFilePayload = {
   user_id: 1,
   sticker: 'file_id',
   // @ts-expect-error invalid sticker_format literal
-  sticker_format: 'gif'
+  sticker_format: 'gif',
 };
 
 void _okSendMessage;

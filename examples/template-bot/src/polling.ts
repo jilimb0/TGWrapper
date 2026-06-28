@@ -1,14 +1,14 @@
+import type { SessionEnvelope } from '@tgwrapper/core';
 import {
   ApiClient,
   BotKernel,
   BotRuntime,
-  Context,
+  type Context,
   MemorySessionStorage,
   PollingSource,
   SessionManager,
-  TreeRouter
+  TreeRouter,
 } from '@tgwrapper/core';
-import type { SessionEnvelope } from '@tgwrapper/core';
 
 type State = 'idle' | 'await_name';
 interface Data {
@@ -24,7 +24,7 @@ const apiClient = new ApiClient({ token });
 const storage = new MemorySessionStorage<SessionEnvelope<State, Data>>();
 const sessionManager = new SessionManager<State, Data>({
   storage,
-  initialData: () => ({})
+  initialData: () => ({}),
 });
 
 const router = new TreeRouter<Context<State, Data>>();
@@ -35,9 +35,9 @@ router.command('/start', async (ctx) => {
     reply_markup: {
       inline_keyboard: [
         [{ text: 'Set name', callback_data: 'set_name' }],
-        [{ text: 'Who am I?', callback_data: 'whoami' }]
-      ]
-    }
+        [{ text: 'Who am I?', callback_data: 'whoami' }],
+      ],
+    },
   });
 });
 
@@ -83,16 +83,16 @@ const kernel = new BotKernel<State, Data>({
   },
   transitions: {
     idle: ['await_name'],
-    await_name: ['idle']
-  }
+    await_name: ['idle'],
+  },
 });
 
 const runtime = new BotRuntime(
   new PollingSource(apiClient, {
     dropPendingUpdates: true,
-    timeoutSeconds: 25
+    timeoutSeconds: 25,
   }),
-  kernel
+  kernel,
 );
 
 process.on('SIGINT', async () => {

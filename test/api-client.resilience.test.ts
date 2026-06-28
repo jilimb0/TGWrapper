@@ -13,12 +13,14 @@ describe('ApiClient resilience', () => {
       circuitBreaker: {
         failureThreshold: 2,
         cooldownMs: 1_000,
-        halfOpenMaxRequests: 1
-      }
+        halfOpenMaxRequests: 1,
+      },
     });
 
     await expect(client.callApi('sendMessage', { chat_id: 1, text: 'x' })).rejects.toThrow();
     await expect(client.callApi('sendMessage', { chat_id: 1, text: 'x' })).rejects.toThrow();
-    await expect(client.callApi('sendMessage', { chat_id: 1, text: 'x' })).rejects.toBeInstanceOf(CircuitOpenError);
+    await expect(client.callApi('sendMessage', { chat_id: 1, text: 'x' })).rejects.toBeInstanceOf(
+      CircuitOpenError,
+    );
   });
 });

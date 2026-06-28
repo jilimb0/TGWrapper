@@ -1,5 +1,5 @@
 import type { WebhookRequest } from '../types/core.js';
-import { WebhookHandler } from './webhook-handler.js';
+import type { WebhookHandler } from './webhook-handler.js';
 
 export interface NodeLikeIncomingMessage {
   method?: string;
@@ -40,7 +40,7 @@ export class NodeHttpHandler {
     const request: WebhookRequest = {
       method: req.method ?? 'GET',
       headers,
-      rawBody: chunks.join('')
+      rawBody: chunks.join(''),
     };
 
     const response = await this.handler.handle(request);

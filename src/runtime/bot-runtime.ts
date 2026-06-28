@@ -1,6 +1,12 @@
-import { BoundedConcurrencyQueue } from '../guards/bounded-concurrency.js';
-import { TokenBucketRateLimiter } from '../guards/token-bucket-rate-limiter.js';
-import type { Logger, MetricsCollector, RuntimeHooks, RuntimeLifecycle, UpdateSource } from '../types/core.js';
+import type { BoundedConcurrencyQueue } from '../guards/bounded-concurrency.js';
+import type { TokenBucketRateLimiter } from '../guards/token-bucket-rate-limiter.js';
+import type {
+  Logger,
+  MetricsCollector,
+  RuntimeHooks,
+  RuntimeLifecycle,
+  UpdateSource,
+} from '../types/core.js';
 import type { Update } from '../types/telegram.js';
 
 export interface RuntimeHandler {
@@ -25,7 +31,11 @@ export class BotRuntime implements RuntimeLifecycle {
   private running = false;
   private inMemoryRateLimiterWarningLogged = false;
 
-  public constructor(source: UpdateSource, handler: RuntimeHandler, guards: RuntimeGuardOptions = {}) {
+  public constructor(
+    source: UpdateSource,
+    handler: RuntimeHandler,
+    guards: RuntimeGuardOptions = {},
+  ) {
     this.source = source;
     this.handler = handler;
     this.guards = guards;
@@ -81,8 +91,8 @@ export class BotRuntime implements RuntimeLifecycle {
           timestamp: new Date().toISOString(),
           data: {
             update_type: updateType,
-            message: error instanceof Error ? error.message : 'unknown'
-          }
+            message: error instanceof Error ? error.message : 'unknown',
+          },
         });
       }
     }
@@ -90,7 +100,7 @@ export class BotRuntime implements RuntimeLifecycle {
       update,
       updateType,
       tenantKey,
-      startedAt
+      startedAt,
     });
 
     if (this.guards.rateLimiter && !this.guards.rateLimiter.allow(tenantKey)) {
@@ -99,7 +109,7 @@ export class BotRuntime implements RuntimeLifecycle {
         level: 'warn',
         event: 'runtime_rate_limited',
         timestamp: new Date().toISOString(),
-        data: { tenant: tenantKey }
+        data: { tenant: tenantKey },
       });
       return;
     }
@@ -121,19 +131,24 @@ export class BotRuntime implements RuntimeLifecycle {
         timestamp: new Date().toISOString(),
         data: {
           tenant: tenantKey,
-          message: error instanceof Error ? error.message : 'unknown'
-        }
+          message: error instanceof Error ? error.message : 'unknown',
+        },
       });
     }
   }
 
-  private async safeHandleUpdate(update: Update, tenantKey: string, updateType: string, startedAt: string): Promise<void> {
+  private async safeHandleUpdate(
+    update: Update,
+    tenantKey: string,
+    updateType: string,
+    startedAt: string,
+  ): Promise<void> {
     try {
       await this.handler.handleUpdate(update);
     } catch (error: unknown) {
       this.guards.metrics?.increment('runtime_handler_errors', 1, {
         tenant: tenantKey,
-        update_type: updateType
+        update_type: updateType,
       });
       this.guards.logger?.log({
         level: 'error',
@@ -142,15 +157,15 @@ export class BotRuntime implements RuntimeLifecycle {
         data: {
           tenant: tenantKey,
           update_type: updateType,
-          message: error instanceof Error ? error.message : 'unknown'
-        }
+          message: error instanceof Error ? error.message : 'unknown',
+        },
       });
       await this.guards.hooks?.onError?.({
         update,
         updateType,
         tenantKey,
         error,
-        startedAt
+        startedAt,
       });
       for (const handler of this.errorHandlers) {
         await handler(error);
@@ -178,8 +193,8 @@ export class BotRuntime implements RuntimeLifecycle {
     const nodeEnv =
       typeof globalThis === 'object' &&
       'process' in globalThis &&
-      typeof (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env?.NODE_ENV ===
-        'string'
+      typeof (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env
+        ?.NODE_ENV === 'string'
         ? (globalThis as { process?: { env?: { NODE_ENV?: string } } }).process?.env?.NODE_ENV
         : undefined;
     if (nodeEnv !== 'production') {
@@ -193,8 +208,8 @@ export class BotRuntime implements RuntimeLifecycle {
       timestamp: new Date().toISOString(),
       data: {
         recommendation:
-          'Use @tgwrapper/adapter-redis createRateLimiter(...) for distributed multi-instance deployments.'
-      }
+          'Use @tgwrapper/adapter-redis createRateLimiter(...) for distributed multi-instance deployments.',
+      },
     });
   }
 }

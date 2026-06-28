@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
-  EcsJsonLogger,
-  InMemoryMetrics,
-  MetricsRegistry,
-  Tracer,
   attachBotObservability,
   classifyError,
   createRuntimeObservabilityHooks,
+  EcsJsonLogger,
   getObservabilityHealth,
+  InMemoryMetrics,
+  MetricsRegistry,
   renderPrometheusMetrics,
-  withCorrelationContext
+  Tracer,
+  withCorrelationContext,
 } from '../packages/observability/src/index.js';
 
 describe('observability apm features', () => {
@@ -42,7 +42,10 @@ describe('observability apm features', () => {
   it('classifies errors and attaches bot observability', async () => {
     const metrics = new InMemoryMetrics();
     const logs: string[] = [];
-    const logger = new EcsJsonLogger({ serviceName: 'test-bot' }, { write: (line) => logs.push(line) });
+    const logger = new EcsJsonLogger(
+      { serviceName: 'test-bot' },
+      { write: (line) => logs.push(line) },
+    );
 
     const handlers = new Map<string, (payload: unknown) => void>();
     const target = {
@@ -53,13 +56,13 @@ describe('observability apm features', () => {
       onError: (handler: (error: unknown) => void) => {
         handlers.set('error', handler as unknown as (payload: unknown) => void);
         return () => handlers.delete('error');
-      }
+      },
     };
 
     const detach = attachBotObservability(target, {
       metrics,
       logger,
-      serviceName: 'test-bot'
+      serviceName: 'test-bot',
     });
 
     handlers.get('update')?.({ update_id: 1, message: { text: 'x' } });
@@ -73,11 +76,18 @@ describe('observability apm features', () => {
 
     expect(metrics.getCounter('bot_launch_total|service=test-bot')).toBe(1);
     expect(metrics.getCounter('bot_update_total|service=test-bot,update_type=message')).toBe(1);
-    expect(metrics.getCounter('queue_events_total|action=enqueue,queue=updates,service=test-bot')).toBe(1);
-    expect(metrics.getCounter('db_events_total|operation=redis_get,service=test-bot,status=ok')).toBe(1);
+    expect(
+      metrics.getCounter('queue_events_total|action=enqueue,queue=updates,service=test-bot'),
+    ).toBe(1);
+    expect(
+      metrics.getCounter('db_events_total|operation=redis_get,service=test-bot,status=ok'),
+    ).toBe(1);
     expect(logs.length).toBeGreaterThan(0);
 
-    const classified = classifyError(Object.assign(new Error('network'), { code: 'NET_FAIL', retryable: true }), 'api');
+    const classified = classifyError(
+      Object.assign(new Error('network'), { code: 'NET_FAIL', retryable: true }),
+      'api',
+    );
     expect(classified.class).toBe('transport');
     expect(classified.retryable).toBe(true);
   });

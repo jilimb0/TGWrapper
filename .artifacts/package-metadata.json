@@ -3,12 +3,7 @@
     "file": "package.json",
     "name": "@tgwrapper/core",
     "version": "0.13.1",
-    "files": [
-      "dist/**/*.js",
-      "dist/**/*.d.ts",
-      "dist-cjs/**/*.js",
-      "README.md"
-    ],
+    "files": ["dist/**/*.js", "dist/**/*.d.ts", "dist-cjs/**/*.js", "README.md"],
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
@@ -24,12 +19,7 @@
     "file": "packages/adapter-redis/package.json",
     "name": "@tgwrapper/adapter-redis",
     "version": "0.5.1",
-    "files": [
-      "dist/**/*.js",
-      "dist/**/*.d.ts",
-      "dist-cjs/**/*.js",
-      "README.md"
-    ],
+    "files": ["dist/**/*.js", "dist/**/*.d.ts", "dist-cjs/**/*.js", "README.md"],
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",
@@ -45,12 +35,7 @@
     "file": "packages/observability/package.json",
     "name": "@tgwrapper/observability",
     "version": "0.6.1",
-    "files": [
-      "dist/**/*.js",
-      "dist/**/*.d.ts",
-      "dist-cjs/**/*.js",
-      "README.md"
-    ],
+    "files": ["dist/**/*.js", "dist/**/*.d.ts", "dist-cjs/**/*.js", "README.md"],
     "exports": {
       ".": {
         "types": "./dist/index.d.ts",

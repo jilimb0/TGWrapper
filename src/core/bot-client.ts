@@ -1,7 +1,4 @@
-import { ApiClient } from './api-client.js';
 import { BotRuntime } from '../runtime/bot-runtime.js';
-import { PollingSource } from '../update-loop/polling.js';
-import { WebhookSource } from '../update-loop/webhook.js';
 import type {
   ApiCallEvent,
   ApiErrorEvent,
@@ -10,12 +7,15 @@ import type {
   Logger,
   MetricsCollector,
   RuntimeHooks,
-  RuntimeLifecycle
+  RuntimeLifecycle,
 } from '../types/core.js';
 import type { CallbackQuery, Message, Update } from '../types/telegram.js';
 import type { TelegramApiMethodPayloads } from '../types/telegram.payloads.generated.js';
 import type { TelegramApiMethodResults } from '../types/telegram.results.generated.js';
+import { PollingSource } from '../update-loop/polling.js';
+import { WebhookSource } from '../update-loop/webhook.js';
 import type { BinaryInput } from './api-client.js';
+import { ApiClient } from './api-client.js';
 
 export type BotClientEventMap = {
   update: Update;
@@ -28,7 +28,9 @@ export type BotClientEventMap = {
 };
 
 export type BotEventName = keyof BotClientEventMap;
-export type BotEventHandler<TEvent extends BotEventName> = (event: BotClientEventMap[TEvent]) => void | Promise<void>;
+export type BotEventHandler<TEvent extends BotEventName> = (
+  event: BotClientEventMap[TEvent],
+) => void | Promise<void>;
 
 export interface CreateBotClientOptions {
   token: string;
@@ -51,20 +53,22 @@ export interface BotClient extends RuntimeLifecycle {
   sendMessage(
     chatId: number | string,
     text: string,
-    extra?: Omit<TelegramApiMethodPayloads['sendMessage'], 'chat_id' | 'text'>
+    extra?: Omit<TelegramApiMethodPayloads['sendMessage'], 'chat_id' | 'text'>,
   ): Promise<TelegramApiMethodResults['sendMessage']>;
   sendDocument(
     chatId: number | string,
     document: BinaryInput | TelegramApiMethodPayloads['sendDocument']['document'],
-    extra?: Omit<TelegramApiMethodPayloads['sendDocument'], 'chat_id' | 'document'>
+    extra?: Omit<TelegramApiMethodPayloads['sendDocument'], 'chat_id' | 'document'>,
   ): Promise<TelegramApiMethodResults['sendDocument']>;
   answerCallbackQuery(
     callbackQueryId: string,
-    extra?: Omit<TelegramApiMethodPayloads['answerCallbackQuery'], 'callback_query_id'>
+    extra?: Omit<TelegramApiMethodPayloads['answerCallbackQuery'], 'callback_query_id'>,
   ): Promise<TelegramApiMethodResults['answerCallbackQuery']>;
-  editMessageText(payload: TelegramApiMethodPayloads['editMessageText']): Promise<TelegramApiMethodResults['editMessageText']>;
+  editMessageText(
+    payload: TelegramApiMethodPayloads['editMessageText'],
+  ): Promise<TelegramApiMethodResults['editMessageText']>;
   editMessageReplyMarkup(
-    payload: TelegramApiMethodPayloads['editMessageReplyMarkup']
+    payload: TelegramApiMethodPayloads['editMessageReplyMarkup'],
   ): Promise<TelegramApiMethodResults['editMessageReplyMarkup']>;
   getFileLink(fileId: string): Promise<string>;
 }
@@ -79,10 +83,13 @@ export function createBotClient(options: CreateBotClientOptions): BotClient {
     error: new Set(),
     api_call: new Set(),
     api_result: new Set(),
-    api_error: new Set()
+    api_error: new Set(),
   };
 
-  const emit = async <TEvent extends BotEventName>(event: TEvent, payload: BotClientEventMap[TEvent]): Promise<void> => {
+  const emit = async <TEvent extends BotEventName>(
+    event: TEvent,
+    payload: BotClientEventMap[TEvent],
+  ): Promise<void> => {
     for (const handler of handlers[event]) {
       await handler(payload as never);
     }
@@ -101,20 +108,22 @@ export function createBotClient(options: CreateBotClientOptions): BotClient {
     },
     onApiError: async (event) => {
       await emit('api_error', event);
-    }
+    },
   });
 
   const mode = options.mode ?? 'polling';
   const source =
     mode === 'webhook'
       ? new WebhookSource()
-        : new PollingSource(apiClient, {
-          ...(options.polling?.timeoutSeconds !== undefined ? { timeoutSeconds: options.polling.timeoutSeconds } : {}),
+      : new PollingSource(apiClient, {
+          ...(options.polling?.timeoutSeconds !== undefined
+            ? { timeoutSeconds: options.polling.timeoutSeconds }
+            : {}),
           ...(options.polling?.limit !== undefined ? { limit: options.polling.limit } : {}),
           ...(options.polling?.dropPendingUpdates !== undefined
             ? { dropPendingUpdates: options.polling.dropPendingUpdates }
             : {}),
-          ...(options.polling?.signal ? { signal: options.polling.signal } : {})
+          ...(options.polling?.signal ? { signal: options.polling.signal } : {}),
         });
 
   const runtime = new BotRuntime(
@@ -128,13 +137,13 @@ export function createBotClient(options: CreateBotClientOptions): BotClient {
         if (update.callback_query) {
           await emit('callback_query', update.callback_query);
         }
-      }
+      },
     },
     {
       ...(options.logger ? { logger: options.logger } : {}),
       ...(options.metrics ? { metrics: options.metrics } : {}),
-      ...(options.hooks ? { hooks: options.hooks } : {})
-    }
+      ...(options.hooks ? { hooks: options.hooks } : {}),
+    },
   );
 
   runtime.onError(async (error) => {
@@ -151,9 +160,13 @@ export function createBotClient(options: CreateBotClientOptions): BotClient {
     isRunning: () => runtime.isRunning(),
     onError: (handler) => runtime.onError(handler),
     on: (event, handler) => {
-      (handlers[event] as Set<BotEventHandler<typeof event>>).add(handler as BotEventHandler<typeof event>);
+      (handlers[event] as Set<BotEventHandler<typeof event>>).add(
+        handler as BotEventHandler<typeof event>,
+      );
       return () => {
-        (handlers[event] as Set<BotEventHandler<typeof event>>).delete(handler as BotEventHandler<typeof event>);
+        (handlers[event] as Set<BotEventHandler<typeof event>>).delete(
+          handler as BotEventHandler<typeof event>,
+        );
       };
     },
     ingest: (update) => {
@@ -165,7 +178,11 @@ export function createBotClient(options: CreateBotClientOptions): BotClient {
       return apiClient.sendMessage(chatId, text, extra as unknown as JsonObject);
     },
     sendDocument: async (chatId, document, extra = {}) => {
-      return apiClient.sendDocument(chatId, document as BinaryInput, extra as unknown as JsonObject);
+      return apiClient.sendDocument(
+        chatId,
+        document as BinaryInput,
+        extra as unknown as JsonObject,
+      );
     },
     answerCallbackQuery: async (callbackQueryId, extra = {}) => {
       return apiClient.answerCallbackQuery(callbackQueryId, extra as unknown as JsonObject);
@@ -178,6 +195,6 @@ export function createBotClient(options: CreateBotClientOptions): BotClient {
     },
     getFileLink: async (fileId) => {
       return apiClient.getFileLink(fileId);
-    }
+    },
   };
 }

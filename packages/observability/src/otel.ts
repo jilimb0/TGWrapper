@@ -1,4 +1,4 @@
-import type { TraceSpan } from './index.js';
+import type { TraceSpan } from './types.js';
 
 export interface OtelReadableSpan {
   name: string;
@@ -24,7 +24,7 @@ export interface OtelReadableSpan {
 export function toOtelReadableSpan(span: TraceSpan): OtelReadableSpan {
   const startSec = Math.floor(span.startTime / 1000);
   const startNanos = (span.startTime % 1000) * 1_000_000;
-  
+
   let endSec = startSec;
   let endNanos = startNanos;
   if (span.endTime) {
@@ -38,14 +38,14 @@ export function toOtelReadableSpan(span: TraceSpan): OtelReadableSpan {
     spanContext: () => ({
       traceId: span.traceId,
       spanId: span.spanId,
-      traceFlags: 1 // Recorded
+      traceFlags: 1, // Recorded
     }),
     ...(span.parentSpanId !== undefined ? { parentSpanId: span.parentSpanId } : {}),
     startTime: [startSec, startNanos],
     ...(span.endTime ? { endTime: [endSec, endNanos] as [number, number] } : {}),
     status: {
-      code: span.status === 'ok' ? 1 : span.status === 'error' ? 2 : 0
+      code: span.status === 'ok' ? 1 : span.status === 'error' ? 2 : 0,
     },
-    attributes: { ...span.attributes }
+    attributes: { ...span.attributes },
   };
 }

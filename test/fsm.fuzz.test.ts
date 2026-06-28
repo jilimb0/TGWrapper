@@ -14,7 +14,7 @@ describe('FSM optimistic locking fuzz', () => {
     const manager = new SessionManager<State, Data>({
       storage,
       initialData: () => ({ count: 0 }),
-      conflictRetries: 50
+      conflictRetries: 50,
     });
 
     const increments = 50;
@@ -23,8 +23,8 @@ describe('FSM optimistic locking fuzz', () => {
         manager.runInSession('user:1', async (session) => {
           const next = session.data.count + 1;
           session.data.count = next;
-        })
-      )
+        }),
+      ),
     );
 
     const finalValue = await storage.get('user:1');

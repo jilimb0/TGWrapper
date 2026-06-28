@@ -1,12 +1,12 @@
-import { describe, expect, it } from 'vitest';
 import { performance } from 'node:perf_hooks';
+import { describe, expect, it } from 'vitest';
 import {
   ApiClient,
   BotKernel,
-  Context,
+  type Context,
   MemorySessionStorage,
   SessionManager,
-  TreeRouter
+  TreeRouter,
 } from '../../src/index.js';
 import type { SessionEnvelope } from '../../src/types/core.js';
 
@@ -22,13 +22,13 @@ describe('Load: throughput baseline', () => {
 
     const api = new ApiClient({
       token: 'TEST',
-      mockResponder: async () => ({ ok: true })
+      mockResponder: async () => ({ ok: true }),
     });
 
     const storage = new MemorySessionStorage<SessionEnvelope<State, Data>>();
     const sessions = new SessionManager<State, Data>({
       storage,
-      initialData: () => ({ count: 0 })
+      initialData: () => ({ count: 0 }),
     });
 
     const router = new TreeRouter<Context<State, Data>>();
@@ -41,7 +41,7 @@ describe('Load: throughput baseline', () => {
       apiClient: api,
       sessionManager: sessions,
       router,
-      resolveSessionKey: (u) => String(u.message?.from?.id ?? '0')
+      resolveSessionKey: (u) => String(u.message?.from?.id ?? '0'),
     });
 
     const update = {
@@ -51,8 +51,8 @@ describe('Load: throughput baseline', () => {
         date: Math.floor(Date.now() / 1000),
         chat: { id: 1, type: 'private' as const },
         from: { id: 1, is_bot: false, first_name: 'u' },
-        text: 'hi'
-      }
+        text: 'hi',
+      },
     };
 
     const started = performance.now();

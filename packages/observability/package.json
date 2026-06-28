@@ -42,13 +42,16 @@
   "scripts": {
     "build": "pnpm build:esm && pnpm build:cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
     "prepublishOnly": "node ../../scripts/enforce-ci-publish.mjs",
     "build:esm": "tsc -p tsconfig.json",
     "build:cjs": "tsc -p tsconfig.cjs.json"
   },
   "devDependencies": {
     "typescript": "6.0.3",
-    "@types/node": "^25.6.0"
+    "@types/node": "^25.6.0",
+    "vitest": "^4.1.0",
+    "@vitest/coverage-v8": "^4.1.0"
   },
   "files": [
     "dist/**/*.js",

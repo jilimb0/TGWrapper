@@ -1,0 +1,21 @@
+# Global owners
+* @jilimb0
+
+# Core package
+src/ @jilimb0
+
+# Redis adapter
+packages/adapter-redis/ @jilimb0
+
+# Observability
+packages/observability/ @jilimb0
+
+# Examples
+examples/ @jilimb0
+
+# CI/CD
+.github/ @jilimb0
+
+# Documentation
+docs/ @jilimb0
+wiki/ @jilimb0

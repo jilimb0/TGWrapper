@@ -1197,10 +1197,6 @@ packages:
     resolution: {integrity: sha512-OVaU5sbrwo4VOsk/GUH3jgfZBV5S6wLZT9tNUfBlgRFVxOERVltxkwK5lP9GtRN9ujhdyHkVft2qR1HBOWS+Bg==}
     engines: {node: '>=22.13'}
 
-  '@tgwrapper/core@0.17.0':
-    resolution: {integrity: sha512-W0s7oDMvu9u3XYzIErYm8NpiO1GeSQmOq0uFHAs9zmLQkUz5C4RE9Fo7dDyvfhoRxnJI6rzVSGWis2TKoAUG0A==}
-    engines: {node: '>=22.13'}
-
   '@tgwrapper/core@0.17.1':
     resolution: {integrity: sha512-/L/kv5vWkQwjDK+bYaGAeegtCFsZ0ciNOk9SlK5XWZ+Ig/SkJwLavoaM12RWMXGDDGfQlpz40v0Q78Thmah1aQ==}
     engines: {node: '>=22.13'}
@@ -3385,8 +3381,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@tgwrapper/core@0.17.0': {}
-
   '@tgwrapper/core@0.17.1': {}
 
   '@tgwrapper/observability@0.9.3': {}
@@ -3394,7 +3388,7 @@ snapshots:
   '@tgwrapper/starter-migration@0.2.6':
     dependencies:
       '@tgwrapper/adapter-redis': 0.8.3
-      '@tgwrapper/core': 0.17.0
+      '@tgwrapper/core': 0.17.1
       '@tgwrapper/observability': 0.9.3
       ioredis: 5.11.1
       telegraf: 4.16.3
@@ -3405,7 +3399,7 @@ snapshots:
   '@tgwrapper/starter-standard-bot@0.2.6':
     dependencies:
       '@tgwrapper/adapter-redis': 0.8.3
-      '@tgwrapper/core': 0.17.0
+      '@tgwrapper/core': 0.17.1
       '@tgwrapper/observability': 0.9.3
       ioredis: 5.11.1
     transitivePeerDependencies:
@@ -3414,7 +3408,7 @@ snapshots:
   '@tgwrapper/starter-support-bot@0.2.6':
     dependencies:
       '@tgwrapper/adapter-redis': 0.8.3
-      '@tgwrapper/core': 0.17.0
+      '@tgwrapper/core': 0.17.1
       '@tgwrapper/observability': 0.9.3
       ioredis: 5.11.1
     transitivePeerDependencies:

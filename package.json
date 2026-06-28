@@ -30,6 +30,7 @@
     "node": ">=26.0"
   },
   "scripts": {
+    "prepare": "pnpm build",
     "build": "pnpm build:esm && pnpm build:cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "typecheck:compat": "tsc -p tsconfig.type-tests.json --noEmit",

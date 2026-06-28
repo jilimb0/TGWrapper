@@ -5,6 +5,7 @@
 > When your bot stops being a side project and becomes a core service, TGWrapper is where teams land.
 
 [![npm version](https://img.shields.io/npm/v/@tgwrapper/core.svg)](https://www.npmjs.com/package/@tgwrapper/core)
+[![CI](https://github.com/jilimb0/TGWrapper/actions/workflows/ci.yml/badge.svg)](https://github.com/jilimb0/TGWrapper/actions/workflows/ci.yml)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 
 ---

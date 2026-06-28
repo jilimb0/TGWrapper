@@ -9,11 +9,7 @@ inputs:
   node-version:
     description: Node.js version to use
     required: false
-    default: "24"
-  pnpm-version:
-    description: pnpm version to use
-    required: false
-    default: "11.5.2"
+    default: "26"
   frozen:
     description: >
       Use --frozen-lockfile (true) or --no-frozen-lockfile (false).
@@ -29,8 +25,6 @@ runs:
   using: composite
   steps:
     - uses: pnpm/action-setup@v6
-      with:
-        version: ${{ inputs.pnpm-version }}
 
     - uses: actions/setup-node@v6
       with:

@@ -58,7 +58,7 @@ jobs:
           ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-node@v6
         with:
-          node-version: 24
+          node-version: 26
       - uses: pnpm/action-setup@v6
       - name: Run published smoke
         run: |

@@ -10,7 +10,7 @@
     "test": "tsc --noEmit"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.17.0",
+    "@tgwrapper/core": "^0.17.1",
     "@tgwrapper/adapter-redis": "^0.8.3",
     "@tgwrapper/observability": "^0.9.3",
     "ioredis": "^5.9.3"

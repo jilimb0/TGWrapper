@@ -1,5 +1,11 @@
 # @tgwrapper/core
 
+## 0.17.1
+
+### Patch Changes
+
+- d1b2ac6: Telegram bot api update and fix
+
 ## 0.17.0
 
 ### Minor Changes

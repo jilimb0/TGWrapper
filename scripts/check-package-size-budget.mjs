@@ -44,7 +44,15 @@ for (const budget of budgets) {
     process.exit(1);
   }
 
-  const parsed = JSON.parse(pack.stdout);
+  const jsonLine = pack.stdout
+    .split('\n')
+    .find((line) => line.trimStart().startsWith('[') || line.trimStart().startsWith('{'));
+  if (!jsonLine) {
+    console.error(`No JSON output from npm pack for ${budget.name}`);
+    console.error(pack.stdout);
+    process.exit(1);
+  }
+  const parsed = JSON.parse(jsonLine);
   const info = parsed[0];
   const packageSize = Number(info.size ?? 0);
   const unpackedSize = Number(info.unpackedSize ?? 0);

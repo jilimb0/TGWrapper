@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
 	withCorrelationContext,
 	getCorrelationContext,
+	LogLevel,
 } from './index.js';
 
 describe('correlation context', () => {

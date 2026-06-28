@@ -44,15 +44,26 @@ for (const budget of budgets) {
     process.exit(1);
   }
 
-  const jsonLine = pack.stdout
-    .split('\n')
-    .find((line) => line.trimStart().startsWith('[') || line.trimStart().startsWith('{'));
-  if (!jsonLine) {
+  let parsed;
+  let buffer = '';
+  for (const line of pack.stdout.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('[WARN')) {
+      continue;
+    }
+    buffer += `${line}\n`;
+    try {
+      parsed = JSON.parse(buffer);
+      break;
+    } catch {
+      // keep accumulating until valid JSON
+    }
+  }
+  if (!parsed) {
     console.error(`No JSON output from npm pack for ${budget.name}`);
     console.error(pack.stdout);
     process.exit(1);
   }
-  const parsed = JSON.parse(jsonLine);
   const info = parsed[0];
   const packageSize = Number(info.size ?? 0);
   const unpackedSize = Number(info.unpackedSize ?? 0);

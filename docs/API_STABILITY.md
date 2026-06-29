@@ -50,9 +50,9 @@ The following exports from `@tgwrapper/core` are considered **stable** and will 
 
 | Package | Status | Notes |
 |---------|--------|-------|
-| `@tgwrapper/core` | Stable (v1.0.0) | Public API defined above |
-| `@tgwrapper/adapter-redis` | Stable (v1.0.0) | Redis storage, rate limiting, caching |
-| `@tgwrapper/observability` | Stable (v1.0.0) | Tracing, metrics, structured logging |
+| `@tgwrapper/core` | Stable (v0.19+) | Public API defined above |
+| `@tgwrapper/adapter-redis` | Stable (v0.9+) | Redis storage, rate limiting, caching |
+| `@tgwrapper/observability` | Stable (v0.10+) | Tracing, metrics, structured logging |
 
 ## Beta / Internal Exports
 

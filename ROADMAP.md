@@ -1,8 +1,8 @@
 # Roadmap
 
-## v1.0.0 (current) — API stability guarantee
-- ✅ API stability policy with semantic versioning
+## v0.19.x (current) — Production hardening
 - ✅ FailsafeSessionStorage: automatic memory fallback on Redis failure
+- ✅ API stability policy documented
 - ✅ Biome v2.x linting across all packages
 - ✅ Monolith splits (adapter-redis, observability)
 - ✅ Migration cookbook (12 patterns)

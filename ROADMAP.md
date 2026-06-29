@@ -1,6 +1,6 @@
 # Roadmap
 
-## v0.19.x (current) — Production hardening
+## v0.18.x (current) — Production hardening
 - ✅ FailsafeSessionStorage: automatic memory fallback on Redis failure
 - ✅ API stability policy documented
 - ✅ Biome v2.x linting across all packages

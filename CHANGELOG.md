@@ -1,5 +1,21 @@
 # @tgwrapper/core
 
+## 1.0.0
+
+### Major Release
+
+- **API stability guarantee**: Full semantic versioning contract documented in API_STABILITY.md. No breaking changes without a major version bump.
+- **FailsafeSessionStorage**: Automatic memory fallback when Redis is unavailable. Auto-retry after 5s cooldown. No more crashes on infrastructure blips.
+- **Biome v2.5.1 linting**: Applied across all packages (core, adapter-redis, observability). 0 lint errors.
+- **Monolith splits**: adapter-redis (607→7 files) and observability (1657→10 files) refactored into maintainable modules.
+- **5-minute quick start**: Zero-config, no-Redis bot example in docs/5_MINUTE_QUICK_START.md.
+- **Migration cookbook**: 12 common patterns translated from Telegraf/grammY to TGWrapper.
+- **Landing page + case studies**: GitHub Pages site with benchmark comparisons vs Telegraf/grammY. 3 real-world case studies (Speech, MyPersFin, FormatFlow).
+- **Public roadmap**: ROADMAP.md with planned releases through v1.0.
+- **Engine version**: Standardized on Node >=24.0, matching CI.
+- **Coverage thresholds**: 70% lines/functions, 60% branches enforcement in vitest.
+- **CI lint enforcement**: `pnpm lint` runs in CI verify job.
+
 ## 0.17.1
 
 ### Patch Changes

@@ -1,5 +1,8 @@
 name: Deploy GitHub Pages
 
+# Prerequisite: Enable GitHub Pages in repo Settings → Pages → Source: "GitHub Actions"
+# This is a one-time manual step. After that, this workflow runs automatically on docs/ changes.
+
 on:
   push:
     branches: [main]
@@ -26,8 +29,6 @@ jobs:
       - uses: actions/checkout@v7
       - name: Setup Pages
         uses: actions/configure-pages@v6
-        with:
-          enablement: true
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5
         with:

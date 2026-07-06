@@ -118,10 +118,23 @@ export interface SceneHooks<TContext> {
 
 export type Handler<TContext> = (ctx: TContext) => Promise<void>;
 
+/**
+ * Middleware function type.
+ * Receives the Context object and a next() function.
+ * Must call next() to continue the pipeline, or omit to halt.
+ */
+export type Middleware<TContext> = (ctx: TContext, next: () => Promise<void>) => Promise<void>;
+
+export interface MiddlewareCandidate<TContext> {
+  priority: number;
+  fn: Middleware<TContext>;
+}
+
 export interface RouteCandidate<TContext> {
   priority: number;
   match: (ctx: TContext) => boolean;
   handler: Handler<TContext>;
+  middlewares?: ReadonlyArray<Middleware<TContext>>;
 }
 
 export interface PollingOptions {

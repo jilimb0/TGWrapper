@@ -58,6 +58,7 @@ export type {
   LogEvent,
   Logger,
   MetricsCollector,
+  Middleware,
   PollingOptions,
   RetryOptions,
   RouteCandidate,
@@ -90,6 +91,8 @@ export type {
 } from './types/telegram.js';
 export type { TelegramApiMethodPayloads } from './types/telegram.payloads.generated.js';
 export type { TelegramApiMethodResults } from './types/telegram.results.generated.js';
+export type { CapturedWebhook } from './debugger/webhook-debugger.js';
+export { WebhookDebugger } from './debugger/webhook-debugger.js';
 export { PollingSource } from './update-loop/polling.js';
 export { isFreshUpdate, isValidTelegramUpdate } from './update-loop/update-validator.js';
 export { WebhookSource } from './update-loop/webhook.js';

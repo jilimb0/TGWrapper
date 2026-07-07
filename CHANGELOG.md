@@ -1,21 +1,5 @@
 # @tgwrapper/core
 
-## 0.18.0
-
-### Minor Release
-
-- **FailsafeSessionStorage**: Automatic memory fallback when Redis is unavailable. Auto-retry after 5s cooldown.
-- **Biome v2.5.1 linting**: Applied across all packages (core, adapter-redis, observability). 0 lint errors.
-- **Monolith splits**: adapter-redis (607→7 files) and observability (1657→10 files) refactored into maintainable modules.
-- **API stability policy**: Documented in API_STABILITY.md with explicit public API surface and deprecation process.
-- **5-minute quick start**: Zero-config, no-Redis bot example in docs/5_MINUTE_QUICK_START.md.
-- **Migration cookbook**: 12 common patterns translated from Telegraf/grammY to TGWrapper.
-- **Landing page + case studies**: GitHub Pages site with benchmark comparisons vs Telegraf/grammY. 3 case studies.
-- **Public roadmap**: ROADMAP.md with planned releases.
-- **Engine version**: Standardized on Node >=24.0, matching CI.
-- **Coverage thresholds**: 70% lines/functions, 60% branches across all packages.
-- **CI lint enforcement**: `pnpm lint` runs in CI verify job.
-
 ## 0.17.1
 
 ### Patch Changes

@@ -1,13 +1,13 @@
 {
-  "name": "@tgwrapper/adapter-redis",
-  "version": "0.8.3",
-  "description": "Redis storage adapter for TGWrapper providing distributed sessions, caching namespaces, and rate limiters",
+  "name": "@tgwrapper/adapter-dynamodb",
+  "version": "0.1.0",
+  "description": "DynamoDB session storage adapter for TGWrapper with CAS via condition expressions",
   "repository": {
     "type": "git",
     "url": "https://github.com/jilimb0/TGWrapper"
   },
   "license": "Apache-2.0",
-  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/packages/adapter-redis#readme",
+  "homepage": "https://github.com/jilimb0/TGWrapper/tree/main/packages/adapter-dynamodb#readme",
   "bugs": {
     "url": "https://github.com/jilimb0/TGWrapper/issues"
   },
@@ -18,8 +18,7 @@
   "keywords": [
     "telegram",
     "bot",
-    "redis",
-    "ratelimit",
+    "dynamodb",
     "session",
     "fsm",
     "tgwrapper"
@@ -41,13 +40,14 @@
   "scripts": {
     "build": "pnpm build:esm && pnpm build:cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:integration": "vitest run test/redis.integration.test.ts",
+    "test:integration": "vitest run test/dynamodb.integration.test.ts",
     "prepublishOnly": "node ../../scripts/enforce-ci-publish.mjs",
     "build:esm": "tsc -p tsconfig.json",
     "build:cjs": "tsc -p tsconfig.cjs.json"
   },
   "dependencies": {
-    "ioredis": "^5.9.3"
+    "@aws-sdk/client-dynamodb": "^3.800.0",
+    "@aws-sdk/util-dynamodb": "^3.996.5"
   },
   "devDependencies": {
     "typescript": "6.0.3",

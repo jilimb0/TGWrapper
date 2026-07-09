@@ -10,7 +10,7 @@
     "remove": "serverless remove"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.18.0"
+    "@tgwrapper/core": "workspace:^"
   },
   "devDependencies": {
     "serverless": "^4.6.2",

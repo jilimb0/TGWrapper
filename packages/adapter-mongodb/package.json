@@ -1,6 +1,6 @@
 {
   "name": "@tgwrapper/adapter-mongodb",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "MongoDB session storage adapter for TGWrapper with CAS via findOneAndUpdate",
   "repository": {
     "type": "git",
@@ -15,7 +15,14 @@
     "type": "github",
     "url": "https://github.com/sponsors/jilimb0"
   },
-  "keywords": ["telegram", "bot", "mongodb", "session", "fsm", "tgwrapper"],
+  "keywords": [
+    "telegram",
+    "bot",
+    "mongodb",
+    "session",
+    "fsm",
+    "tgwrapper"
+  ],
   "type": "module",
   "main": "./dist-cjs/index.js",
   "types": "./dist/index.d.ts",

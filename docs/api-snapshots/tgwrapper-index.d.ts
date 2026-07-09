@@ -28,10 +28,12 @@ export { createSessionKey, createSessionNamespace } from './tenant/key-namespace
 export { MockApiClient } from './testkit/mock-api-client.js';
 export { MockBotClient } from './testkit/mock-bot-client.js';
 export { createCallbackUpdate, createMessageUpdate } from './testkit/update-factory.js';
-export type { ApiCallEvent, ApiClientOptions, ApiErrorEvent, ApiResultEvent, CasResult, CircuitBreakerOptions, ContextShortcuts, Handler, JsonObject, JsonValue, LogEvent, Logger, MetricsCollector, PollingOptions, RetryOptions, RouteCandidate, RuntimeErrorEvent, RuntimeHooks, RuntimeLifecycle, RuntimeUpdateEvent, SessionEnvelope, SessionStorage, UpdateSource, VersionedValue, WebhookHandlerOptions, WebhookRequest, WebhookResponse, } from './types/core.js';
+export type { ApiCallEvent, ApiClientOptions, ApiErrorEvent, ApiResultEvent, CasResult, CircuitBreakerOptions, ContextShortcuts, Handler, JsonObject, JsonValue, LogEvent, Logger, MetricsCollector, Middleware, PollingOptions, RetryOptions, RouteCandidate, RuntimeErrorEvent, RuntimeHooks, RuntimeLifecycle, RuntimeUpdateEvent, SessionEnvelope, SessionStorage, UpdateSource, VersionedValue, WebhookHandlerOptions, WebhookRequest, WebhookResponse, } from './types/core.js';
 export type { ApiMethods, CallbackQuery, Chat, EditMessageReplyMarkupOptions, EditMessageTextOptions, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, Message, SendDocumentOptions, SendMessageOptions, Update, User, } from './types/telegram.js';
 export type { TelegramApiMethodPayloads } from './types/telegram.payloads.generated.js';
 export type { TelegramApiMethodResults } from './types/telegram.results.generated.js';
+export type { CapturedWebhook } from './debugger/webhook-debugger.js';
+export { WebhookDebugger } from './debugger/webhook-debugger.js';
 export { PollingSource } from './update-loop/polling.js';
 export { isFreshUpdate, isValidTelegramUpdate } from './update-loop/update-validator.js';
 export { WebhookSource } from './update-loop/webhook.js';

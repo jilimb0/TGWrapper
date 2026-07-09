@@ -1,7 +1,7 @@
 ---
-'@tgwrapper/core': minor
-'@tgwrapper/adapter-dynamodb': minor
-'@tgwrapper/adapter-mongodb': minor
+"@tgwrapper/core": minor
+"@tgwrapper/adapter-dynamodb": minor
+"@tgwrapper/adapter-mongodb": minor
 ---
 
 feat: ecosystem expansion — middleware chain, DynamoDB/MongoDB adapters, webhook debugger

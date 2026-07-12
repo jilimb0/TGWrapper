@@ -12,3 +12,4 @@ docs/generated/
 docs/telegram-api-schema.latest.json
 docs/telegram-api-schema.drift-report.json
 .pnpm-store/
+coverage/*

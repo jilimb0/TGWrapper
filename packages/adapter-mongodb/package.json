@@ -46,7 +46,7 @@
     "build:cjs": "tsc -p tsconfig.cjs.json"
   },
   "dependencies": {
-    "mongodb": "^6.15.0"
+    "mongodb": "^7.5.0"
   },
   "devDependencies": {
     "typescript": "6.0.3",

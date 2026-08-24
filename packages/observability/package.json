@@ -48,7 +48,7 @@
     "build:cjs": "tsc -p tsconfig.cjs.json"
   },
   "devDependencies": {
-    "typescript": "6.0.3",
+    "typescript": "7.0.2",
     "@types/node": "^26.0.0",
     "vitest": "^4.1.0",
     "@vitest/coverage-v8": "^4.1.0"

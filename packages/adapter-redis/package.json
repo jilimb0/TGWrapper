@@ -47,7 +47,7 @@
     "build:cjs": "tsc -p tsconfig.cjs.json"
   },
   "dependencies": {
-    "ioredis": "^5.9.3"
+    "ioredis": "^6.0.0"
   },
   "devDependencies": {
     "typescript": "6.0.3",

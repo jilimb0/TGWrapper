@@ -1,6 +1,6 @@
 {
   "publishedVersions": {
-    "@tgwrapper/core": "^0.20.0",
+    "@tgwrapper/core": "^0.20.1",
     "@tgwrapper/adapter-redis": "^0.9.0",
     "@tgwrapper/observability": "^0.10.0",
     "@tgwrapper/starter-migration": "^0.2.7",

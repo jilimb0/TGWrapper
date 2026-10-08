@@ -1,5 +1,11 @@
 # @tgwrapper/core
 
+## 0.20.1
+
+### Patch Changes
+
+- ed5c65b: Resolve Telegram Bot API schema drift: add ephemeral message methods and latest update keys
+
 ## 0.19.0
 
 ### Minor Changes

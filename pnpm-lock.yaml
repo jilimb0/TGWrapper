@@ -50,14 +50,14 @@ importers:
   examples/ai-bot-starter:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: workspace:^
-        version: link:../../packages/adapter-redis
+        specifier: ^0.9.0
+        version: 0.9.0
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
       '@tgwrapper/observability':
-        specifier: workspace:^
-        version: link:../../packages/observability
+        specifier: ^0.10.0
+        version: 0.10.0
       ioredis:
         specifier: ^6.0.0
         version: 6.0.0
@@ -72,14 +72,14 @@ importers:
   examples/aws-lambda:
     dependencies:
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
 
   examples/cloudflare-worker:
     dependencies:
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
     devDependencies:
       wrangler:
         specifier: ^4.75.0
@@ -88,26 +88,26 @@ importers:
   examples/create-tgwrapper:
     dependencies:
       '@tgwrapper/starter-migration':
-        specifier: workspace:^
-        version: link:../migration-starter
+        specifier: ^0.2.7
+        version: 0.2.7
       '@tgwrapper/starter-standard-bot':
-        specifier: workspace:^
-        version: link:../standard-bot
+        specifier: ^0.2.7
+        version: 0.2.7
       '@tgwrapper/starter-support-bot':
-        specifier: workspace:^
-        version: link:../support-bot
+        specifier: ^0.2.7
+        version: 0.2.7
 
   examples/migration-starter:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: workspace:^
-        version: link:../../packages/adapter-redis
+        specifier: ^0.9.0
+        version: 0.9.0
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
       '@tgwrapper/observability':
-        specifier: workspace:^
-        version: link:../../packages/observability
+        specifier: ^0.10.0
+        version: 0.10.0
       ioredis:
         specifier: ^6.0.0
         version: 6.0.0
@@ -128,14 +128,14 @@ importers:
   examples/moderation-bot:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: workspace:^
-        version: link:../../packages/adapter-redis
+        specifier: ^0.9.0
+        version: 0.9.0
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
       '@tgwrapper/observability':
-        specifier: workspace:^
-        version: link:../../packages/observability
+        specifier: ^0.10.0
+        version: 0.10.0
       ioredis:
         specifier: ^6.0.0
         version: 6.0.0
@@ -150,14 +150,14 @@ importers:
   examples/multi-instance-redis-starter:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: workspace:^
-        version: link:../../packages/adapter-redis
+        specifier: ^0.9.0
+        version: 0.9.0
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
       '@tgwrapper/observability':
-        specifier: workspace:^
-        version: link:../../packages/observability
+        specifier: ^0.10.0
+        version: 0.10.0
       ioredis:
         specifier: ^6.0.0
         version: 6.0.0
@@ -172,8 +172,8 @@ importers:
   examples/node-http:
     dependencies:
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -182,8 +182,8 @@ importers:
   examples/polling-starter:
     dependencies:
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -195,8 +195,8 @@ importers:
   examples/serverless-webhook-starter:
     dependencies:
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -208,14 +208,14 @@ importers:
   examples/standard-bot:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: workspace:^
-        version: link:../../packages/adapter-redis
+        specifier: ^0.9.0
+        version: 0.9.0
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
       '@tgwrapper/observability':
-        specifier: workspace:^
-        version: link:../../packages/observability
+        specifier: ^0.10.0
+        version: 0.10.0
       ioredis:
         specifier: ^6.0.0
         version: 6.0.0
@@ -233,14 +233,14 @@ importers:
   examples/support-bot:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: workspace:^
-        version: link:../../packages/adapter-redis
+        specifier: ^0.9.0
+        version: 0.9.0
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
       '@tgwrapper/observability':
-        specifier: workspace:^
-        version: link:../../packages/observability
+        specifier: ^0.10.0
+        version: 0.10.0
       ioredis:
         specifier: ^6.0.0
         version: 6.0.0
@@ -258,8 +258,8 @@ importers:
   examples/template-bot:
     dependencies:
       '@tgwrapper/core':
-        specifier: workspace:^
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -933,6 +933,9 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@ioredis/commands@1.10.0':
+    resolution: {integrity: sha512-UmeW7z4LfctwoQ5wkhVzgq8tXkreED2xZGpX+Bg+zA+WJFZCT6c062AfCK/Dfk81xZnnwdhJCUMkitihRaoC2Q==}
+
   '@ioredis/commands@2.0.0':
     resolution: {integrity: sha512-vrx0AE/T0h7cRZwfo1M39Cr+ZhZrkf0V8mQN75wucKCxCLD9l/VX6no3gFvrLqD1IlG/1LtzWovqEw3t0Vr9zg==}
 
@@ -1135,6 +1138,42 @@ packages:
 
   '@telegraf/types@7.1.0':
     resolution: {integrity: sha512-kGevOIbpMcIlCDeorKGpwZmdH7kHbqlk/Yj6dEpJMKEQw5lk0KVQY0OLXaCswy8GqlIVLd5625OB+rAntP9xVw==}
+
+  '@tgwrapper/adapter-redis@0.8.3':
+    resolution: {integrity: sha512-OVaU5sbrwo4VOsk/GUH3jgfZBV5S6wLZT9tNUfBlgRFVxOERVltxkwK5lP9GtRN9ujhdyHkVft2qR1HBOWS+Bg==}
+    engines: {node: '>=22.13'}
+
+  '@tgwrapper/adapter-redis@0.9.0':
+    resolution: {integrity: sha512-yKZOxpK4fA5ZM7JZWDl/gEAxPfLQnlGAWk7slU94RF29rEeMAODcHg6n5CFJWIFP/wCmGrNd9AfHOSSJLa9VgQ==}
+    engines: {node: '>=22.13'}
+
+  '@tgwrapper/core@0.19.0':
+    resolution: {integrity: sha512-O5BpwbZnZsNP2ObnQ725S5OcNJ0sJiQrUT+eZTyCgZjb8Czqwmy5raQE8HChGcLQbxz45Og2Ry9DVrrVYdcBQw==}
+    engines: {node: '>=24.0'}
+
+  '@tgwrapper/core@0.20.1':
+    resolution: {integrity: sha512-Obti1Jt09WdUmnCSu5FEBrEThRiL0gMeif412a888GrxlQ6E/K0PR9sd7BDVoTcpqkflC+rU64FmRS9ySmA3ew==}
+    engines: {node: '>=24.0'}
+
+  '@tgwrapper/observability@0.10.0':
+    resolution: {integrity: sha512-fGuKVIVOASnh5mxtFWDaQQxBi1hnW4giY8GGnRBLZUPisVYhTUresL9GcDGyth8D5iw4LYASjHTIaX8jAsNUpA==}
+    engines: {node: '>=22.13'}
+
+  '@tgwrapper/observability@0.9.3':
+    resolution: {integrity: sha512-ci32MlMGESghLM0MF4oV/OFeHJorUAuDhS1uHw+ML3gN2UmswTWPzJ5nR/akhSoztgIhm++jyC7VUeWOUEJ18g==}
+    engines: {node: '>=22.13'}
+
+  '@tgwrapper/starter-migration@0.2.7':
+    resolution: {integrity: sha512-pDM6hKWxHEI/4kdJuSQ9sAkSo9AHnqyBZweLPi3FuuS1zEDsUEI8DitcEMqYPHdONBIHeDXRObHOyozVhOkWag==}
+    engines: {node: '>=22.13'}
+
+  '@tgwrapper/starter-standard-bot@0.2.7':
+    resolution: {integrity: sha512-QfavfvRf3WTCVvkC1iL41IuPd2cZo6bC+g5pXRQ+df4Nmz2AMDdaeRaGGhVAtWQctR1XLSduNBij2YcrLw0YIA==}
+    engines: {node: '>=22.13'}
+
+  '@tgwrapper/starter-support-bot@0.2.7':
+    resolution: {integrity: sha512-ulhRD9o8QTWfUW7wHiMD7luh99H0YR7Uofrd8YUuZQK9HLCxiwFZwn3CIE1cO8DBF2wBxyf/TY0OEm94jlg3eA==}
+    engines: {node: '>=22.13'}
 
   '@tybys/wasm-util@0.10.3':
     resolution: {integrity: sha512-F3fo1MYrRJYL3zER0OUOmkutjr1Vp23m7OsSgp7nq4SP6OqX6C/56XFIPAl5bt3zaBRjmW7SGz3u/6LwFpYcOg==}
@@ -1444,6 +1483,10 @@ packages:
   import-meta-resolve@4.2.0:
     resolution: {integrity: sha512-Iqv2fzaTQN28s/FwZAoFq0ZSs/7hMAHJVX+w8PZl3cY19Pxk6jFFalxQoIfW2826i/fDLXv8IiEZRIT0lDuWcg==}
 
+  ioredis@5.11.1:
+    resolution: {integrity: sha512-ehuGcf94bQXhfagULNXrJdfnWO38v070jxSx/qE87Kjzmu2fU7ro5EFAb+OPituLqgfyuQaym5DlrNydW2sJ9A==}
+    engines: {node: '>=12.22.0'}
+
   ioredis@6.0.0:
     resolution: {integrity: sha512-f+Dtubxfpf6KYFq7WVXJoOLn0bk4TJrMrN9SzeE+jrWrCWj7XX3fA6vkryafhADX+GMymRxgDJDOI33COkJc0w==}
     engines: {node: '>=20.0.0'}
@@ -1668,6 +1711,10 @@ packages:
 
   redis-errors@1.2.0:
     resolution: {integrity: sha512-1qny3OExCf0UvUV/5wpYKf2YwPcOqXzkwKKSmKHiE6ZMQs5heeE/c8eXK+PNllPvmjgAbfnsbpkGZWy8cBpn9w==}
+    engines: {node: '>=4'}
+
+  redis-parser@3.0.0:
+    resolution: {integrity: sha512-DJnGAeenTdpMEH6uAJRK/uiyEIH9WVsUmoLwzudwGJUwZPp80PDBWPHXSAGNPwNvIXAbe7MSUB1zQFugFml66A==}
     engines: {node: '>=4'}
 
   rolldown@1.0.3:
@@ -2512,6 +2559,8 @@ snapshots:
   '@img/sharp-win32-x64@0.35.5':
     optional: true
 
+  '@ioredis/commands@1.10.0': {}
+
   '@ioredis/commands@2.0.0': {}
 
   '@jridgewell/resolve-uri@3.1.2': {}
@@ -2681,6 +2730,55 @@ snapshots:
   '@speed-highlight/core@1.2.24': {}
 
   '@telegraf/types@7.1.0': {}
+
+  '@tgwrapper/adapter-redis@0.8.3':
+    dependencies:
+      ioredis: 5.11.1
+    transitivePeerDependencies:
+      - supports-color
+
+  '@tgwrapper/adapter-redis@0.9.0':
+    dependencies:
+      ioredis: 5.11.1
+    transitivePeerDependencies:
+      - supports-color
+
+  '@tgwrapper/core@0.19.0': {}
+
+  '@tgwrapper/core@0.20.1': {}
+
+  '@tgwrapper/observability@0.10.0': {}
+
+  '@tgwrapper/observability@0.9.3': {}
+
+  '@tgwrapper/starter-migration@0.2.7':
+    dependencies:
+      '@tgwrapper/adapter-redis': 0.8.3
+      '@tgwrapper/core': 0.19.0
+      '@tgwrapper/observability': 0.9.3
+      ioredis: 5.11.1
+      telegraf: 4.16.3
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
+  '@tgwrapper/starter-standard-bot@0.2.7':
+    dependencies:
+      '@tgwrapper/adapter-redis': 0.8.3
+      '@tgwrapper/core': 0.19.0
+      '@tgwrapper/observability': 0.9.3
+      ioredis: 5.11.1
+    transitivePeerDependencies:
+      - supports-color
+
+  '@tgwrapper/starter-support-bot@0.2.7':
+    dependencies:
+      '@tgwrapper/adapter-redis': 0.8.3
+      '@tgwrapper/core': 0.19.0
+      '@tgwrapper/observability': 0.9.3
+      ioredis: 5.11.1
+    transitivePeerDependencies:
+      - supports-color
 
   '@tybys/wasm-util@0.10.3':
     dependencies:
@@ -2925,6 +3023,18 @@ snapshots:
 
   import-meta-resolve@4.2.0: {}
 
+  ioredis@5.11.1:
+    dependencies:
+      '@ioredis/commands': 1.10.0
+      cluster-key-slot: 1.1.1
+      debug: 4.4.3
+      denque: 2.1.0
+      redis-errors: 1.2.0
+      redis-parser: 3.0.0
+      standard-as-callback: 2.1.0
+    transitivePeerDependencies:
+      - supports-color
+
   ioredis@6.0.0:
     dependencies:
       '@ioredis/commands': 2.0.0
@@ -3098,6 +3208,10 @@ snapshots:
   punycode@2.3.1: {}
 
   redis-errors@1.2.0: {}
+
+  redis-parser@3.0.0:
+    dependencies:
+      redis-errors: 1.2.0
 
   rolldown@1.0.3:
     dependencies:

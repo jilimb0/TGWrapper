@@ -11,7 +11,7 @@ permissions:
   actions: read
 
 concurrency:
-  group: published-smoke-${{ github.event_name }}-${{ github.event.workflow_run.head_sha || github.sha }}
+  group: published-smoke-${{ github.event_name }}-${{ github.sha }}
   cancel-in-progress: true
 
 jobs:
@@ -54,8 +54,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
       - uses: actions/setup-node@v7
         with:
           node-version: 26

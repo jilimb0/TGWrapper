@@ -154,6 +154,7 @@ type TypedUpdateFields = {
     [key: string]: unknown;
   };
   pre_checkout_query?: {
+    id: string;
     from: User;
     [key: string]: unknown;
   };

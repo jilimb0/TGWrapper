@@ -96,3 +96,6 @@ export { WebhookDebugger } from './debugger/webhook-debugger.js';
 export { PollingSource } from './update-loop/polling.js';
 export { isFreshUpdate, isValidTelegramUpdate } from './update-loop/update-validator.js';
 export { WebhookSource } from './update-loop/webhook.js';
+
+export * from './tma/index.js';
+export * from './payments/index.js';

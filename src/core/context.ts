@@ -29,6 +29,10 @@ export class Context<TState extends string, TData extends JsonObject> {
     this.apiClient = params.apiClient;
   }
 
+  public get api(): ApiClient {
+    return this.apiClient;
+  }
+
   public get message(): Message.TextMessage | undefined {
     const maybeMessage = this.primaryMessage;
     if (maybeMessage && 'text' in maybeMessage) {
@@ -43,6 +47,18 @@ export class Context<TState extends string, TData extends JsonObject> {
 
   public get callbackQuery(): CallbackQuery | undefined {
     return this.update.callback_query;
+  }
+
+  public get preCheckoutQuery() {
+    return this.update.pre_checkout_query;
+  }
+
+  public get successfulPayment() {
+    const msg = this.primaryMessage;
+    if (msg && 'successful_payment' in msg) {
+      return (msg as Record<string, unknown>).successful_payment;
+    }
+    return undefined;
   }
 
   public get fromId(): number | undefined {
@@ -137,6 +153,23 @@ export class Context<TState extends string, TData extends JsonObject> {
     }
 
     return this.apiClient.answerCallbackQuery(callbackQueryId, text === undefined ? {} : { text });
+  }
+
+  public async answerPreCheckoutQuery(ok: boolean, errorMessage?: string): Promise<unknown> {
+    const preCheckoutQueryId = this.update.pre_checkout_query?.id;
+    if (!preCheckoutQueryId) {
+      throw new Error('Cannot answer pre-checkout query for non-pre_checkout_query update.');
+    }
+
+    const payload: JsonObject = {
+      pre_checkout_query_id: preCheckoutQueryId,
+      ok,
+    };
+    if (errorMessage !== undefined) {
+      payload.error_message = errorMessage;
+    }
+
+    return this.apiClient.callApiUnsafe('answerPreCheckoutQuery', payload);
   }
 
   private get primaryMessage(): Message | undefined {

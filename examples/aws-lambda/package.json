@@ -10,6 +10,6 @@
     "remove": "npx serverless remove"
   },
   "dependencies": {
-    "@tgwrapper/core": "workspace:^"
+    "@tgwrapper/core": "^0.20.1"
   }
 }

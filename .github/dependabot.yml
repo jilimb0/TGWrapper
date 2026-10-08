@@ -46,3 +46,6 @@ updates:
       github-actions-all:
         patterns:
           - "*"
+    ignore:
+      - dependency-name: "changesets/action"
+        update-types: ["version-update:semver-major"]

@@ -165,7 +165,7 @@ jobs:
       # changesets/action handles two modes automatically:
       #   1. Pending changesets exist → creates/updates version PR
       #   2. No pending changesets    → publishes any unpublished packages
-      - uses: changesets/action@v2
+      - uses: changesets/action@v1
         id: changesets
         with:
           publish: node scripts/ci-publish.mjs

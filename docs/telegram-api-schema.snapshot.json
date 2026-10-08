@@ -1,5 +1,5 @@
 {
-  "fetched_at": "2026-06-12T08:11:45.464Z",
+  "fetched_at": "2026-10-08T12:33:44.004Z",
   "source": "telegram-api-doc",
   "source_url": "https://core.telegram.org/bots/api",
   "methods": [
@@ -31,6 +31,7 @@
     "deleteBusinessMessages",
     "deleteChatPhoto",
     "deleteChatStickerSet",
+    "deleteEphemeralMessage",
     "deleteForumTopic",
     "deleteMessage",
     "deleteMessageReaction",
@@ -42,6 +43,10 @@
     "deleteWebhook",
     "editChatInviteLink",
     "editChatSubscriptionInviteLink",
+    "editEphemeralMessageCaption",
+    "editEphemeralMessageMedia",
+    "editEphemeralMessageReplyMarkup",
+    "editEphemeralMessageText",
     "editForumTopic",
     "editGeneralForumTopic",
     "editMessageCaption",
@@ -206,7 +211,9 @@
     "pre_checkout_query",
     "purchased_paid_media",
     "removed_chat_boost",
-    "shipping_query"
+    "shipping_query",
+    "stopped_message_generation",
+    "subscription"
   ],
   "structured_methods": [
     {
@@ -228,7 +235,7 @@
           "name": "show_alert",
           "type": "Boolean",
           "required": false,
-          "description": "If True , an alert will be shown by the client instead of a notification at the top of the chat screen. Defaults to false ."
+          "description": "If True , an alert will be shown by the client instead of a notification at the top of the chat screen. Defaults to False ."
         },
         {
           "name": "url",
@@ -240,7 +247,7 @@
           "name": "cache_time",
           "type": "Integer",
           "required": false,
-          "description": "The maximum amount of time in seconds that the result of the callback query may be cached client-side. Telegram apps will support caching starting in version 3.14. Defaults to 0."
+          "description": "The maximum amount of time in seconds that the result of the callback query may be cached client-side. Defaults to 0."
         }
       ],
       "returns": "True",
@@ -297,7 +304,7 @@
           "name": "results",
           "type": "Array of InlineQueryResult",
           "required": true,
-          "description": "A JSON-serialized array of results for the inline query"
+          "description": "A JSON-serialized Array of results for the inline query"
         },
         {
           "name": "cache_time",
@@ -325,7 +332,7 @@
         }
       ],
       "returns": "True",
-      "summary": "answerInlineQuery Use this method to send answers to an inline query. On success, True is returned. No more than 50 results per query are allowed. Parameter Type Required Description inline_query_id String Yes Unique identifier for the answered query results Array of InlineQueryResult Yes A JSON-serialized array of results for the inline query cache_time Integer Optional The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300. is_per"
+      "summary": "answerInlineQuery Use this method to send answers to an inline query. On success, True is returned. No more than 50 results per query are allowed. Parameter Type Required Description inline_query_id String Yes Unique identifier for the answered query results Array of InlineQueryResult Yes A JSON-serialized Array of results for the inline query cache_time Integer Optional The maximum amount of time in seconds that the result of the inline query may be cached on the server. Defaults to 300. is_per"
     },
     {
       "name": "answerPreCheckoutQuery",
@@ -371,7 +378,7 @@
           "name": "shipping_options",
           "type": "Array of ShippingOption",
           "required": false,
-          "description": "Required if ok is True . A JSON-serialized array of available shipping options."
+          "description": "Required if ok is True . A JSON-serialized Array of available shipping options."
         },
         {
           "name": "error_message",
@@ -614,7 +621,7 @@
           "name": "show_caption_above_media",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if the caption must be shown above the message media. Ignored if a new caption isn't specified."
+          "description": "Pass True if the caption must be shown above the message media. Ignored if a new caption isn't specified."
         },
         {
           "name": "disable_notification",
@@ -660,7 +667,7 @@
         }
       ],
       "returns": "the MessageId of the sent message on success",
-      "summary": "copyMessage Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz poll can be copied only if the value of the field correct_option_id is known to the bot. The method is analogous to the method forwardMessage , but the copied message doesn't have a link to the original message. Returns the MessageId of the sent message on success. Parameter Type Required Description chat_id In"
+      "summary": "copyMessage Use this method to copy messages of any kind. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz poll can be copied only if the value of the field correct_option_ids is known to the bot. The method is analogous to the method forwardMessage , but the copied message doesn't have a link to the original message. Returns the MessageId of the sent message on success. Parameter Type Required Description chat_id I"
     },
     {
       "name": "copyMessages",
@@ -714,8 +721,8 @@
           "description": "Pass True to copy the messages without their captions"
         }
       ],
-      "returns": "an array of MessageId of the sent messages",
-      "summary": "copyMessages Use this method to copy messages of any kind. If some of the specified messages can't be found or copied, they are skipped. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz poll can be copied only if the value of the field correct_option_id is known to the bot. The method is analogous to the method forwardMessages , but the copied messages don't have a link to the original message. Album grouping is kep"
+      "returns": "an Array of MessageId of the sent messages",
+      "summary": "copyMessages Use this method to copy messages of any kind. If some of the specified messages can't be found or copied, they are skipped. Service messages, paid media messages, giveaway messages, giveaway winners messages, and invoice messages can't be copied. A quiz poll can be copied only if the value of the field correct_option_ids is known to the bot. The method is analogous to the method forwardMessages , but the copied messages don't have a link to the original message. Album grouping is ke"
     },
     {
       "name": "createChatInviteLink",
@@ -877,7 +884,7 @@
           "name": "suggested_tip_amounts",
           "type": "Array of Integer",
           "required": false,
-          "description": "A JSON-serialized array of suggested amounts of tips in the smallest units of the currency (integer, not float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount ."
+          "description": "A JSON-serialized Array of suggested amounts of tips in the smallest units of the currency (integer, not float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount ."
         },
         {
           "name": "provider_data",
@@ -1113,6 +1120,31 @@
       "summary": "deleteChatStickerSet Use this method to delete a group sticker set from a supergroup. The bot must be an administrator in the chat for this to work and must have the appropriate administrator rights. Use the field can_set_sticker_set optionally returned in getChat requests to check if the bot can use this method. Returns True on success. Parameter Type Required Description chat_id Integer or String Yes Unique identifier for the target chat or username of the target supergroup in the format @user"
     },
     {
+      "name": "deleteEphemeralMessage",
+      "params": [
+        {
+          "name": "chat_id",
+          "type": "Integer or String",
+          "required": true,
+          "description": "Unique identifier for the target chat or username of the target supergroup in the format @username"
+        },
+        {
+          "name": "receiver_user_id",
+          "type": "Integer",
+          "required": true,
+          "description": "Identifier of the user who received the message"
+        },
+        {
+          "name": "ephemeral_message_id",
+          "type": "Integer",
+          "required": true,
+          "description": "Identifier of the ephemeral message to delete"
+        }
+      ],
+      "returns": "True on success",
+      "summary": "deleteEphemeralMessage Use this method to delete an ephemeral message. Note that it is not guaranteed that the user will receive the message deletion event, especially if they are offline. Returns True on success. Parameter Type Required Description chat_id Integer or String Yes Unique identifier for the target chat or username of the target supergroup in the format @username receiver_user_id Integer Yes Identifier of the user who received the message ephemeral_message_id Integer Yes Identifier "
+    },
+    {
       "name": "deleteForumTopic",
       "params": [
         {
@@ -1346,6 +1378,190 @@
       "summary": "editChatSubscriptionInviteLink Use this method to edit a subscription invite link created by the bot. The bot must have the can_invite_users administrator rights. Returns the edited invite link as a ChatInviteLink object. Parameter Type Required Description chat_id Integer or String Yes Unique identifier for the target chat or username of the target channel in the format @username invite_link String Yes The invite link to edit name String Optional Invite link name; 0-32 characters"
     },
     {
+      "name": "editEphemeralMessageCaption",
+      "params": [
+        {
+          "name": "chat_id",
+          "type": "Integer or String",
+          "required": true,
+          "description": "Unique identifier for the target chat or username of the target supergroup in the format @username"
+        },
+        {
+          "name": "receiver_user_id",
+          "type": "Integer",
+          "required": true,
+          "description": "Identifier of the user who received the message"
+        },
+        {
+          "name": "ephemeral_message_id",
+          "type": "Integer",
+          "required": true,
+          "description": "Identifier of the ephemeral message to edit"
+        },
+        {
+          "name": "caption",
+          "type": "String",
+          "required": false,
+          "description": "New caption of the message, 0-1024 characters after entities parsing"
+        },
+        {
+          "name": "parse_mode",
+          "type": "String",
+          "required": false,
+          "description": "Mode for parsing entities in the message caption. See formatting options for more details."
+        },
+        {
+          "name": "caption_entities",
+          "type": "Array of MessageEntity",
+          "required": false,
+          "description": "A JSON-serialized list of special entities that appear in the caption, which can be specified instead of parse_mode"
+        },
+        {
+          "name": "show_caption_above_media",
+          "type": "Boolean",
+          "required": false,
+          "description": "Pass True if the caption must be shown above the message media. Supported only for animation, photo and video messages."
+        },
+        {
+          "name": "reply_markup",
+          "type": "InlineKeyboardMarkup",
+          "required": false,
+          "description": "A JSON-serialized object for an inline keyboard"
+        }
+      ],
+      "returns": "True",
+      "summary": "editEphemeralMessageCaption Use this method to edit the caption of an ephemeral message. Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline. On success, True is returned. Parameter Type Required Description chat_id Integer or String Yes Unique identifier for the target chat or username of the target supergroup in the format @username receiver_user_id Integer Yes Identifier of the user who received the message ephemeral_message_id Inte"
+    },
+    {
+      "name": "editEphemeralMessageMedia",
+      "params": [
+        {
+          "name": "chat_id",
+          "type": "Integer or String",
+          "required": true,
+          "description": "Unique identifier for the target chat or username of the target supergroup in the format @username"
+        },
+        {
+          "name": "receiver_user_id",
+          "type": "Integer",
+          "required": true,
+          "description": "Identifier of the user who received the message"
+        },
+        {
+          "name": "ephemeral_message_id",
+          "type": "Integer",
+          "required": true,
+          "description": "Identifier of the ephemeral message to edit"
+        },
+        {
+          "name": "media",
+          "type": "InputMedia",
+          "required": true,
+          "description": "A JSON-serialized object for the new media content of the message"
+        },
+        {
+          "name": "reply_markup",
+          "type": "InlineKeyboardMarkup",
+          "required": false,
+          "description": "A JSON-serialized object for an inline keyboard"
+        }
+      ],
+      "returns": "True",
+      "summary": "editEphemeralMessageMedia Use this method to edit the media of an ephemeral message. Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline. On success, True is returned. Parameter Type Required Description chat_id Integer or String Yes Unique identifier for the target chat or username of the target supergroup in the format @username receiver_user_id Integer Yes Identifier of the user who received the message ephemeral_message_id Integer "
+    },
+    {
+      "name": "editEphemeralMessageReplyMarkup",
+      "params": [
+        {
+          "name": "chat_id",
+          "type": "Integer or String",
+          "required": true,
+          "description": "Unique identifier for the target chat or username of the target supergroup in the format @username"
+        },
+        {
+          "name": "receiver_user_id",
+          "type": "Integer",
+          "required": true,
+          "description": "Identifier of the user who received the message"
+        },
+        {
+          "name": "ephemeral_message_id",
+          "type": "Integer",
+          "required": true,
+          "description": "Identifier of the ephemeral message to edit"
+        },
+        {
+          "name": "reply_markup",
+          "type": "InlineKeyboardMarkup",
+          "required": false,
+          "description": "A JSON-serialized object for an inline keyboard"
+        }
+      ],
+      "returns": "True",
+      "summary": "editEphemeralMessageReplyMarkup Use this method to edit only the reply markup of an ephemeral message. Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline. On success, True is returned. Parameter Type Required Description chat_id Integer or String Yes Unique identifier for the target chat or username of the target supergroup in the format @username receiver_user_id Integer Yes Identifier of the user who received the message ephemeral_m"
+    },
+    {
+      "name": "editEphemeralMessageText",
+      "params": [
+        {
+          "name": "chat_id",
+          "type": "Integer or String",
+          "required": true,
+          "description": "Unique identifier for the target chat or username of the target supergroup in the format @username"
+        },
+        {
+          "name": "receiver_user_id",
+          "type": "Integer",
+          "required": true,
+          "description": "Identifier of the user who received the message"
+        },
+        {
+          "name": "ephemeral_message_id",
+          "type": "Integer",
+          "required": true,
+          "description": "Identifier of the ephemeral message to edit"
+        },
+        {
+          "name": "text",
+          "type": "String",
+          "required": false,
+          "description": "New text of the message, 1-4096 characters after entity parsing; required if rich_message isn't specified"
+        },
+        {
+          "name": "parse_mode",
+          "type": "String",
+          "required": false,
+          "description": "Mode for parsing entities in the message text. See formatting options for more details."
+        },
+        {
+          "name": "entities",
+          "type": "Array of MessageEntity",
+          "required": false,
+          "description": "A JSON-serialized list of special entities that appear in message text, which can be specified instead of parse_mode"
+        },
+        {
+          "name": "rich_message",
+          "type": "InputRichMessage",
+          "required": false,
+          "description": "New rich content of the message; required if text isn't specified"
+        },
+        {
+          "name": "link_preview_options",
+          "type": "LinkPreviewOptions",
+          "required": false,
+          "description": "Link preview generation options for the message"
+        },
+        {
+          "name": "reply_markup",
+          "type": "InlineKeyboardMarkup",
+          "required": false,
+          "description": "A JSON-serialized object for an inline keyboard"
+        }
+      ],
+      "returns": "True",
+      "summary": "editEphemeralMessageText Use this method to edit an ephemeral text or rich message. Note that it is not guaranteed that the user will receive the message edit event, especially if they are offline. On success, True is returned. Parameter Type Required Description chat_id Integer or String Yes Unique identifier for the target chat or username of the target supergroup in the format @username receiver_user_id Integer Yes Identifier of the user who received the message ephemeral_message_id Integer Y"
+    },
+    {
       "name": "editForumTopic",
       "params": [
         {
@@ -1444,7 +1660,7 @@
           "name": "show_caption_above_media",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if the caption must be shown above the message media. Supported only for animation, photo and video messages."
+          "description": "Pass True if the caption must be shown above the message media. Supported only for animation, photo and video messages."
         },
         {
           "name": "reply_markup",
@@ -1597,7 +1813,7 @@
           "name": "media",
           "type": "InputMedia",
           "required": true,
-          "description": "A JSON-serialized object for a new media content of the message"
+          "description": "A JSON-serialized object for the new media content of the message"
         },
         {
           "name": "reply_markup",
@@ -1701,7 +1917,7 @@
           "name": "rich_message",
           "type": "InputRichMessage",
           "required": false,
-          "description": "New rich content of the message; required if text isn't specified"
+          "description": "New rich content of the message; required if text isn't specified. Direct upload of new files and explicit upload of files by a URL isn't supported when an inline message is edited."
         },
         {
           "name": "reply_markup",
@@ -1913,8 +2129,8 @@
           "description": "Protects the contents of the forwarded messages from forwarding and saving"
         }
       ],
-      "returns": "an array of MessageId of the sent messages",
-      "summary": "forwardMessages Use this method to forward multiple messages of any kind. If some of the specified messages can't be found or forwarded, they are skipped. Service messages and messages with protected content can't be forwarded. Album grouping is kept for forwarded messages. On success, an array of MessageId of the sent messages is returned. Parameter Type Required Description chat_id Integer or String Yes Unique identifier for the target chat or username of the target bot, supergroup or channel "
+      "returns": "an Array of MessageId of the sent messages",
+      "summary": "forwardMessages Use this method to forward multiple messages of any kind. If some of the specified messages can't be found or forwarded, they are skipped. Service messages and messages with protected content can't be forwarded. Album grouping is kept for forwarded messages. On success, an Array of MessageId of the sent messages is returned. Parameter Type Required Description chat_id Integer or String Yes Unique identifier for the target chat or username of the target bot, supergroup or channel "
     },
     {
       "name": "getAvailableGifts",
@@ -2155,8 +2371,8 @@
           "description": "Unique identifier for the target chat or username of the target supergroup or channel in the format @username"
         }
       ],
-      "returns": "Int on success",
-      "summary": "getChatMemberCount Use this method to get the number of members in a chat. Returns Int on success. Parameter Type Required Description chat_id Integer or String Yes Unique identifier for the target chat or username of the target supergroup or channel in the format @username"
+      "returns": "Integer on success",
+      "summary": "getChatMemberCount Use this method to get the number of members in a chat. Returns Integer on success. Parameter Type Required Description chat_id Integer or String Yes Unique identifier for the target chat or username of the target supergroup or channel in the format @username"
     },
     {
       "name": "getChatMenuButton",
@@ -2502,8 +2718,8 @@
           "description": "The maximum number of messages to return; 1-20"
         }
       ],
-      "returns": "an array of Message objects",
-      "summary": "getUserPersonalChatMessages Use this method to get the last messages from the personal chat (i.e., the chat currently added to their profile) of a given user. On success, an array of Message objects is returned. Parameter Type Required Description user_id Integer Yes Unique identifier for the target user limit Integer Yes The maximum number of messages to return; 1-20"
+      "returns": "an Array of Message objects",
+      "summary": "getUserPersonalChatMessages Use this method to get the last messages from the personal chat (i.e., the chat currently added to their profile) of a given user. On success, an Array of Message objects is returned. Parameter Type Required Description user_id Integer Yes Unique identifier for the target user limit Integer Yes The maximum number of messages to return; 1-20"
     },
     {
       "name": "getUserProfileAudios",
@@ -2844,6 +3060,12 @@
           "type": "Boolean",
           "required": false,
           "description": "Pass True if the administrator can edit the tags of regular members; for groups and supergroups only"
+        },
+        {
+          "name": "can_send_welcome_messages",
+          "type": "Boolean",
+          "required": false,
+          "description": "Pass True if the administrator can manage chat welcome messages or directly send them in the case of bots"
         }
       ],
       "returns": "True on success",
@@ -3166,6 +3388,12 @@
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
         },
         {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
+        },
+        {
           "name": "animation",
           "type": "InputFile or String",
           "required": true,
@@ -3217,7 +3445,7 @@
           "name": "show_caption_above_media",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if the caption must be shown above the message media"
+          "description": "Pass True if the caption must be shown above the message media"
         },
         {
           "name": "has_spoiler",
@@ -3297,6 +3525,12 @@
           "type": "Integer",
           "required": false,
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
+        },
+        {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
         },
         {
           "name": "audio",
@@ -3436,11 +3670,11 @@
           "name": "web_app_url",
           "type": "String",
           "required": true,
-          "description": "The URL of the Mini App to be opened"
+          "description": "An HTTPS URL of a Web App to be opened with additional data as specified in Initializing Web Apps"
         }
       ],
       "returns": "True on success",
-      "summary": "sendChatJoinRequestWebApp Use this method to process a received chat join request query by showing a Mini App to the user before deciding the outcome. Returns True on success. Parameter Type Required Description chat_join_request_query_id String Yes Unique identifier of the join request query web_app_url String Yes The URL of the Mini App to be opened"
+      "summary": "sendChatJoinRequestWebApp Use this method to process a received chat join request query by showing a Mini App to the user before deciding the outcome. Call answerChatJoinRequestQuery to resolve the join request query based on the user interaction with the Mini App. Returns True on success. Parameter Type Required Description chat_join_request_query_id String Yes Unique identifier of the join request query web_app_url String Yes An HTTPS URL of a Web App to be opened with additional data as speci"
     },
     {
       "name": "sendChecklist",
@@ -3523,6 +3757,12 @@
           "type": "Integer",
           "required": false,
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
+        },
+        {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
         },
         {
           "name": "phone_number",
@@ -3699,6 +3939,12 @@
           "type": "Integer",
           "required": false,
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
+        },
+        {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
         },
         {
           "name": "document",
@@ -3965,7 +4211,7 @@
           "name": "suggested_tip_amounts",
           "type": "Array of Integer",
           "required": false,
-          "description": "A JSON-serialized array of suggested amounts of tips in the smallest units of the currency (integer, not float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount ."
+          "description": "A JSON-serialized Array of suggested amounts of tips in the smallest units of the currency (integer, not float/double). At most 4 suggested tip amounts can be specified. The suggested tip amounts must be positive, passed in a strictly increased order and must not exceed max_tip_amount ."
         },
         {
           "name": "start_parameter",
@@ -4119,6 +4365,12 @@
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
         },
         {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
+        },
+        {
           "name": "live_photo",
           "type": "InputFile or String",
           "required": true,
@@ -4152,7 +4404,7 @@
           "name": "show_caption_above_media",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if the caption must be shown above the message media"
+          "description": "Pass True if the caption must be shown above the message media"
         },
         {
           "name": "has_spoiler",
@@ -4234,6 +4486,12 @@
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
         },
         {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
+        },
+        {
           "name": "latitude",
           "type": "Float",
           "required": true,
@@ -4255,7 +4513,7 @@
           "name": "live_period",
           "type": "Integer",
           "required": false,
-          "description": "Period in seconds during which the location will be updated (see Live Locations , should be between 60 and 86400, or 0x7FFFFFFF for live locations that can be edited indefinitely"
+          "description": "Period in seconds during which the location will be updated (see Live Locations ), must be between 60 and 86400, or 0x7FFFFFFF for live locations that can be edited indefinitely. Must be 0 for ephemeral messages."
         },
         {
           "name": "heading",
@@ -4346,7 +4604,7 @@
           "name": "media",
           "type": "Array of InputMediaAudio , InputMediaDocument , InputMediaLivePhoto , InputMediaPhoto and InputMediaVideo",
           "required": true,
-          "description": "A JSON-serialized array describing messages to be sent, must include 2-10 items"
+          "description": "A JSON-serialized Array describing messages to be sent, must include 2-10 items"
         },
         {
           "name": "disable_notification",
@@ -4379,8 +4637,8 @@
           "description": "Description of the message to reply to"
         }
       ],
-      "returns": "an array of Message objects that were sent",
-      "summary": "sendMediaGroup Use this method to send a group of photos, live photos, videos, documents or audios as an album. Documents and audio files can be only grouped in an album with messages of the same type. On success, an array of Message objects that were sent is returned. Parameter Type Required Description business_connection_id String Optional Unique identifier of the business connection on behalf of which the message will be sent chat_id Integer or String Yes Unique identifier for the target cha"
+      "returns": "an Array of Message objects that were sent",
+      "summary": "sendMediaGroup Use this method to send a group of photos, live photos, videos, documents or audios as an album. Documents and audio files can be only grouped in an album with messages of the same type. On success, an Array of Message objects that were sent is returned. Parameter Type Required Description business_connection_id String Optional Unique identifier of the business connection on behalf of which the message will be sent chat_id Integer or String Yes Unique identifier for the target cha"
     },
     {
       "name": "sendMessage",
@@ -4408,6 +4666,12 @@
           "type": "Integer",
           "required": false,
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
+        },
+        {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
         },
         {
           "name": "text",
@@ -4498,7 +4762,7 @@
           "name": "draft_id",
           "type": "Integer",
           "required": true,
-          "description": "Unique identifier of the message draft; must be non-zero. Changes of drafts with the same identifier are animated."
+          "description": "Unique identifier of the message draft; must be non-zero. Changes to drafts with the same identifier are animated. Otherwise, the draft is replaced without animation."
         },
         {
           "name": "text",
@@ -4517,6 +4781,18 @@
           "type": "Array of MessageEntity",
           "required": false,
           "description": "A JSON-serialized list of special entities that appear in message text, which can be specified instead of parse_mode"
+        },
+        {
+          "name": "can_stop",
+          "type": "Boolean",
+          "required": false,
+          "description": "Pass True to show the user a button to stop further drafts. The bot will receive an Update “stopped_message_generation” if the user presses the button."
+        },
+        {
+          "name": "keep_on_stop",
+          "type": "Boolean",
+          "required": false,
+          "description": "Pass True to keep the draft in the chat when the button is pressed. The draft will still disappear after a short time or if the bot sends a message. To fully preserve the partial draft, the bot should send it as a new message."
         }
       ],
       "returns": "True on success",
@@ -4559,7 +4835,7 @@
           "name": "media",
           "type": "Array of InputPaidMedia",
           "required": true,
-          "description": "A JSON-serialized array describing the media to be sent; up to 10 items"
+          "description": "A JSON-serialized Array describing the media to be sent; up to 10 items"
         },
         {
           "name": "payload",
@@ -4589,7 +4865,7 @@
           "name": "show_caption_above_media",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if the caption must be shown above the message media"
+          "description": "Pass True if the caption must be shown above the message media"
         },
         {
           "name": "disable_notification",
@@ -4659,6 +4935,12 @@
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
         },
         {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
+        },
+        {
           "name": "photo",
           "type": "InputFile or String",
           "required": true,
@@ -4686,7 +4968,7 @@
           "name": "show_caption_above_media",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if the caption must be shown above the message media"
+          "description": "Pass True if the caption must be shown above the message media"
         },
         {
           "name": "has_spoiler",
@@ -4801,37 +5083,37 @@
           "name": "allows_multiple_answers",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if the poll allows multiple answers, defaults to False"
+          "description": "Pass True if the poll allows multiple answers, defaults to False"
         },
         {
           "name": "allows_revoting",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if the poll allows to change chosen answer options, defaults to False for quizzes and to True for regular polls"
+          "description": "Pass True if the poll allows to change chosen answer options, defaults to False for quizzes and to True for regular polls"
         },
         {
           "name": "shuffle_options",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if the poll options must be shown in random order"
+          "description": "Pass True if the poll options must be shown in random order"
         },
         {
           "name": "allow_adding_options",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if answer options can be added to the poll after creation; not supported for anonymous polls and quizzes"
+          "description": "Pass True if answer options can be added to the poll after creation; not supported for anonymous polls and quizzes"
         },
         {
           "name": "hide_results_until_closes",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if poll results must be shown only after the poll closes"
+          "description": "Pass True if poll results must be shown only after the poll closes"
         },
         {
           "name": "members_only",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if voting is limited to users who have been members of the chat where the poll is being sent for more than 24 hours; for channel chats only"
+          "description": "Pass True if voting is limited to users who have been members of the chat where the poll is being sent for more than 24 hours; for channel chats only"
         },
         {
           "name": "country_codes",
@@ -4958,7 +5240,7 @@
           "name": "business_connection_id",
           "type": "String",
           "required": false,
-          "description": "Unique identifier of the business connection on behalf of which the message will be sent"
+          "description": "Unique identifier of the business connection on behalf of which the message will be sent. Bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages."
         },
         {
           "name": "chat_id",
@@ -4977,6 +5259,12 @@
           "type": "Integer",
           "required": false,
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
+        },
+        {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
         },
         {
           "name": "rich_message",
@@ -5028,7 +5316,7 @@
         }
       ],
       "returns": "the sent Message",
-      "summary": "sendRichMessage Use this method to send rich messages. If the message contains a block with a media element, then the bot must have the right to send the media to the chat. On success, the sent Message is returned. Parameter Type Required Description business_connection_id String Optional Unique identifier of the business connection on behalf of which the message will be sent chat_id Integer or String Yes Unique identifier for the target chat or username of the target bot, supergroup or channel "
+      "summary": "sendRichMessage Use this method to send rich messages. If the message contains a block with a media element, then the bot must have the right to send the media to the chat. On success, the sent Message is returned. Parameter Type Required Description business_connection_id String Optional Unique identifier of the business connection on behalf of which the message will be sent. Bot can send rich messages on behalf of a business account only if the corresponding user can send rich messages. chat_i"
     },
     {
       "name": "sendRichMessageDraft",
@@ -5049,13 +5337,25 @@
           "name": "draft_id",
           "type": "Integer",
           "required": true,
-          "description": "Unique identifier of the message draft; must be non-zero. Changes to drafts with the same identifier are animated."
+          "description": "Unique identifier of the message draft; must be non-zero. Changes to drafts with the same identifier are animated. Otherwise, the draft is replaced without animation."
         },
         {
           "name": "rich_message",
           "type": "InputRichMessage",
           "required": true,
-          "description": "The partial message to be streamed"
+          "description": "The partial message to be streamed. Direct upload of new files and explicit upload of files by a URL isn't supported."
+        },
+        {
+          "name": "can_stop",
+          "type": "Boolean",
+          "required": false,
+          "description": "Pass True to show the user a button to stop further drafts. The bot will receive an Update “stopped_message_generation” if the user presses the button."
+        },
+        {
+          "name": "keep_on_stop",
+          "type": "Boolean",
+          "required": false,
+          "description": "Pass True to keep the draft in the chat when the button is pressed. The draft will still disappear after a short time or if the bot sends a message. To fully preserve the partial draft, the bot should send it as a new message."
         }
       ],
       "returns": "True on success",
@@ -5087,6 +5387,12 @@
           "type": "Integer",
           "required": false,
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
+        },
+        {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
         },
         {
           "name": "sticker",
@@ -5172,6 +5478,12 @@
           "type": "Integer",
           "required": false,
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
+        },
+        {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
         },
         {
           "name": "latitude",
@@ -5295,6 +5607,12 @@
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
         },
         {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
+        },
+        {
           "name": "video",
           "type": "InputFile or String",
           "required": true,
@@ -5358,7 +5676,7 @@
           "name": "show_caption_above_media",
           "type": "Boolean",
           "required": false,
-          "description": "Pass True , if the caption must be shown above the message media"
+          "description": "Pass True if the caption must be shown above the message media"
         },
         {
           "name": "has_spoiler",
@@ -5446,6 +5764,12 @@
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
         },
         {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
+        },
+        {
           "name": "video_note",
           "type": "InputFile or String",
           "required": true,
@@ -5513,7 +5837,7 @@
         }
       ],
       "returns": "the sent Message",
-      "summary": "sendVideoNote As of v.4.0 , Telegram clients support rounded square MPEG4 videos of up to 1 minute long. Use this method to send video messages. On success, the sent Message is returned. Parameter Type Required Description business_connection_id String Optional Unique identifier of the business connection on behalf of which the message will be sent chat_id Integer or String Yes Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username mess"
+      "summary": "sendVideoNote Use this method to send a rounded square MPEG4 video of up to 1 minute long. On success, the sent Message is returned. Parameter Type Required Description business_connection_id String Optional Unique identifier of the business connection on behalf of which the message will be sent chat_id Integer or String Yes Unique identifier for the target chat or username of the target bot, supergroup or channel in the format @username message_thread_id Integer Optional Unique identifier for t"
     },
     {
       "name": "sendVoice",
@@ -5541,6 +5865,12 @@
           "type": "Integer",
           "required": false,
           "description": "Identifier of the direct messages topic to which the message will be sent; required if the message is sent to a direct messages chat"
+        },
+        {
+          "name": "ephemeral_message_parameters",
+          "type": "EphemeralMessageParameters",
+          "required": false,
+          "description": "A JSON-serialized object containing the parameters of the ephemeral message to send"
         },
         {
           "name": "voice",
@@ -5650,7 +5980,7 @@
           "name": "show_gift_button",
           "type": "Boolean",
           "required": true,
-          "description": "Pass True , if a button for sending a gift to the user or by the business account must always be shown in the input field"
+          "description": "Pass True if a button for sending a gift to the user or by the business account must always be shown in the input field"
         },
         {
           "name": "accepted_gift_types",
@@ -5660,7 +5990,7 @@
         }
       ],
       "returns": "True on success",
-      "summary": "setBusinessAccountGiftSettings Changes the privacy settings pertaining to incoming gifts in a managed business account. Requires the can_change_gift_settings business bot right. Returns True on success. Parameter Type Required Description business_connection_id String Yes Unique identifier of the business connection show_gift_button Boolean Yes Pass True , if a button for sending a gift to the user or by the business account must always be shown in the input field accepted_gift_types AcceptedGif"
+      "summary": "setBusinessAccountGiftSettings Changes the privacy settings pertaining to incoming gifts in a managed business account. Requires the can_change_gift_settings business bot right. Returns True on success. Parameter Type Required Description business_connection_id String Yes Unique identifier of the business connection show_gift_button Boolean Yes Pass True if a button for sending a gift to the user or by the business account must always be shown in the input field accepted_gift_types AcceptedGiftT"
     },
     {
       "name": "setBusinessAccountName",
@@ -5982,17 +6312,17 @@
           "name": "is_access_restricted",
           "type": "Boolean",
           "required": true,
-          "description": "Pass True , if only selected users can access the bot. The bot's owner can always access it."
+          "description": "Pass True if only selected users can access the bot. The bot's owner can always access it."
         },
         {
           "name": "added_user_ids",
           "type": "Array of Integer",
           "required": false,
-          "description": "A JSON-serialized list of up to 10 identifiers of users who will have access to the bot in addition to its owner. Ignored if is_access_restricted is false."
+          "description": "A JSON-serialized list of up to 10 identifiers of users who will have access to the bot in addition to its owner. Ignored if is_access_restricted is False ."
         }
       ],
       "returns": "True on success",
-      "summary": "setManagedBotAccessSettings Use this method to change the access settings of a managed bot. Returns True on success. Parameter Type Required Description user_id Integer Yes User identifier of the managed bot whose access settings will be changed is_access_restricted Boolean Yes Pass True , if only selected users can access the bot. The bot's owner can always access it. added_user_ids Array of Integer Optional A JSON-serialized list of up to 10 identifiers of users who will have access to the bot"
+      "summary": "setManagedBotAccessSettings Use this method to change the access settings of a managed bot. Returns True on success. Parameter Type Required Description user_id Integer Yes User identifier of the managed bot whose access settings will be changed is_access_restricted Boolean Yes Pass True if only selected users can access the bot. The bot's owner can always access it. added_user_ids Array of Integer Optional A JSON-serialized list of up to 10 identifiers of users who will have access to the bot i"
     },
     {
       "name": "setMessageReaction",
@@ -6152,7 +6482,7 @@
           "name": "errors",
           "type": "Array of PassportElementError",
           "required": true,
-          "description": "A JSON-serialized array describing the errors"
+          "description": "A JSON-serialized Array describing the errors"
         }
       ],
       "returns": "True on success",
@@ -7066,9 +7396,15 @@
           "type": "String",
           "required": null,
           "description": "Description of the command; 1-256 characters"
+        },
+        {
+          "name": "is_ephemeral",
+          "type": "Boolean",
+          "required": null,
+          "description": "Optional . True , if the command sends an ephemeral message, which can be seen only by the sender of the message and the bot"
         }
       ],
-      "summary": "BotCommand This object represents a bot command. Field Type Description command String Text of the command; 1-32 characters. Can contain only lowercase English letters, digits and underscores. description String Description of the command; 1-256 characters"
+      "summary": "BotCommand This object represents a bot command. Field Type Description command String Text of the command; 1-32 characters. Can contain only lowercase English letters, digits and underscores. description String Description of the command; 1-256 characters is_ephemeral Boolean Optional . True , if the command sends an ephemeral message, which can be seen only by the sender of the message and the bot"
     },
     {
       "name": "BotCommandScopeAllChatAdministrators",
@@ -7213,6 +7549,30 @@
         }
       ],
       "summary": "BotShortDescription This object represents the bot's short description. Field Type Description short_description String The bot's short description"
+    },
+    {
+      "name": "BotSubscriptionUpdated",
+      "fields": [
+        {
+          "name": "user",
+          "type": "User",
+          "required": null,
+          "description": "User who subscribed for payments toward the bot"
+        },
+        {
+          "name": "invoice_payload",
+          "type": "String",
+          "required": null,
+          "description": "Bot-specified invoice payload"
+        },
+        {
+          "name": "state",
+          "type": "String",
+          "required": null,
+          "description": "The new state of the subscription. Currently, it can be one of “canceled” if the user canceled the subscription, “active” if the user re-enabled a previously canceled subscription, or “failed” if payment for the subscription failed."
+        }
+      ],
+      "summary": "BotSubscriptionUpdated This object contains information about changes to a user payment subscription toward the current bot. Field Type Description user User User who subscribed for payments toward the bot invoice_payload String Bot-specified invoice payload state String The new state of the subscription. Currently, it can be one of “canceled” if the user canceled the subscription, “active” if the user re-enabled a previously canceled subscription, or “failed” if payment for the subscription fai"
     },
     {
       "name": "BusinessBotRights",
@@ -7653,7 +8013,13 @@
           "name": "can_manage_tags",
           "type": "Boolean",
           "required": null,
-          "description": "Optional . True , if the administrator can edit the tags of regular members; for groups and supergroups only. If omitted defaults to the value of can_pin_messages."
+          "description": "Optional . True , if the administrator can edit the tags of regular members; for groups and supergroups only"
+        },
+        {
+          "name": "can_send_welcome_messages",
+          "type": "Boolean",
+          "required": null,
+          "description": "True , if the administrator can manage chat welcome messages or directly send them in the case of bots"
         }
       ],
       "summary": "ChatAdministratorRights Represents the rights of an administrator in a chat. Field Type Description is_anonymous Boolean True , if the user's presence in the chat is hidden can_manage_chat Boolean True , if the administrator can access the chat event log, get boost list, see hidden supergroup and channel members, report spam messages, ignore slow mode, and send messages to the chat without paying Telegram Stars. Implied by any other administrator privilege. can_delete_messages Boolean True , if "
@@ -8146,6 +8512,12 @@
           "type": "User",
           "required": null,
           "description": "Optional . The bot that processes join request queries in the chat. The field is only available to chat administrators."
+        },
+        {
+          "name": "community",
+          "type": "Community",
+          "required": null,
+          "description": "Optional . The Community to which the chat belongs"
         }
       ],
       "summary": "ChatFullInfo This object contains full information about a chat. Field Type Description id Integer Unique identifier for this chat. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier. type String Type of the chat, can be either “private”, “group”, “supergroup” or “channel” title"
@@ -8265,7 +8637,7 @@
           "name": "query_id",
           "type": "String",
           "required": null,
-          "description": "Optional . Identifier of the join request query. If present, then the bot must call sendChatJoinRequestWebApp or directly call answerChatJoinRequestQuery within 10 seconds."
+          "description": "Optional . Identifier of the join request query; for bots assigned to process join requests only. If present, then the bot must call sendChatJoinRequestWebApp or directly call answerChatJoinRequestQuery within 10 seconds."
         }
       ],
       "summary": "ChatJoinRequest Represents a join request sent to a chat. Field Type Description chat Chat Chat to which the request was sent from User User that sent the join request user_chat_id Integer Identifier of a private chat with the user who sent the join request. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a 64-bit integer or double-precision float type are safe for "
@@ -8409,7 +8781,13 @@
           "name": "can_manage_tags",
           "type": "Boolean",
           "required": null,
-          "description": "Optional . True , if the administrator can edit the tags of regular members; for groups and supergroups only. If omitted defaults to the value of can_pin_messages."
+          "description": "Optional . True , if the administrator can edit the tags of regular members; for groups and supergroups only"
+        },
+        {
+          "name": "can_send_welcome_messages",
+          "type": "Boolean",
+          "required": null,
+          "description": "True , if the administrator can manage chat welcome messages or directly send them in the case of bots"
         },
         {
           "name": "custom_title",
@@ -8829,7 +9207,7 @@
           "name": "can_manage_topics",
           "type": "Boolean",
           "required": null,
-          "description": "Optional . True , if the user is allowed to create forum topics. If omitted defaults to the value of can_pin_messages."
+          "description": "Optional . True , if the user is allowed to create forum topics. If omitted, defaults to the value of can_pin_messages."
         }
       ],
       "summary": "ChatPermissions Describes actions that a non-administrator user is allowed to take in a chat. Field Type Description can_send_messages Boolean Optional . True , if the user is allowed to send text messages, rich messages, contacts, giveaways, giveaway winners, invoices, locations and venues can_send_audios Boolean Optional . True , if the user is allowed to send audios can_send_documents Boolean Optional . True , if the user is allowed to send documents can_send_photos Boolean Optional . True , "
@@ -9021,6 +9399,48 @@
       "summary": "ChecklistTasksDone Describes a service message about checklist tasks marked as done or not done. Field Type Description checklist_message Message Optional . Message containing the checklist whose tasks were marked as done or not done. Note that the Message object in this field will not contain the reply_to_message field even if it itself is a reply. marked_as_done_task_ids Array of Integer Optional . Identifiers of the tasks that were marked as done marked_as_not_done_task_ids Array of Integer O"
     },
     {
+      "name": "Community",
+      "fields": [
+        {
+          "name": "id",
+          "type": "Integer",
+          "required": null,
+          "description": "Unique identifier for this community. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier."
+        },
+        {
+          "name": "name",
+          "type": "String",
+          "required": null,
+          "description": "Name of the community"
+        }
+      ],
+      "summary": "Community Represents a community (a group of chats). Field Type Description id Integer Unique identifier for this community. This number may have more than 32 significant bits and some programming languages may have difficulty/silent defects in interpreting it. But it has at most 52 significant bits, so a signed 64-bit integer or double-precision float type are safe for storing this identifier. name String Name of the community"
+    },
+    {
+      "name": "CommunityChatAdded",
+      "fields": [
+        {
+          "name": "community",
+          "type": "Community",
+          "required": null,
+          "description": "The new community to which the chat or the bot belongs"
+        }
+      ],
+      "summary": "CommunityChatAdded Describes a service message about a chat or a bot being added to a community. Field Type Description community Community The new community to which the chat or the bot belongs"
+    },
+    {
+      "name": "CommunityChatJoined",
+      "fields": [
+        {
+          "name": "community",
+          "type": "Community",
+          "required": null,
+          "description": "The community from which the chat was joined"
+        }
+      ],
+      "summary": "CommunityChatJoined Describes a service message about a chat being joined by a user from a community. Field Type Description community Community The community from which the chat was joined"
+    },
+    {
       "name": "Contact",
       "fields": [
         {
@@ -9093,7 +9513,7 @@
           "name": "are_direct_messages_enabled",
           "type": "Boolean",
           "required": null,
-          "description": "True , if direct messages are enabled for the channel chat; false otherwise"
+          "description": "True , if direct messages are enabled for the channel chat; False otherwise"
         },
         {
           "name": "direct_message_star_count",
@@ -9102,7 +9522,7 @@
           "description": "Optional . The new number of Telegram Stars that must be paid by users for each direct message sent to the channel. Does not apply to users who have been exempted by administrators. Defaults to 0."
         }
       ],
-      "summary": "DirectMessagePriceChanged Describes a service message about a change in the price of direct messages sent to a channel chat. Field Type Description are_direct_messages_enabled Boolean True , if direct messages are enabled for the channel chat; false otherwise direct_message_star_count Integer Optional . The new number of Telegram Stars that must be paid by users for each direct message sent to the channel. Does not apply to users who have been exempted by administrators. Defaults to 0."
+      "summary": "DirectMessagePriceChanged Describes a service message about a change in the price of direct messages sent to a channel chat. Field Type Description are_direct_messages_enabled Boolean True , if direct messages are enabled for the channel chat; False otherwise direct_message_star_count Integer Optional . The new number of Telegram Stars that must be paid by users for each direct message sent to the channel. Does not apply to users who have been exempted by administrators. Defaults to 0."
     },
     {
       "name": "DirectMessagesTopic",
@@ -9163,6 +9583,30 @@
         }
       ],
       "summary": "Document This object represents a general file (as opposed to photos , voice messages and audio files ). Field Type Description file_id String Identifier for this file, which can be used to download or reuse the file file_unique_id String Unique identifier for this file, which is supposed to be the same over time and for different bots. Can't be used to download or reuse the file. thumbnail PhotoSize Optional . Document thumbnail as defined by the sender file_name String Optional . Original file"
+    },
+    {
+      "name": "EphemeralMessageParameters",
+      "fields": [
+        {
+          "name": "receiver_user_id",
+          "type": "Integer",
+          "required": null,
+          "description": "Identifier of the user who will receive the message. It is not guaranteed that the user will receive the message, especially if they are offline. See here for more details."
+        },
+        {
+          "name": "callback_query_id",
+          "type": "String",
+          "required": null,
+          "description": "Optional . Identifier of the callback query which triggered the message, if any"
+        },
+        {
+          "name": "replace_callback_query_message",
+          "type": "Boolean",
+          "required": null,
+          "description": "Optional . Pass True if the ephemeral message must be shown in place of the original message. Must be False for callback queries from ephemeral messages, which must be edited using regular editEphemeralMessage… methods."
+        }
+      ],
+      "summary": "EphemeralMessageParameters Field Type Description receiver_user_id Integer Identifier of the user who will receive the message. It is not guaranteed that the user will receive the message, especially if they are offline. See here for more details. callback_query_id String Optional . Identifier of the callback query which triggered the message, if any replace_callback_query_message Boolean Optional . Pass True if the ephemeral message must be shown in place of the original message. Must be False "
     },
     {
       "name": "ExternalReplyInfo",
@@ -9363,7 +9807,7 @@
           "name": "force_reply",
           "type": "True",
           "required": null,
-          "description": "Shows reply interface to the user, as if they manually selected the bot's message and tapped 'Reply'"
+          "description": "Shows reply interface to the user, as if they had manually selected the bot's message and tapped 'Reply'"
         },
         {
           "name": "input_field_placeholder",
@@ -9378,7 +9822,7 @@
           "description": "Optional . Use this parameter if you want to force reply from specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply to a message in the same chat and forum topic, sender of the original message."
         }
       ],
-      "summary": "ForceReply Upon receiving a message with this object, Telegram clients will display a reply interface to the user (act as if the user has selected the bot's message and tapped 'Reply'). This can be extremely useful if you want to create user-friendly step-by-step interfaces without having to sacrifice privacy mode . Not supported in channels and for messages sent on behalf of a user account. Field Type Description force_reply True Shows reply interface to the user, as if they manually selected t"
+      "summary": "ForceReply Upon receiving a message with this object, Telegram clients will display a reply interface to the user (act as if the user has selected the bot's message and tapped 'Reply'). This can be extremely useful if you want to create user-friendly step-by-step interfaces without having to sacrifice privacy mode . Not supported in channels and for messages sent on behalf of a user account. Field Type Description force_reply True Shows reply interface to the user, as if they had manually select"
     },
     {
       "name": "ForumTopic",
@@ -9897,7 +10341,7 @@
           "name": "login_url",
           "type": "LoginUrl",
           "required": null,
-          "description": "Optional . An HTTPS URL used to automatically authorize the user. Can be used as a replacement for the Telegram Login Widget ."
+          "description": "Optional . An HTTPS URL used to automatically authorize the user. Can be used as a replacement for the Telegram Login Widget . Not supported for ephemeral messages."
         },
         {
           "name": "switch_inline_query",
@@ -9934,6 +10378,12 @@
           "type": "Boolean",
           "required": null,
           "description": "Optional . Specify True , to send a Pay button . Substrings “ ” and “XTR” in the buttons's text will be replaced with a Telegram Star icon. NOTE: This type of button must always be the first button in the first row and can only be used in invoice messages."
+        },
+        {
+          "name": "disabled",
+          "type": "DisabledButton",
+          "required": null,
+          "description": "Optional . If set, then the button is disabled and does nothing"
         }
       ],
       "summary": "InlineKeyboardButton This object represents one button of an inline keyboard. Exactly one of the fields other than text , icon_custom_emoji_id , and style must be used to specify the type of the button. Field Type Description text String Label text on the button icon_custom_emoji_id String Optional . Unique identifier of the custom emoji shown before the text of the button. Can only be used by bots that purchased additional usernames on Fragment or in the messages directly sent by the bot to pri"
@@ -9946,9 +10396,15 @@
           "type": "Array of Array of InlineKeyboardButton",
           "required": null,
           "description": "Array of button rows, each represented by an Array of InlineKeyboardButton objects"
+        },
+        {
+          "name": "force_reply",
+          "type": "Boolean",
+          "required": null,
+          "description": "Optional . Pass True if the reply interface must be shown to the user, as if they had manually selected the bot's message and tapped 'Reply'. The value of the field can't be changed when the inline keyboard is edited."
         }
       ],
-      "summary": "InlineKeyboardMarkup This object represents an inline keyboard that appears right next to the message it belongs to. Field Type Description inline_keyboard Array of Array of InlineKeyboardButton Array of button rows, each represented by an Array of InlineKeyboardButton objects"
+      "summary": "InlineKeyboardMarkup This object represents an inline keyboard that appears right next to the message it belongs to. Field Type Description inline_keyboard Array of Array of InlineKeyboardButton Array of button rows, each represented by an Array of InlineKeyboardButton objects force_reply Boolean Optional . Pass True if the reply interface must be shown to the user, as if they had manually selected the bot's message and tapped 'Reply'. The value of the field can't be changed when the inline keyb"
     },
     {
       "name": "InputChecklist",
@@ -10029,7 +10485,7 @@
           "name": "type",
           "type": "String",
           "required": null,
-          "description": "Type of the result, must be animation"
+          "description": "Type of the media, must be animation"
         },
         {
           "name": "media",
@@ -10065,7 +10521,7 @@
           "name": "show_caption_above_media",
           "type": "Boolean",
           "required": null,
-          "description": "Optional . Pass True , if the caption must be shown above the message media"
+          "description": "Optional . Pass True if the caption must be shown above the message media"
         },
         {
           "name": "width",
@@ -10092,7 +10548,7 @@
           "description": "Optional . Pass True if the animation needs to be covered with a spoiler animation"
         }
       ],
-      "summary": "InputMediaAnimation Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent. Field Type Description type String Type of the result, must be animation media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach:// ” to upload a new one using multipart/form-data under name. More information on Sending Files » thumbnail String Optional . Thumbn"
+      "summary": "InputMediaAnimation Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent. Field Type Description type String Type of the media, must be animation media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach:// ” to upload a new one using multipart/form-data under name. More information on Sending Files » thumbnail String Optional . Thumbna"
     },
     {
       "name": "InputMediaAudio",
@@ -10101,7 +10557,7 @@
           "name": "type",
           "type": "String",
           "required": null,
-          "description": "Type of the result, must be audio"
+          "description": "Type of the media, must be audio"
         },
         {
           "name": "media",
@@ -10152,7 +10608,7 @@
           "description": "Optional . Title of the audio"
         }
       ],
-      "summary": "InputMediaAudio Represents an audio file to be treated as music to be sent. Field Type Description type String Type of the result, must be audio media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach:// ” to upload a new one using multipart/form-data under name. More information on Sending Files » thumbnail String Optional . Thumbnail of the file sent; can be ignore"
+      "summary": "InputMediaAudio Represents an audio file to be treated as music to be sent. Field Type Description type String Type of the media, must be audio media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach:// ” to upload a new one using multipart/form-data under name. More information on Sending Files » thumbnail String Optional . Thumbnail of the file sent; can be ignored"
     },
     {
       "name": "InputMediaDocument",
@@ -10161,7 +10617,7 @@
           "name": "type",
           "type": "String",
           "required": null,
-          "description": "Type of the result, must be document"
+          "description": "Type of the media, must be document"
         },
         {
           "name": "media",
@@ -10200,7 +10656,7 @@
           "description": "Optional . Disables automatic server-side content type detection for files uploaded using multipart/form-data. Always True , if the document is sent as part of an album."
         }
       ],
-      "summary": "InputMediaDocument Represents a general file to be sent. Field Type Description type String Type of the result, must be document media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach:// ” to upload a new one using multipart/form-data under name. More information on Sending Files » thumbnail String Optional . Thumbnail of the file sent; can be ignored if thumbnail g"
+      "summary": "InputMediaDocument Represents a general file to be sent. Field Type Description type String Type of the media, must be document media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach:// ” to upload a new one using multipart/form-data under name. More information on Sending Files » thumbnail String Optional . Thumbnail of the file sent; can be ignored if thumbnail ge"
     },
     {
       "name": "InputMediaLink",
@@ -10209,7 +10665,7 @@
           "name": "type",
           "type": "String",
           "required": null,
-          "description": "Type of the result, must be link"
+          "description": "Type of the media, must be link"
         },
         {
           "name": "url",
@@ -10218,7 +10674,7 @@
           "description": "HTTP URL of the link"
         }
       ],
-      "summary": "InputMediaLink Represents an HTTP link to be sent. Field Type Description type String Type of the result, must be link url String HTTP URL of the link"
+      "summary": "InputMediaLink Represents an HTTP link to be sent. Field Type Description type String Type of the media, must be link url String HTTP URL of the link"
     },
     {
       "name": "InputMediaLivePhoto",
@@ -10227,7 +10683,7 @@
           "name": "type",
           "type": "String",
           "required": null,
-          "description": "Type of the result, must be live_photo"
+          "description": "Type of the media, must be live_photo"
         },
         {
           "name": "media",
@@ -10263,7 +10719,7 @@
           "name": "show_caption_above_media",
           "type": "Boolean",
           "required": null,
-          "description": "Optional . Pass True , if the caption must be shown above the message media"
+          "description": "Optional . Pass True if the caption must be shown above the message media"
         },
         {
           "name": "has_spoiler",
@@ -10272,7 +10728,7 @@
           "description": "Optional . Pass True if the live photo needs to be covered with a spoiler animation"
         }
       ],
-      "summary": "InputMediaLivePhoto Represents a live photo to be sent. Field Type Description type String Type of the result, must be live_photo media String Video of the live photo to send. Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach:// ” to upload a new one using multipart/form-data under name. More information on Sending Files » . Sending live photos by a URL is currently unsupported. photo String The static photo to send. Pass a file_id to send a file tha"
+      "summary": "InputMediaLivePhoto Represents a live photo to be sent. Field Type Description type String Type of the media, must be live_photo media String Video of the live photo to send. Pass a file_id to send a file that exists on the Telegram servers (recommended) or pass “attach:// ” to upload a new one using multipart/form-data under name. More information on Sending Files » . Sending live photos by a URL is currently unsupported. photo String The static photo to send. Pass a file_id to send a file that"
     },
     {
       "name": "InputMediaLocation",
@@ -10281,7 +10737,7 @@
           "name": "type",
           "type": "String",
           "required": null,
-          "description": "Type of the result, must be location"
+          "description": "Type of the media, must be location"
         },
         {
           "name": "latitude",
@@ -10302,7 +10758,7 @@
           "description": "Optional . The radius of uncertainty for the location, measured in meters; 0-1500"
         }
       ],
-      "summary": "InputMediaLocation Represents a location to be sent. Field Type Description type String Type of the result, must be location latitude Float Latitude of the location longitude Float Longitude of the location horizontal_accuracy Float Optional . The radius of uncertainty for the location, measured in meters; 0-1500"
+      "summary": "InputMediaLocation Represents a location to be sent. Field Type Description type String Type of the media, must be location latitude Float Latitude of the location longitude Float Longitude of the location horizontal_accuracy Float Optional . The radius of uncertainty for the location, measured in meters; 0-1500"
     },
     {
       "name": "InputMediaPhoto",
@@ -10311,7 +10767,7 @@
           "name": "type",
           "type": "String",
           "required": null,
-          "description": "Type of the result, must be photo"
+          "description": "Type of the media, must be photo"
         },
         {
           "name": "media",
@@ -10341,7 +10797,7 @@
           "name": "show_caption_above_media",
           "type": "Boolean",
           "required": null,
-          "description": "Optional . Pass True , if the caption must be shown above the message media"
+          "description": "Optional . Pass True if the caption must be shown above the message media"
         },
         {
           "name": "has_spoiler",
@@ -10350,7 +10806,7 @@
           "description": "Optional . Pass True if the photo needs to be covered with a spoiler animation"
         }
       ],
-      "summary": "InputMediaPhoto Represents a photo to be sent. Field Type Description type String Type of the result, must be photo media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach:// ” to upload a new one using multipart/form-data under name. More information on Sending Files » caption String Optional . Caption of the photo to be sent, 0-1024 characters after entities parsin"
+      "summary": "InputMediaPhoto Represents a photo to be sent. Field Type Description type String Type of the media, must be photo media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach:// ” to upload a new one using multipart/form-data under name. More information on Sending Files » caption String Optional . Caption of the photo to be sent, 0-1024 characters after entities parsing"
     },
     {
       "name": "InputMediaSticker",
@@ -10359,7 +10815,7 @@
           "name": "type",
           "type": "String",
           "required": null,
-          "description": "Type of the result, must be sticker"
+          "description": "Type of the media, must be sticker"
         },
         {
           "name": "media",
@@ -10374,7 +10830,7 @@
           "description": "Optional . Emoji associated with the sticker; only for just uploaded stickers"
         }
       ],
-      "summary": "InputMediaSticker Represents a sticker file to be sent. Field Type Description type String Type of the result, must be sticker media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a .WEBP sticker from the Internet, or pass “attach:// ” to upload a new .WEBP, .TGS, or .WEBM sticker using multipart/form-data under name. More information on Sending Files » emoji String Optional . Emoji associated with the st"
+      "summary": "InputMediaSticker Represents a sticker file to be sent. Field Type Description type String Type of the media, must be sticker media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a .WEBP sticker from the Internet, or pass “attach:// ” to upload a new .WEBP, .TGS, or .WEBM sticker using multipart/form-data under name. More information on Sending Files » emoji String Optional . Emoji associated with the sti"
     },
     {
       "name": "InputMediaVenue",
@@ -10383,7 +10839,7 @@
           "name": "type",
           "type": "String",
           "required": null,
-          "description": "Type of the result, must be venue"
+          "description": "Type of the media, must be venue"
         },
         {
           "name": "latitude",
@@ -10434,7 +10890,7 @@
           "description": "Optional . Google Places type of the venue. (See supported types .)"
         }
       ],
-      "summary": "InputMediaVenue Represents a venue to be sent. Field Type Description type String Type of the result, must be venue latitude Float Latitude of the location longitude Float Longitude of the location title String Name of the venue address String Address of the venue foursquare_id String Optional . Foursquare identifier of the venue foursquare_type String Optional . Foursquare type of the venue, if known. (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.)"
+      "summary": "InputMediaVenue Represents a venue to be sent. Field Type Description type String Type of the media, must be venue latitude Float Latitude of the location longitude Float Longitude of the location title String Name of the venue address String Address of the venue foursquare_id String Optional . Foursquare identifier of the venue foursquare_type String Optional . Foursquare type of the venue, if known. (For example, “arts_entertainment/default”, “arts_entertainment/aquarium” or “food/icecream”.) "
     },
     {
       "name": "InputMediaVideo",
@@ -10443,7 +10899,7 @@
           "name": "type",
           "type": "String",
           "required": null,
-          "description": "Type of the result, must be video"
+          "description": "Type of the media, must be video"
         },
         {
           "name": "media",
@@ -10491,7 +10947,7 @@
           "name": "show_caption_above_media",
           "type": "Boolean",
           "required": null,
-          "description": "Optional . Pass True , if the caption must be shown above the message media"
+          "description": "Optional . Pass True if the caption must be shown above the message media"
         },
         {
           "name": "width",
@@ -10524,7 +10980,49 @@
           "description": "Optional . Pass True if the video needs to be covered with a spoiler animation"
         }
       ],
-      "summary": "InputMediaVideo Represents a video to be sent. Field Type Description type String Type of the result, must be video media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach:// ” to upload a new one using multipart/form-data under name. More information on Sending Files » thumbnail String Optional . Thumbnail of the file sent; can be ignored if thumbnail generation for"
+      "summary": "InputMediaVideo Represents a video to be sent. Field Type Description type String Type of the media, must be video media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass “attach:// ” to upload a new one using multipart/form-data under name. More information on Sending Files » thumbnail String Optional . Thumbnail of the file sent; can be ignored if thumbnail generation for "
+    },
+    {
+      "name": "InputMediaVoiceNote",
+      "fields": [
+        {
+          "name": "type",
+          "type": "String",
+          "required": null,
+          "description": "Type of the media, must be voice_note"
+        },
+        {
+          "name": "media",
+          "type": "String",
+          "required": null,
+          "description": "File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass \"attach:// \" to upload a new one using multipart/form-data under name. More information on Sending Files »"
+        },
+        {
+          "name": "caption",
+          "type": "String",
+          "required": null,
+          "description": "Optional . Caption of the voice message to be sent, 0-1024 characters after entities parsing"
+        },
+        {
+          "name": "parse_mode",
+          "type": "String",
+          "required": null,
+          "description": "Optional . Mode for parsing entities in the voice message caption. See formatting options for more details."
+        },
+        {
+          "name": "caption_entities",
+          "type": "Array of MessageEntity",
+          "required": null,
+          "description": "Optional . List of special entities that appear in the caption, which can be specified instead of parse_mode"
+        },
+        {
+          "name": "duration",
+          "type": "Integer",
+          "required": null,
+          "description": "Optional . Duration of the voice message in seconds"
+        }
+      ],
+      "summary": "InputMediaVoiceNote Represents a voice message file to be sent. Field Type Description type String Type of the media, must be voice_note media String File to send. Pass a file_id to send a file that exists on the Telegram servers (recommended), pass an HTTP URL for Telegram to get a file from the Internet, or pass \"attach:// \" to upload a new one using multipart/form-data under name. More information on Sending Files » caption String Optional . Caption of the voice message to be sent, 0-1024 cha"
     },
     {
       "name": "InputPaidMediaLivePhoto",
@@ -11169,7 +11667,7 @@
           "name": "bot_username",
           "type": "String",
           "required": null,
-          "description": "Optional . Username of a bot, which will be used for user authorization. See Setting up a bot for more details. If not specified, the current bot's username will be assumed. The url 's domain must be the same as the domain linked with the bot. See Linking your domain to the bot for more details."
+          "description": "Optional . Username of a bot, which will be used for user authorization; not supported in RichMessageButton . See Setting up a bot for more details. If not specified, the current bot's username will be assumed. The url 's domain must be the same as the domain linked with the bot. See Linking your domain to the bot for more details."
         },
         {
           "name": "request_write_access",
@@ -11178,7 +11676,7 @@
           "description": "Optional . Pass True to request the permission for your bot to send messages to the user"
         }
       ],
-      "summary": "LoginUrl This object represents a parameter of the inline keyboard button used to automatically authorize a user. Serves as a great replacement for the Telegram Login Widget when the user is coming from Telegram. All the user needs to do is tap/click a button and confirm that they want to log in: Telegram apps support these buttons as of version 5.7 . Sample bot: @discussbot Field Type Description url String An HTTPS URL to be opened with user authorization data added to the query string when th"
+      "summary": "LoginUrl This object represents a parameter of the inline keyboard button used to automatically authorize a user. It serves as a great replacement for the Telegram Login Widget when the user is coming from Telegram. All the user needs to do is tap/click a button and confirm that they want to log in: Sample bot: @DiscussBot Field Type Description url String An HTTPS URL to be opened with user authorization data added to the query string when the button is pressed. If the user refuses to provide a"
     },
     {
       "name": "ManagedBotCreated",
@@ -11265,7 +11763,7 @@
           "name": "message_id",
           "type": "Integer",
           "required": null,
-          "description": "Unique message identifier inside this chat. In specific instances (e.g., message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately. In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent."
+          "description": "Unique message identifier inside this chat; 0 for ephemeral messages. In specific instances (e.g., a message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately. In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent."
         },
         {
           "name": "message_thread_id",
@@ -11308,6 +11806,18 @@
           "type": "String",
           "required": null,
           "description": "Optional . Tag or custom title of the sender of the message; for supergroups only"
+        },
+        {
+          "name": "receiver_user",
+          "type": "User",
+          "required": null,
+          "description": "Optional . For ephemeral messages, the user who received the message"
+        },
+        {
+          "name": "ephemeral_message_id",
+          "type": "Integer",
+          "required": null,
+          "description": "Optional . For ephemeral messages, identifier of the ephemeral message inside this chat. The identifier may be reused for another ephemeral message after the message is deleted or expires."
         },
         {
           "name": "date",
@@ -11355,7 +11865,7 @@
           "name": "reply_to_message",
           "type": "Message",
           "required": null,
-          "description": "Optional . For replies in the same chat and message thread, the original message. Note that the Message object in this field will not contain further reply_to_message fields even if it itself is a reply."
+          "description": "Optional . For replies in the same chat and message thread, the original message. Note that the Message object in this field will not contain further reply_to_message fields even if it itself is a reply. If the message is a reply to an ephemeral message, then this field may be omitted."
         },
         {
           "name": "external_reply",
@@ -11769,7 +12279,7 @@
           "name": "proximity_alert_triggered",
           "type": "ProximityAlertTriggered",
           "required": null,
-          "description": "Optional . Service message. A user in the chat triggered another user's proximity alert while sharing Live Location."
+          "description": "Optional . Service message: a user in the chat triggered another user's proximity alert while sharing Live Location"
         },
         {
           "name": "boost_added",
@@ -11794,6 +12304,24 @@
           "type": "ChecklistTasksAdded",
           "required": null,
           "description": "Optional . Service message: tasks were added to a checklist"
+        },
+        {
+          "name": "community_chat_added",
+          "type": "CommunityChatAdded",
+          "required": null,
+          "description": "Optional . Service message: chat or bot added to a Community"
+        },
+        {
+          "name": "community_chat_joined",
+          "type": "CommunityChatJoined",
+          "required": null,
+          "description": "Optional . Service message: chat was joined by a user from a Community"
+        },
+        {
+          "name": "community_chat_removed",
+          "type": "CommunityChatRemoved",
+          "required": null,
+          "description": "Optional . Service message: chat or bot removed from a Community"
         },
         {
           "name": "direct_message_price_changed",
@@ -11952,7 +12480,7 @@
           "description": "Optional . Inline keyboard attached to the message. login_url buttons are represented as ordinary url buttons."
         }
       ],
-      "summary": "Message This object represents a message. Field Type Description message_id Integer Unique message identifier inside this chat. In specific instances (e.g., message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately. In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent. message_thread_id Integer Optional . Unique identifier of a message thread or forum topic to which the me"
+      "summary": "Message This object represents a message. Field Type Description message_id Integer Unique message identifier inside this chat; 0 for ephemeral messages. In specific instances (e.g., a message containing a video sent to a big chat), the server might automatically schedule a message instead of sending it immediately. In such cases, this field will be 0 and the relevant message will be unusable until it is actually sent. message_thread_id Integer Optional . Unique identifier of a message thread or"
     },
     {
       "name": "MessageAutoDeleteTimerChanged",
@@ -12025,6 +12553,30 @@
         }
       ],
       "summary": "MessageEntity This object represents one special entity in a text message. For example, hashtags, usernames, URLs, etc. Field Type Description type String Type of the entity. Currently, can be “mention” ( @username ), “hashtag” ( #hashtag or #hashtag@chatusername ), “cashtag” ( $USD or $USD@chatusername ), “bot_command” ( /start@jobs_bot ), “url” ( https://telegram.org ), “email” ( do-not-reply@telegram.org ), “phone_number” ( +1-212-555-0123 ), “bold” ( bold text ), “italic” ( italic text ), “u"
+    },
+    {
+      "name": "MessageGenerationStopped",
+      "fields": [
+        {
+          "name": "chat",
+          "type": "Chat",
+          "required": null,
+          "description": "Chat in which the message is generated"
+        },
+        {
+          "name": "message_thread_id",
+          "type": "Integer",
+          "required": null,
+          "description": "Optional . Unique identifier of the message thread in which the message is generated"
+        },
+        {
+          "name": "draft_id",
+          "type": "Integer",
+          "required": null,
+          "description": "Unique identifier of the message draft which was stopped"
+        }
+      ],
+      "summary": "MessageGenerationStopped This object describes an update about a user stopping message generation. Field Type Description chat Chat Chat in which the message is generated message_thread_id Integer Optional . Unique identifier of the message thread in which the message is generated draft_id Integer Unique identifier of the message draft which was stopped"
     },
     {
       "name": "MessageId",
@@ -13041,19 +13593,19 @@
           "name": "is_persistent",
           "type": "Boolean",
           "required": null,
-          "description": "Optional . Requests clients to always show the keyboard when the regular keyboard is hidden. Defaults to false , in which case the custom keyboard can be hidden and opened with a keyboard icon."
+          "description": "Optional . Requests clients to always show the keyboard when the regular keyboard is hidden. Defaults to False , in which case the custom keyboard can be hidden and opened with a keyboard icon."
         },
         {
           "name": "resize_keyboard",
           "type": "Boolean",
           "required": null,
-          "description": "Optional . Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller if there are just two rows of buttons). Defaults to false , in which case the custom keyboard is always of the same height as the app's standard keyboard."
+          "description": "Optional . Requests clients to resize the keyboard vertically for optimal fit (e.g., make the keyboard smaller if there are just two rows of buttons). Defaults to False , in which case the custom keyboard is always of the same height as the app's standard keyboard."
         },
         {
           "name": "one_time_keyboard",
           "type": "Boolean",
           "required": null,
-          "description": "Optional . Requests clients to hide the keyboard as soon as it's been used. The keyboard will still be available, but clients will automatically display the usual letter-keyboard in the chat - the user can press a special button in the input field to see the custom keyboard again. Defaults to false ."
+          "description": "Optional . Requests clients to hide the keyboard as soon as it's been used. The keyboard will still be available, but clients will automatically display the usual letter-keyboard in the chat - the user can press a special button in the input field to see the custom keyboard again. Defaults to False ."
         },
         {
           "name": "input_field_placeholder",
@@ -13066,9 +13618,15 @@
           "type": "Boolean",
           "required": null,
           "description": "Optional . Use this parameter if you want to show the keyboard to specific users only. Targets: 1) users that are @mentioned in the text of the Message object; 2) if the bot's message is a reply to a message in the same chat and forum topic, sender of the original message. Example: A user requests to change the bot's language, bot replies to the request with a keyboard to select the new language. Other users in the group don't see the keyboard."
+        },
+        {
+          "name": "force_reply",
+          "type": "Boolean",
+          "required": null,
+          "description": "Optional . Pass True if the reply interface must be shown to the user, as if they had manually selected the bot's message and tapped 'Reply'"
         }
       ],
-      "summary": "ReplyKeyboardMarkup This object represents a custom keyboard with reply options (see Introduction to bots for details and examples). Not supported in channels and for messages sent on behalf of a business account. Field Type Description keyboard Array of Array of KeyboardButton Array of button rows, each represented by an Array of KeyboardButton objects is_persistent Boolean Optional . Requests clients to always show the keyboard when the regular keyboard is hidden. Defaults to false , in which "
+      "summary": "ReplyKeyboardMarkup This object represents a custom keyboard with reply options (see Introduction to bots for details and examples). Not supported in channels and for messages sent on behalf of a business account. Field Type Description keyboard Array of Array of KeyboardButton Array of button rows, each represented by an Array of KeyboardButton objects is_persistent Boolean Optional . Requests clients to always show the keyboard when the regular keyboard is hidden. Defaults to False , in which "
     },
     {
       "name": "ReplyKeyboardRemove",
@@ -13095,25 +13653,31 @@
           "name": "message_id",
           "type": "Integer",
           "required": null,
-          "description": "Identifier of the message that will be replied to in the current chat, or in the chat chat_id if it is specified"
+          "description": "Optional . Identifier of the message that will be replied to in the current chat, or in the chat chat_id if it is specified. Required if ephemeral_message_id isn't specified."
         },
         {
           "name": "chat_id",
           "type": "Integer or String",
           "required": null,
-          "description": "Optional . If the message to be replied to is from a different chat, unique identifier for the chat or username of the bot, supergroup or channel in the format @username . Not supported for messages sent on behalf of a business account and messages from channel direct messages chats."
+          "description": "Optional . If the message to be replied to is from a different chat, unique identifier for the chat or username of the bot, supergroup or channel in the format @username . Not supported for messages sent on behalf of a business account, messages from channel direct messages chats and ephemeral messages."
+        },
+        {
+          "name": "ephemeral_message_id",
+          "type": "Integer",
+          "required": null,
+          "description": "Optional . Identifier of the incoming ephemeral message that will be replied to in the current chat. A reply to an ephemeral message must itself be an ephemeral message. An ephemeral message may only be replied to within 15 seconds of being sent. Required if message_id isn't specified."
         },
         {
           "name": "allow_sending_without_reply",
           "type": "Boolean",
           "required": null,
-          "description": "Optional . Pass True if the message should be sent even if the specified message to be replied to is not found. Always False for replies in another chat or forum topic. Always True for messages sent on behalf of a business account."
+          "description": "Optional . Pass True if the message should be sent even if the specified message to be replied to is not found. Always False for replies in another chat or forum topic, and sent ephemeral messages. Always True for messages sent on behalf of a business account."
         },
         {
           "name": "quote",
           "type": "String",
           "required": null,
-          "description": "Optional . Quoted part of the message to be replied to; 0-1024 characters after entities parsing. The quote must be an exact substring of the message to be replied to, including bold , italic , underline , strikethrough , spoiler , custom_emoji , and date_time entities. The message will fail to send if the quote isn't found in the original message."
+          "description": "Optional . Quoted part of the message to be replied to; 0-1024 characters after entities parsing. The quote must be an exact substring of the message to be replied to, including bold , italic , underline , strikethrough , spoiler , custom_emoji , and date_time entities. The message will fail to send if the quote isn't found in the original message. Ignored for ephemeral messages."
         },
         {
           "name": "quote_parse_mode",
@@ -13146,7 +13710,7 @@
           "description": "Optional . Persistent identifier of the specific poll option to be replied to"
         }
       ],
-      "summary": "ReplyParameters Describes reply parameters for the message that is being sent. Field Type Description message_id Integer Identifier of the message that will be replied to in the current chat, or in the chat chat_id if it is specified chat_id Integer or String Optional . If the message to be replied to is from a different chat, unique identifier for the chat or username of the bot, supergroup or channel in the format @username . Not supported for messages sent on behalf of a business account and "
+      "summary": "ReplyParameters Describes reply parameters for the message that is being sent. Field Type Description message_id Integer Optional . Identifier of the message that will be replied to in the current chat, or in the chat chat_id if it is specified. Required if ephemeral_message_id isn't specified. chat_id Integer or String Optional . If the message to be replied to is from a different chat, unique identifier for the chat or username of the bot, supergroup or channel in the format @username . Not su"
     },
     {
       "name": "ResponseParameters",
@@ -13545,13 +14109,13 @@
           "name": "currency",
           "type": "String",
           "required": null,
-          "description": "Currency in which the payment was made. Currently, one of “XTR” for Telegram Stars or “TON” for toncoins."
+          "description": "Currency in which the payment was made. Currently, one of “XTR” for Telegram Stars or “TON” for TON grams."
         },
         {
           "name": "amount",
           "type": "Integer",
           "required": null,
-          "description": "Optional . The amount of the currency that was received by the channel in nanotoncoins; for payments in toncoins only"
+          "description": "Optional . The amount of the currency that was received by the channel in nanograms; for payments in TON grams only"
         },
         {
           "name": "star_amount",
@@ -13560,7 +14124,7 @@
           "description": "Optional . The amount of Telegram Stars that was received by the channel; for payments in Telegram Stars only"
         }
       ],
-      "summary": "SuggestedPostPaid Describes a service message about a successful payment for a suggested post. Field Type Description suggested_post_message Message Optional . Message containing the suggested post. Note that the Message object in this field will not contain the reply_to_message field even if it itself is a reply. currency String Currency in which the payment was made. Currently, one of “XTR” for Telegram Stars or “TON” for toncoins. amount Integer Optional . The amount of the currency that was "
+      "summary": "SuggestedPostPaid Describes a service message about a successful payment for a suggested post. Field Type Description suggested_post_message Message Optional . Message containing the suggested post. Note that the Message object in this field will not contain the reply_to_message field even if it itself is a reply. currency String Currency in which the payment was made. Currently, one of “XTR” for Telegram Stars or “TON” for TON grams. amount Integer Optional . The amount of the currency that was"
     },
     {
       "name": "SuggestedPostParameters",
@@ -13587,16 +14151,16 @@
           "name": "currency",
           "type": "String",
           "required": null,
-          "description": "Currency in which the post will be paid. Currently, must be one of “XTR” for Telegram Stars or “TON” for toncoins."
+          "description": "Currency in which the post will be paid. Currently, must be one of “XTR” for Telegram Stars or “TON” for TON grams."
         },
         {
           "name": "amount",
           "type": "Integer",
           "required": null,
-          "description": "The amount of the currency that will be paid for the post in the smallest units of the currency, i.e. Telegram Stars or nanotoncoins. Currently, price in Telegram Stars must be between 5 and 100000, and price in nanotoncoins must be between 10000000 and 10000000000000."
+          "description": "The amount of the currency that will be paid for the post in the smallest units of the currency, i.e. Telegram Stars or nanograms. Currently, price in Telegram Stars must be between 5 and 100000, and price in nanograms must be between 10000000 and 10000000000000."
         }
       ],
-      "summary": "SuggestedPostPrice Describes the price of a suggested post. Field Type Description currency String Currency in which the post will be paid. Currently, must be one of “XTR” for Telegram Stars or “TON” for toncoins. amount Integer The amount of the currency that will be paid for the post in the smallest units of the currency, i.e. Telegram Stars or nanotoncoins. Currently, price in Telegram Stars must be between 5 and 100000, and price in nanotoncoins must be between 10000000 and 10000000000000."
+      "summary": "SuggestedPostPrice Describes the price of a suggested post. Field Type Description currency String Currency in which the post will be paid. Currently, must be one of “XTR” for Telegram Stars or “TON” for TON grams. amount Integer The amount of the currency that will be paid for the post in the smallest units of the currency, i.e. Telegram Stars or nanograms. Currently, price in Telegram Stars must be between 5 and 100000, and price in nanograms must be between 10000000 and 10000000000000."
     },
     {
       "name": "SuggestedPostRefunded",
@@ -13872,16 +14436,34 @@
           "description": "Origin of the gift. Currently, either “upgrade” for gifts upgraded from regular gifts, “transfer” for gifts transferred from other users or channels, “resale” for gifts bought from other users, “gifted_upgrade” for upgrades purchased after the gift was sent, or “offer” for gifts bought or sold through gift purchase offers."
         },
         {
+          "name": "text",
+          "type": "String",
+          "required": null,
+          "description": "Optional . Text of the message that was added to the gift"
+        },
+        {
+          "name": "entities",
+          "type": "Array of MessageEntity",
+          "required": null,
+          "description": "Optional . Special entities that appear in the text"
+        },
+        {
+          "name": "is_private",
+          "type": "True",
+          "required": null,
+          "description": "Optional . True , if the sender and gift text are shown only to the gift receiver; otherwise, everyone will be able to see them"
+        },
+        {
           "name": "last_resale_currency",
           "type": "String",
           "required": null,
-          "description": "Optional . For gifts bought from other users, the currency in which the payment for the gift was done. Currently, one of “XTR” for Telegram Stars or “TON” for toncoins."
+          "description": "Optional . For gifts bought from other users, the currency in which the payment for the gift was done. Currently, one of “XTR” for Telegram Stars or “TON” for TON grams."
         },
         {
           "name": "last_resale_amount",
           "type": "Integer",
           "required": null,
-          "description": "Optional . For gifts bought from other users, the price paid for the gift in either Telegram Stars or nanotoncoins"
+          "description": "Optional . For gifts bought from other users, the price paid for the gift in either Telegram Stars or nanograms"
         },
         {
           "name": "owned_gift_id",
@@ -13902,7 +14484,7 @@
           "description": "Optional . Point in time (Unix timestamp) when the gift can be transferred. If it is in the past, then the gift can be transferred now."
         }
       ],
-      "summary": "UniqueGiftInfo Describes a service message about a unique gift that was sent or received. Field Type Description gift UniqueGift Information about the gift origin String Origin of the gift. Currently, either “upgrade” for gifts upgraded from regular gifts, “transfer” for gifts transferred from other users or channels, “resale” for gifts bought from other users, “gifted_upgrade” for upgrades purchased after the gift was sent, or “offer” for gifts bought or sold through gift purchase offers. last_"
+      "summary": "UniqueGiftInfo Describes a service message about a unique gift that was sent or received. Field Type Description gift UniqueGift Information about the gift origin String Origin of the gift. Currently, either “upgrade” for gifts upgraded from regular gifts, “transfer” for gifts transferred from other users or channels, “resale” for gifts bought from other users, “gifted_upgrade” for upgrades purchased after the gift was sent, or “offer” for gifts bought or sold through gift purchase offers. text "
     },
     {
       "name": "UniqueGiftModel",
@@ -14370,7 +14952,7 @@
           "description": "Optional . File size in bytes"
         }
       ],
-      "summary": "VideoNote This object represents a video message (available in Telegram apps as of v.4.0 ). Field Type Description file_id String Identifier for this file, which can be used to download or reuse the file file_unique_id String Unique identifier for this file, which is supposed to be the same over time and for different bots. Can't be used to download or reuse the file. length Integer Video width and height (diameter of the video message) as defined by the sender duration Integer Duration of the v"
+      "summary": "VideoNote This object represents a video message . Field Type Description file_id String Identifier for this file, which can be used to download or reuse the file file_unique_id String Unique identifier for this file, which is supposed to be the same over time and for different bots. Can't be used to download or reuse the file. length Integer Video width and height (diameter of the video message) as defined by the sender duration Integer Duration of the video in seconds as defined by the sender "
     },
     {
       "name": "VideoQuality",

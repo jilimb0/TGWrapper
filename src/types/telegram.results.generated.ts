@@ -14,10 +14,15 @@ export type StrictTelegramApiMethodResults = {
   approveSuggestedPost: boolean;
   declineSuggestedPost: boolean;
   deleteAllMessageReactions: boolean;
+  deleteEphemeralMessage: boolean;
   deleteMessage: boolean;
   deleteMessageReaction: boolean;
   deleteMessages: boolean;
   deleteWebhook: boolean;
+  editEphemeralMessageCaption: boolean;
+  editEphemeralMessageMedia: boolean;
+  editEphemeralMessageReplyMarkup: boolean;
+  editEphemeralMessageText: boolean;
   getMe: import("./telegram.js").User;
   getUpdates: import("./telegram.js").Update[];
   getWebhookInfo: UnknownResult;
@@ -66,6 +71,7 @@ export type TelegramApiMethodResults = {
   deleteBusinessMessages: UnknownResult;
   deleteChatPhoto: UnknownResult;
   deleteChatStickerSet: UnknownResult;
+  deleteEphemeralMessage: boolean;
   deleteForumTopic: UnknownResult;
   deleteMessage: boolean;
   deleteMessageReaction: boolean;
@@ -77,6 +83,10 @@ export type TelegramApiMethodResults = {
   deleteWebhook: boolean;
   editChatInviteLink: UnknownResult;
   editChatSubscriptionInviteLink: UnknownResult;
+  editEphemeralMessageCaption: boolean;
+  editEphemeralMessageMedia: boolean;
+  editEphemeralMessageReplyMarkup: boolean;
+  editEphemeralMessageText: boolean;
   editForumTopic: UnknownResult;
   editGeneralForumTopic: UnknownResult;
   editMessageCaption: UnknownResult;

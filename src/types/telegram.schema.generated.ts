@@ -1,7 +1,7 @@
 /**
  * AUTO-GENERATED FILE. DO NOT EDIT.
  * Source: docs/telegram-api-schema.snapshot.json
- * Generated at: 2026-06-12T10:40:33.137Z
+ * Generated at: 2026-10-08T12:34:01.274Z
  */
 
 export type TelegramApiMethodName =
@@ -33,6 +33,7 @@ export type TelegramApiMethodName =
   | 'deleteBusinessMessages'
   | 'deleteChatPhoto'
   | 'deleteChatStickerSet'
+  | 'deleteEphemeralMessage'
   | 'deleteForumTopic'
   | 'deleteMessage'
   | 'deleteMessageReaction'
@@ -44,6 +45,10 @@ export type TelegramApiMethodName =
   | 'deleteWebhook'
   | 'editChatInviteLink'
   | 'editChatSubscriptionInviteLink'
+  | 'editEphemeralMessageCaption'
+  | 'editEphemeralMessageMedia'
+  | 'editEphemeralMessageReplyMarkup'
+  | 'editEphemeralMessageText'
   | 'editForumTopic'
   | 'editGeneralForumTopic'
   | 'editMessageCaption'
@@ -208,4 +213,6 @@ export type TelegramUpdateKey =
   | 'pre_checkout_query'
   | 'purchased_paid_media'
   | 'removed_chat_boost'
-  | 'shipping_query';
+  | 'shipping_query'
+  | 'stopped_message_generation'
+  | 'subscription';

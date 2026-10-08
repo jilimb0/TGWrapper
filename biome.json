@@ -45,7 +45,9 @@
       "!**/dist",
       "!**/dist-cjs",
       "!**/node_modules",
-      "!**/.turbo"
+      "!**/.turbo",
+      "!**/coverage",
+      "!**/docs/api"
     ],
     "ignoreUnknown": true,
     "maxSize": 1048576

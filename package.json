@@ -75,7 +75,7 @@
     "telegram:schema:results:generate": "node scripts/generate-telegram-schema-results.mjs",
     "telegram:schema:results:check": "node scripts/check-telegram-schema-results-generated.mjs",
     "telegram:schema:release:gate": "node scripts/check-telegram-schema-release-gate.mjs",
-    "docs": "typedoc src/index.ts --out docs/api",
+    "docs": "node --import ./scripts/typedoc-register.mjs ./node_modules/typedoc/bin/typedoc src/index.ts --out docs/api",
     "api:snapshot:check": "node scripts/check-api-snapshot.mjs",
     "api:snapshot:update": "node scripts/update-api-snapshot.mjs",
     "prepublishOnly": "node scripts/enforce-ci-publish.mjs",
@@ -108,10 +108,11 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.1",
     "@changesets/cli": "^2.31.0",
-    "typedoc": "^0.28.19",
-    "typescript": "6.0.3",
+    "typedoc": "^0.28.20",
+    "typescript": "7.0.2",
+    "typescript-compat": "npm:typescript@6.0.3",
     "vite": "8.1.3",
-    "vitest": "^4.1.8"
+    "vitest": "^5.0.3"
   },
   "packageManager": "pnpm@11.5.2+sha512.71c631e382066efc25625d5cf029075de07b61b37f6e27350fbd84b1bda5864c8c1967adc280776b45c30a715c0359a3be08fef42d5bb09e2b99029979692916",
   "files": [

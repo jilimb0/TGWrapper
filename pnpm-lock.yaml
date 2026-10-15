@@ -271,8 +271,8 @@ importers:
         specifier: ^1.13.8
         version: 1.19.17(hono@4.13.13)
       '@tgwrapper/core':
-        specifier: workspace:*
-        version: link:../..
+        specifier: ^0.20.1
+        version: 0.20.1
       hono:
         specifier: ^4.7.4
         version: 4.13.13

@@ -1,6 +1,6 @@
 {
   "name": "@tgwrapper/core",
-  "version": "0.20.1",
+  "version": "0.20.2",
   "description": "Serverless-first Telegram bot framework without external bot libraries",
   "repository": {
     "type": "git",
@@ -90,7 +90,7 @@
     "benchmark:trend:release": "BENCHMARK_MIN_RATIO=0.55 BENCHMARK_MIN_UPS=180000 node scripts/check-benchmark-trend.mjs",
     "telegram:schema:coverage:full:check": "node scripts/check-telegram-schema-full-coverage.mjs",
     "build:esm": "tsc -p tsconfig.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json",
+    "build:cjs": "tsc -p tsconfig.cjs.json && node -e \"fs.writeFileSync('dist-cjs/package.json', JSON.stringify({ type: 'commonjs' }, null, 2))\"",
     "verify:precommit": "node scripts/check-precommit-deps.mjs",
     "hooks:install": "git config core.hooksPath .githooks",
     "release:versions:check": "node scripts/check-release-versions-latest.mjs",
@@ -118,7 +118,7 @@
   "files": [
     "dist/**/*.js",
     "dist/**/*.d.ts",
-    "dist-cjs/**/*.js",
+    "dist-cjs/**/*",
     "README.md"
   ],
   "publishConfig": {

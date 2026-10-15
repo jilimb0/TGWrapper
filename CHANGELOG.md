@@ -1,5 +1,11 @@
 # @tgwrapper/core
 
+## 0.20.2
+
+### Patch Changes
+
+- fix: generate dist-cjs/package.json with type commonjs for Node.js CJS compatibility
+
 ## 0.20.1
 
 ### Patch Changes

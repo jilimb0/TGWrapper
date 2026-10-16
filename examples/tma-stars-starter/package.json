@@ -9,7 +9,7 @@
     "dev": "tsx src/index.ts"
   },
   "dependencies": {
-    "@tgwrapper/core": "^0.20.1",
+    "@tgwrapper/core": "^0.20.2",
     "hono": "^4.7.4",
     "@hono/node-server": "^1.13.8"
   },

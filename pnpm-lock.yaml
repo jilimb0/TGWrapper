@@ -53,8 +53,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
       '@tgwrapper/observability':
         specifier: ^0.10.0
         version: 0.10.0
@@ -72,14 +72,14 @@ importers:
   examples/aws-lambda:
     dependencies:
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
 
   examples/cloudflare-worker:
     dependencies:
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
     devDependencies:
       wrangler:
         specifier: ^4.75.0
@@ -103,8 +103,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
       '@tgwrapper/observability':
         specifier: ^0.10.0
         version: 0.10.0
@@ -131,8 +131,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
       '@tgwrapper/observability':
         specifier: ^0.10.0
         version: 0.10.0
@@ -153,8 +153,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
       '@tgwrapper/observability':
         specifier: ^0.10.0
         version: 0.10.0
@@ -172,8 +172,8 @@ importers:
   examples/node-http:
     dependencies:
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -182,8 +182,8 @@ importers:
   examples/polling-starter:
     dependencies:
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -195,8 +195,8 @@ importers:
   examples/serverless-webhook-starter:
     dependencies:
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -211,8 +211,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
       '@tgwrapper/observability':
         specifier: ^0.10.0
         version: 0.10.0
@@ -236,8 +236,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
       '@tgwrapper/observability':
         specifier: ^0.10.0
         version: 0.10.0
@@ -258,8 +258,8 @@ importers:
   examples/template-bot:
     dependencies:
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
     devDependencies:
       tsx:
         specifier: ^4.20.5
@@ -271,8 +271,8 @@ importers:
         specifier: ^1.13.8
         version: 1.19.17(hono@4.13.13)
       '@tgwrapper/core':
-        specifier: ^0.20.1
-        version: 0.20.1
+        specifier: ^0.20.2
+        version: 0.20.2
       hono:
         specifier: ^4.7.4
         version: 4.13.13
@@ -1174,8 +1174,8 @@ packages:
     resolution: {integrity: sha512-O5BpwbZnZsNP2ObnQ725S5OcNJ0sJiQrUT+eZTyCgZjb8Czqwmy5raQE8HChGcLQbxz45Og2Ry9DVrrVYdcBQw==}
     engines: {node: '>=24.0'}
 
-  '@tgwrapper/core@0.20.1':
-    resolution: {integrity: sha512-Obti1Jt09WdUmnCSu5FEBrEThRiL0gMeif412a888GrxlQ6E/K0PR9sd7BDVoTcpqkflC+rU64FmRS9ySmA3ew==}
+  '@tgwrapper/core@0.20.2':
+    resolution: {integrity: sha512-BZKon2+kWoo002cqNQlFPeC5Wp4lKnQuoZyt/qS+dEsLku4/+Pz4xW6lKlhmrcpRRAwEWjeo/VQJg/pSZ0wVCg==}
     engines: {node: '>=24.0'}
 
   '@tgwrapper/observability@0.10.0':
@@ -2772,7 +2772,7 @@ snapshots:
 
   '@tgwrapper/core@0.19.0': {}
 
-  '@tgwrapper/core@0.20.1': {}
+  '@tgwrapper/core@0.20.2': {}
 
   '@tgwrapper/observability@0.10.0': {}
 

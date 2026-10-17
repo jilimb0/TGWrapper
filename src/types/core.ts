@@ -12,6 +12,7 @@ export interface LogEvent {
   event: string;
   timestamp: string;
   requestId?: string;
+  correlationId?: string;
   data?: JsonObject;
 }
 

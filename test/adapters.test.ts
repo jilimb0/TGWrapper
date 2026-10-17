@@ -75,4 +75,32 @@ describe('Serverless adapters', () => {
 
     expect(response.status).toBe(401);
   });
+
+  it('WebhookHandler responds to /healthz probe and echoes correlation ID with defensive headers', async () => {
+    const handler = new WebhookHandler(
+      {
+        handleUpdate: async () => {},
+      },
+      { secretToken: 'sec' },
+    );
+
+    const response = await handler.handle({
+      method: 'GET',
+      path: '/healthz',
+      headers: {
+        'x-correlation-id': 'tgw-cid-789',
+      },
+      rawBody: '',
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.headers['x-correlation-id']).toBe('tgw-cid-789');
+    expect(response.headers['x-content-type-options']).toBe('nosniff');
+    expect(response.headers['x-frame-options']).toBe('DENY');
+    expect(response.headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
+    const parsed = JSON.parse(response.body);
+    expect(parsed.ok).toBe(true);
+    expect(parsed.status).toBe('ok');
+    expect(parsed.service).toBe('tgwrapper');
+  });
 });

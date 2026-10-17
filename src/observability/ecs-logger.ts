@@ -4,6 +4,7 @@ export interface EcsContext {
   serviceName: string;
   tenantId?: string;
   botId?: string;
+  correlationId?: string;
 }
 
 export interface LogSink {
@@ -29,6 +30,7 @@ export class EcsJsonLogger implements Logger {
       'labels.tenant_id': this.context.tenantId,
       'labels.bot_id': this.context.botId,
       'labels.request_id': event.requestId,
+      'labels.correlation_id': event.correlationId ?? this.context.correlationId ?? event.requestId,
       ...this.toFlatData(event.data),
     };
 

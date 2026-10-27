@@ -37,6 +37,8 @@ export class EcsJsonLogger implements Logger {
     this.sink.write(JSON.stringify(this.stripUndefined(payload)));
   }
 
+  private static readonly REDACT_PATTERN = /pass|token|secret|key|auth|cookie|phone|email|card|otp|cvv/i;
+
   private toFlatData(data?: JsonObject): Record<string, unknown> {
     if (!data) {
       return {};
@@ -44,7 +46,11 @@ export class EcsJsonLogger implements Logger {
 
     const out: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(data)) {
-      out[`labels.${key}`] = value;
+      if (EcsJsonLogger.REDACT_PATTERN.test(key)) {
+        out[`labels.${key}`] = '[REDACTED]';
+      } else {
+        out[`labels.${key}`] = value;
+      }
     }
     return out;
   }

@@ -102,4 +102,42 @@ describe('observability apm features', () => {
     expect(metrics.getCounter('bot_api_call_total|method=getMe,service=svc')).toBe(1);
     expect(metrics.getCounter('db_events_total|operation=redis_get,service=svc,status=ok')).toBe(1);
   });
+
+  it('redacts sensitive keys in EcsJsonLogger', () => {
+    const logs: string[] = [];
+    const logger = new EcsJsonLogger(
+      { serviceName: 'test-bot' },
+      { write: (line) => logs.push(line) },
+    );
+
+    logger.log({
+      timestamp: '2026-10-27T10:00:00Z',
+      level: 'info',
+      event: 'user_action',
+      requestId: 'req-1',
+      data: {
+        password: 'super-secret-password',
+        authToken: 'secret-token-123',
+        phoneNumber: '+1234567890',
+        userEmail: 'alice@example.com',
+        apiKey: 'sk-12345',
+        creditCard: '4111222233334444',
+        otpCode: '123456',
+        cvv: '123',
+        safeData: 'hello-world',
+      },
+    });
+
+    expect(logs.length).toBe(1);
+    const parsed = JSON.parse(logs[0]);
+    expect(parsed['labels.password']).toBe('[REDACTED]');
+    expect(parsed['labels.authToken']).toBe('[REDACTED]');
+    expect(parsed['labels.phoneNumber']).toBe('[REDACTED]');
+    expect(parsed['labels.userEmail']).toBe('[REDACTED]');
+    expect(parsed['labels.apiKey']).toBe('[REDACTED]');
+    expect(parsed['labels.creditCard']).toBe('[REDACTED]');
+    expect(parsed['labels.otpCode']).toBe('[REDACTED]');
+    expect(parsed['labels.cvv']).toBe('[REDACTED]');
+    expect(parsed['labels.safeData']).toBe('hello-world');
+  });
 });

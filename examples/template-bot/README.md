@@ -1,6 +1,6 @@
 # Template Bot
 
-> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`
+> **Requirements:** Node.js `>=24.0`, `pnpm`, `tsx`
 > **Use case:** minimal dual-mode polling and webhook starter with a basic FSM flow.
 
 Minimal starter template for building Telegram bots with TGWrapper.

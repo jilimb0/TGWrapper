@@ -1,6 +1,6 @@
 # Serverless Webhook Starter
 
-> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx` · **Runtime:** Node.js, Cloudflare Workers, AWS Lambda · **Mode:** Webhook (passive)
+> **Requirements:** Node.js `>=24.0`, `pnpm`, `tsx` · **Runtime:** Node.js, Cloudflare Workers, AWS Lambda · **Mode:** Webhook (passive)
 >
 > See [docs/QUICK_START.md](../docs/QUICK_START.md) and [docs/API_STABILITY.md](../docs/API_STABILITY.md).
 

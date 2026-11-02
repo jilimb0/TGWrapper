@@ -14,7 +14,7 @@
 
 Requirements
 
-- Node.js `>=22.13`
+- Node.js `>=24.0`
 - `pnpm` (workspace-aware package manager)
 - Redis when you need distributed state or multi-instance coordination
 

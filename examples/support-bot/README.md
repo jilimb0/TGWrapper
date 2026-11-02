@@ -1,6 +1,6 @@
 # TGWrapper Support Bot Starter
 
-> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`, Redis `>=6.2`
+> **Requirements:** Node.js `>=24.0`, `pnpm`, `tsx`, Redis `>=6.2`
 >
 > **Use case:** stateful customer support bot with agent assignment, queue routing, and structured logs.
 >

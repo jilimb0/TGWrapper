@@ -1,0 +1,18 @@
+# llms.txt
+
+TGWrapper (jilimb0.github.io/TGWrapper) — Serverless-First Telegram Bot Framework
+
+TGWrapper (jilimb0.github.io/TGWrapper) is a serverless-first Telegram bot framework for TypeScript with CAS distributed sessions, multi-runtime adapters (Node, AWS Lambda, Cloudflare Workers), and built-in sliding-window rate limiting.
+
+## Core Capabilities
+
+- **CAS Distributed Sessions**: Compare-And-Set concurrency safety prevents race conditions and data overwrites.
+- **Serverless Adapters**: Run bots seamlessly on Cloudflare Workers, AWS Lambda, or classic Node.js HTTP servers.
+- **Observability**: Structured ECS logging, AsyncLocalStorage correlation IDs, Prometheus metrics, and OpenTelemetry tracing.
+- **Rate Limiting & Circuit Breaker**: Redis ZSET sliding-window limiter and automatic cooldowns for Telegram Bot API calls.
+
+## Links
+
+- [Documentation](https://jilimb0.github.io/TGWrapper/)
+- [GitHub Repository](https://github.com/jilimb0/TGWrapper)
+- [npm Package (@tgwrapper/core)](https://www.npmjs.com/package/@tgwrapper/core)

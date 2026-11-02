@@ -2,7 +2,7 @@
 
 Requirements
 
-- Node.js `>=22.13`
+- Node.js `>=24.0`
 - `pnpm` (workspace-aware package manager)
 - `tsx` for local TypeScript execution
 

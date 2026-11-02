@@ -48,7 +48,7 @@ pnpm add @tgwrapper/observability
 
 - **Package Stability:** `Beta` — see [docs/API_STABILITY.md](../../docs/API_STABILITY.md) for the canonical stability policy.
 - **Adoption Status:** Used in early developer testing environments.
-- **Runtime Support:** Node.js `>=22.13` is primary. Serverless and edge usage is partial and exporter-dependent.
+- **Runtime Support:** Node.js `>=24.0` is primary. Serverless and edge usage is partial and exporter-dependent.
 - **API Stability:** See [docs/API_STABILITY.md](../../docs/API_STABILITY.md) for the canonical API stability definitions. Trace context structures may evolve prior to 1.0.
 
 See [Observability Runtime Support](../../docs/OBSERVABILITY_RUNTIME_SUPPORT.md) and [Observability Stability Contract](../../docs/OBSERVABILITY_STABILITY_CONTRACT.md) for the canonical runtime and stability breakdown.

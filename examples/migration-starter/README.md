@@ -1,6 +1,6 @@
 # TGWrapper Migration Starter
 
-> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`, Redis `>=6.2`
+> **Requirements:** Node.js `>=24.0`, `pnpm`, `tsx`, Redis `>=6.2`
 >
 > **Use case:** side-by-side migration reference from Telegraf-style handlers to TGWrapper.
 >

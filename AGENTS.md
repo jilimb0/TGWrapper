@@ -4,7 +4,7 @@ Serverless-first Telegram bot framework for Node.js. FSM session management, rou
 
 ## Tech Stack
 - **Language:** TypeScript 6
-- **Runtime:** Node.js >= 22.13
+- **Runtime:** Node.js >= 24.0
 - **Monorepo:** pnpm workspace
 - **Tests:** Vitest
 - **Docs:** Typedoc

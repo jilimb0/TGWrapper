@@ -1,25 +1,29 @@
 # Architecture Decisions
 
-## ADR-001: Serverless-first stateless kernel
-- Decision: `BotKernel` processes one update with externally persisted session.
-- Rationale: Same bot code runs in long-lived Node and stateless functions.
+TGWrapper manages architectural decisions through formal Architecture Decision Records (ADRs) conforming to the [ADR Governance Protocol](../.ai/ARCHITECTURE.md).
 
-## ADR-002: Unified webhook contract
-- Decision: `WebhookRequest` / `WebhookResponse` is runtime-neutral.
-- Rationale: Adapters map platform events without duplicating business logic.
+Formal, immutable ADRs are maintained in [`.ai/adr/`](../.ai/adr/):
 
-## ADR-003: Optimistic locking and atomic session wrapper
-- Decision: session writes use `compareAndSet` only via `runInSession`.
-- Rationale: Prevent blind overwrite under concurrent updates.
+## Active Formal ADRs
 
-## ADR-004: Router scenes with hooks
-- Decision: `router.scene(state, handlers, hooks)` stores lifecycle hooks and state-first routing.
-- Rationale: Scene behavior is explicit and deterministic.
+- **[ADR-0001: Zero-Dependency Serverless Core, Automated Schema Parity & Dual ESM/CJS Build](../.ai/adr/0001-zero-dependency-serverless-fsm-and-schema-parity.md)**
+  - *Summary:* Zero external runtime dependencies in `@tgwrapper/core`, automated schema drift detection gates against upstream Telegram Bot API, dual ESM/CJS compilation, and locked performance/size budgets.
+- **[ADR-0002: Atomic Compare-And-Swap (CAS) Session Management & Pluggable Storage Adapters](../.ai/adr/0002-atomic-cas-session-management-and-storage-adapters.md)**
+  - *Summary:* Elimination of silent session race conditions via atomic CAS versioning (`compareAndSet`), multi-engine adapters (`adapter-redis`, `adapter-dynamodb`, `adapter-mongodb`), and automatic fallback (`FailsafeSessionStorage`).
+- **[ADR-0003: Resilient Telegram API Transport with Circuit Breaker and Full Jitter Backoff](../.ai/adr/0003-resilient-transport-circuit-breaker-and-jittered-backoff.md)**
+  - *Summary:* Defense against upstream 429 rate bans and network outages via TokenBucket limiters, 3 retries with Full Jitter, and a tri-state `CircuitBreaker`.
+- **[ADR-0004: Structured Telemetry, OpenTelemetry Semantic Conventions, and Zero Token/PII Leakage](../.ai/adr/0004-structured-telemetry-opentelemetry-and-zero-pii-leakage.md)**
+  - *Summary:* First-party telemetry (`@tgwrapper/observability`), `AsyncLocalStorage` trace propagation, Prometheus metrics exports, and mandatory bot token redaction.
 
-## ADR-005: Resilient API transport
-- Decision: retry+jitter, typed core errors, and circuit breaker around `callApi`.
-- Rationale: Production bots must degrade gracefully during Telegram/API network incidents.
+---
 
-## ADR-006: Structured JSON logs
-- Decision: logging contract emits machine-readable events.
-- Rationale: Required for multi-tenant observability and incident triage.
+## Historical Decision Context (v0.2.x Baseline)
+
+These initial decisions laid the technical foundation for the early prototypes and have since been formalized into the ADRs above:
+
+- **ADR-001: Serverless-first stateless kernel** → Formalized in ADR-0001.
+- **ADR-002: Unified webhook contract** → Formalized in ADR-0001.
+- **ADR-003: Optimistic locking and atomic session wrapper** → Formalized in ADR-0002.
+- **ADR-004: Router scenes with hooks** → Integrated into `@tgwrapper/core` routing pipeline.
+- **ADR-005: Resilient API transport** → Formalized in ADR-0003.
+- **ADR-006: Structured JSON logs** → Formalized in ADR-0004.

@@ -4,7 +4,7 @@ A **runnable** reference implementation demonstrating how to build AI-native Tel
 
 > Without an `OPENAI_API_KEY`, the bot falls back to echo mode — you can still test the Redis session, rate limiting, and observability flows.
 >
-> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`, Redis `>=6.2`
+> **Requirements:** Node.js `>=24.0`, `pnpm`, `tsx`, Redis `>=6.2`
 > **Use case:** AI-native Telegram bot with session history, CAS safety, and observability.
 
 ---
@@ -63,7 +63,7 @@ ai-bot-starter/
 
 ### 1. Prerequisites
 
-- **Node.js >= 22.13**
+- **Node.js >= 24.0**
 - **Redis** running locally (`redis://localhost:6379`) or a remote instance
 - **Telegram bot token** from [@BotFather](https://t.me/BotFather)
 - **OpenAI API key** (optional — bot falls back to echo mode without it)

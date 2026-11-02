@@ -1,6 +1,6 @@
 # Telemetry Reference
 
-> Package: `@tgwrapper/observability` · Stability: Beta · Runtime: Node.js `>=22.13` · Last updated: 2026-06
+> Package: `@tgwrapper/observability` · Stability: Beta · Runtime: Node.js `>=24.0` · Last updated: 2026-11
 >
 > See [docs/API_STABILITY.md](./API_STABILITY.md) for the canonical stability policy.
 

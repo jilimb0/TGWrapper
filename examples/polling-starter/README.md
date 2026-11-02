@@ -1,6 +1,6 @@
 # Polling Starter
 
-> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx` · **Runtime:** Node.js · **Mode:** Long-polling
+> **Requirements:** Node.js `>=24.0`, `pnpm`, `tsx` · **Runtime:** Node.js · **Mode:** Long-polling
 >
 > See [docs/QUICK_START.md](../docs/QUICK_START.md) and [docs/API_STABILITY.md](../docs/API_STABILITY.md). No Redis required.
 

@@ -22,3 +22,6 @@ TGWrapper (`@tgwrapper/core`) — Zero-dependency, serverless-first Telegram Bot
 
 ## 5. Active ADRs
 - **[ADR-0001](.ai/adr/0001-zero-dependency-serverless-fsm-and-schema-parity.md)** (`src/**`, `scripts/**`, `docs/**`): Zero-dependency core with dual ESM/CJS build, automated Telegram Bot API schema generation/drift gates, API snapshot lock, and >=180k UPS throughput baseline.
+- **[ADR-0002](.ai/adr/0002-atomic-cas-session-management-and-storage-adapters.md)** (`src/storage/**`, `packages/adapter-*/**`): Atomic Compare-And-Swap (CAS) state versioning, multi-engine session adapters (Redis, DynamoDB, MongoDB), and automatic memory fallback (`FailsafeSessionStorage`).
+- **[ADR-0003](.ai/adr/0003-resilient-transport-circuit-breaker-and-jittered-backoff.md)** (`src/core/**`, `src/adapters/**`): Outbound Telegram API resilience via TokenBucket rate limiting, Full Jitter exponential backoff, and tri-state CircuitBreaker.
+- **[ADR-0004](.ai/adr/0004-structured-telemetry-opentelemetry-and-zero-pii-leakage.md)** (`src/observability/**`, `packages/observability/**`): Structured JSON logging, AsyncLocalStorage trace correlation, OpenTelemetry semantic conventions, and zero bot token/PII leakage.

@@ -1,6 +1,6 @@
 # Multi-Instance Redis Starter
 
-> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`, Redis `>= 6.2` · **Runtime:** Node.js · **Mode:** Polling with distributed coordination
+> **Requirements:** Node.js `>=24.0`, `pnpm`, `tsx`, Redis `>= 6.2` · **Runtime:** Node.js · **Mode:** Polling with distributed coordination
 >
 > See [docs/QUICK_START.md](../docs/QUICK_START.md) and [docs/API_STABILITY.md](../docs/API_STABILITY.md).
 

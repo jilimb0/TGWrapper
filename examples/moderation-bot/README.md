@@ -1,6 +1,6 @@
 # TGWrapper Moderation & Support Bot Starter
 
-> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`, Redis `>=6.2`
+> **Requirements:** Node.js `>=24.0`, `pnpm`, `tsx`, Redis `>=6.2`
 > **Use case:** production-grade moderation and support bot with Redis session state, rate limiting, and structured logs.
 
 A reference implementation of a production-grade Telegram moderation and support bot built with TGWrapper. Demonstrates structured tickets FSM flow (open → pending → resolved), distributed session management, user rate limiting, and structured telemetry operations.

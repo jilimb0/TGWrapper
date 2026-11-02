@@ -1,6 +1,6 @@
 # Redis Runtime Guide
 
-> Package: `@tgwrapper/adapter-redis` · Stability: Early Production · Runtime: Node.js `>=22.13` · Redis requirement: ≥ 6.2
+> Package: `@tgwrapper/adapter-redis` · Stability: Early Production · Runtime: Node.js `>=24.0` · Redis requirement: ≥ 6.2
 >
 > See [docs/API_STABILITY.md](./API_STABILITY.md) for the canonical stability policy.
 

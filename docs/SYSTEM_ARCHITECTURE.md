@@ -100,7 +100,7 @@ Bot App
 | Layer               | Technology                                                     | Notes                                                          |
 | :------------------ | :------------------------------------------------------------- | :------------------------------------------------------------- |
 | **Language**        | TypeScript 5 (compiled to ESM + CJS dual)                      | Full type inference; no `any` in public API surface            |
-| **Runtime**         | Node.js ≥ 22.13, Cloudflare Workers, AWS Lambda                | Single codebase; mode switched via `createBotClient({ mode })` |
+| **Runtime**         | Node.js ≥ 24.0, Cloudflare Workers, AWS Lambda                 | Single codebase; mode switched via `createBotClient({ mode })` |
 | **Session storage** | In-memory (default) or Redis ≥ 6.2                             | Swappable via `SessionAdapter` interface                       |
 | **Rate limiting**   | In-memory (single-process) or Redis sliding window             | Swappable via `RateLimiter` interface                          |
 | **Tracing**         | `AsyncLocalStorage` (Node) / global fallback (edge)            | No instrumentation agent required                              |

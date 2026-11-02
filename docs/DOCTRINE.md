@@ -1,6 +1,6 @@
 # TGWrapper Project Doctrine
 
-> Version: 0.11.x · Status: Active · Audience: Contributors, Adopters, Maintainers
+> Version: 0.20.x · Status: Active · Audience: Contributors, Adopters, Maintainers
 
 This document defines what TGWrapper is, what it is not, and who it is built for. It exists to prevent scope creep, to guide contribution decisions, and to give adopters an honest picture of the project's identity.
 

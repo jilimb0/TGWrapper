@@ -8,12 +8,13 @@ This document defines the official support window, runtime environment compatibi
 
 ## 💻 Node.js Engine Support
 
-TGWrapper requires Node.js `>=22.13`.
+TGWrapper requires Node.js `>=24.0` (Node.js 24 LTS and 26 Current).
 
 | Node.js Version     | Support Level | CI Verification | Notes                                                            |
 | :------------------ | :------------ | :-------------- | :--------------------------------------------------------------- |
-| **Node.js < 22.13** | `Unsupported` | ❌ No           | The workspace `package.json` enforces `engines.node: ">=22.13"`. |
-| **Node.js 22.13+**  | `Supported`   | ✅ Yes          | Required runtime for all TGWrapper packages and examples.        |
+| **Node.js < 24.0**  | `Unsupported` | ❌ No           | The workspace `package.json` enforces `engines.node: ">=24.0"`.  |
+| **Node.js 24.x LTS**| `Supported`   | ✅ Yes          | Primary targeted production runtime.                             |
+| **Node.js 26.x**    | `Supported`   | ✅ Yes          | Validated in CI watchdog and published smoke tests.              |
 
 ---
 

@@ -2,7 +2,7 @@
 
 Official TGWrapper project scaffolder.
 
-> **Requirements:** Node.js `>=22.13`, `pnpm`, `tsx`
+> **Requirements:** Node.js `>=24.0`, `pnpm`, `tsx`
 >
 > Use this tool to bootstrap a new TGWrapper project with the recommended starter packages.
 

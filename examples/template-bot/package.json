@@ -2,7 +2,7 @@
   "name": "example-template-bot",
   "private": true,
   "engines": {
-    "node": ">=22.13"
+    "node": ">=24.0"
   },
   "type": "module",
   "scripts": {

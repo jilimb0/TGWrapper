@@ -10,7 +10,7 @@ The framework has been validated across standard JavaScript runtimes:
 
 | Runtime Environment    | Support Level         | Execution Constraints                       | Verified Core Functions                                                                              |
 | :--------------------- | :-------------------- | :------------------------------------------ | :--------------------------------------------------------------------------------------------------- |
-| **Node.js (>= 22.13)** | `Full Support`        | Standard long-running runtime.              | Polling loop, AsyncLocalStorage, webhook ports.                                                      |
+| **Node.js (>= 24.0)**  | `Full Support`        | Standard long-running runtime.              | Polling loop, AsyncLocalStorage, webhook ports.                                                      |
 | **AWS Lambda**         | `Capability-specific` | Stateless execution and timeout budgets.    | Core webhook ingestion and HTTP client. Redis and observability exporters require caveats.           |
 | **Cloudflare Workers** | `Capability-specific` | Isolate execution bounds and non-Node APIs. | Native fetch and edge request parsing. Redis TCP clients and Node SDK exporters are not first-class. |
 | **Bun (>= 1.0)**       | `Compatible`          | Standard tests pass.                        | Polling, fetch clients.                                                                              |

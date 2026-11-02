@@ -17,7 +17,7 @@
     "url": "https://github.com/jilimb0/TGWrapper/issues"
   },
   "engines": {
-    "node": ">=22.13"
+    "node": ">=24.0"
   },
   "keywords": [
     "telegram",

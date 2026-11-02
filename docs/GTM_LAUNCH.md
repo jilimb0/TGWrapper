@@ -115,10 +115,10 @@ No pressure either way. Here's the repo: [link]
 Example closing:
 
 ```
-TGWrapper is at v0.15 — the core API is stable, but the observability package is still
-in beta. We're looking for teams running production Telegram bots who want structured
-telemetry and are willing to give feedback on the trace schema. If that's you, open an
-issue or reach out.
+TGWrapper is at v0.20.2 (targeting v1.0.0) — the core API and storage adapters are stable,
+and observability includes OpenTelemetry SDK support. We're looking for teams running
+production Telegram bots who want structured telemetry and are willing to give feedback on
+the trace schema. If that's you, open an issue or reach out.
 ```
 
 ---

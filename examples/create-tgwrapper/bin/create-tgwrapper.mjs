@@ -93,7 +93,7 @@ try {
     name: toPackageName(projectName),
     version: "0.1.0",
     private: true,
-    engines: { node: ">=22.13" },
+    engines: { node: ">=24.0" },
     type: "module",
     scripts: template.scripts,
     dependencies: template.dependencies,

@@ -52,7 +52,7 @@ pnpm add @tgwrapper/adapter-redis ioredis
 
 - **Package Stability:** `Early Production` — see [docs/API_STABILITY.md](../../docs/API_STABILITY.md) for the canonical stability policy.
 - **Adoption Status:** Validated in multi-instance simulation tests.
-- **Runtime Support:** Node.js `>=22.13` (requires Redis Server `>= 6.2.0`).
+- **Runtime Support:** Node.js `>=24.0` (requires Redis Server `>= 6.2.0`).
 - **API Stability:** See [docs/API_STABILITY.md](../../docs/API_STABILITY.md) for the canonical API stability definitions. The adapter surface is currently staging and is intended to remain backwards-compatible across patch/minor releases.
 
 ---

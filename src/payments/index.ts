@@ -2,6 +2,8 @@ export type {
   CreateStarsInvoiceLinkOptions,
   LabeledPrice,
   PaymentHandlerOptions,
+  SendSignedGiftOptions,
+  StarSubscriptionOptions,
   TelegramPreCheckoutQuery,
   TelegramSuccessfulPayment,
 } from './types.js';
@@ -9,6 +11,10 @@ export type {
 export {
   answerPreCheckoutQuery,
   buildStarsInvoicePayload,
+  convertBusinessGiftToStars,
   createPaymentMiddleware,
+  createStarSubscriptionLink,
   createStarsInvoiceLink,
+  getBotStarBalance,
+  sendSignedGift,
 } from './stars.js';

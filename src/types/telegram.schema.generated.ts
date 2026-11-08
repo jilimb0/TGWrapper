@@ -1,7 +1,7 @@
 /**
  * AUTO-GENERATED FILE. DO NOT EDIT.
  * Source: docs/telegram-api-schema.snapshot.json
- * Generated at: 2026-10-08T12:34:01.274Z
+ * Generated at: 2026-11-08T11:20:58.000Z
  */
 
 export type TelegramApiMethodName =

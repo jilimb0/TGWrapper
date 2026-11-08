@@ -21,6 +21,10 @@ export type BotClientEventMap = {
   update: Update;
   message: Message;
   callback_query: CallbackQuery;
+  guest_message: Message;
+  stopped_message_generation: import('../types/telegram.js').MessageGenerationStopped;
+  subscription: import('../types/telegram.js').BotSubscriptionUpdated;
+  managed_bot: import('../types/telegram.js').ManagedBotUpdated;
   error: unknown;
   api_call: ApiCallEvent;
   api_result: ApiResultEvent;
@@ -80,6 +84,10 @@ export function createBotClient(options: CreateBotClientOptions): BotClient {
     update: new Set(),
     message: new Set(),
     callback_query: new Set(),
+    guest_message: new Set(),
+    stopped_message_generation: new Set(),
+    subscription: new Set(),
+    managed_bot: new Set(),
     error: new Set(),
     api_call: new Set(),
     api_result: new Set(),
@@ -136,6 +144,18 @@ export function createBotClient(options: CreateBotClientOptions): BotClient {
         }
         if (update.callback_query) {
           await emit('callback_query', update.callback_query);
+        }
+        if (update.guest_message) {
+          await emit('guest_message', update.guest_message);
+        }
+        if (update.stopped_message_generation) {
+          await emit('stopped_message_generation', update.stopped_message_generation);
+        }
+        if (update.subscription) {
+          await emit('subscription', update.subscription);
+        }
+        if (update.managed_bot) {
+          await emit('managed_bot', update.managed_bot);
         }
       },
     },

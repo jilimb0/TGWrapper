@@ -90,6 +90,60 @@ export interface InlineKeyboardButton {
   [key: string]: unknown;
 }
 
+export interface EphemeralMessageParameters {
+  receiver_user_id: number;
+  callback_query_id?: string;
+  replace_callback_query_message?: boolean;
+  [key: string]: unknown;
+}
+
+export interface MessageGenerationStopped {
+  chat: Chat;
+  draft_id: number;
+  message_thread_id?: number;
+  [key: string]: unknown;
+}
+
+export interface BotSubscriptionUpdated {
+  user: User;
+  invoice_payload: string;
+  state: 'active' | 'canceled' | 'failed' | string;
+  [key: string]: unknown;
+}
+
+export interface ManagedBotUpdated {
+  user: User;
+  bot: User;
+  [key: string]: unknown;
+}
+
+export interface SentGuestMessage {
+  inline_message_id: string;
+  [key: string]: unknown;
+}
+
+export interface StarAmount {
+  amount: number;
+  nanostar_amount?: number;
+  [key: string]: unknown;
+}
+
+export type RichBlock =
+  | { type: 'text'; text: string; entities?: Array<{ type: string; offset: number; length: number; [key: string]: unknown }> }
+  | { type: 'heading'; level: 1 | 2 | 3; text: string }
+  | { type: 'table'; headers: string[]; rows: string[][] }
+  | { type: 'list'; items: string[]; ordered?: boolean }
+  | { type: 'code'; code: string; language?: string }
+  | { type: 'expandable_quote'; text: string }
+  | { type: 'document'; file_id: string; caption?: string }
+  | { type: 'button'; text: string; url?: string; callback_data?: string }
+  | { type: string; [key: string]: unknown };
+
+export interface InputRichMessage {
+  blocks: RichBlock[];
+  [key: string]: unknown;
+}
+
 export interface InlineKeyboardMarkup {
   inline_keyboard: InlineKeyboardButton[][];
   [key: string]: unknown;
@@ -204,6 +258,9 @@ type TypedUpdateFields = {
     [key: string]: unknown;
   };
   guest_message?: Message;
+  stopped_message_generation?: MessageGenerationStopped;
+  subscription?: BotSubscriptionUpdated;
+  managed_bot?: ManagedBotUpdated;
 };
 
 export type Update = {

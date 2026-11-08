@@ -31,6 +31,9 @@ export { InMemoryMetrics } from './observability/metrics.js';
 export { createRuntimeHooks } from './observability/runtime-hooks.js';
 export { TreeRouter } from './router/router.js';
 export { BotRuntime } from './runtime/bot-runtime.js';
+export type { DraftStreamOptions } from './runtime/draft-stream.js';
+export { ActiveDraftRegistry, DraftStreamSession } from './runtime/draft-stream.js';
+export { MAX_RICH_MESSAGE_LENGTH, RichMessageBuilder } from './core/rich-message.js';
 export { MemorySessionStorage } from './storage/memory-session-storage.js';
 export { FailsafeSessionStorage } from './storage/failsafe-session-storage.js';
 export type {
@@ -42,7 +45,14 @@ export { RedisSessionStorage } from './storage/redis-session-storage.js';
 export { createSessionKey, createSessionNamespace } from './tenant/key-namespace.js';
 export { MockApiClient } from './testkit/mock-api-client.js';
 export { MockBotClient } from './testkit/mock-bot-client.js';
-export { createCallbackUpdate, createMessageUpdate } from './testkit/update-factory.js';
+export {
+  createCallbackUpdate,
+  createGuestMessageUpdate,
+  createManagedBotUpdate,
+  createMessageUpdate,
+  createStoppedDraftUpdate,
+  createSubscriptionUpdate,
+} from './testkit/update-factory.js';
 
 export type {
   ApiCallEvent,
@@ -76,16 +86,24 @@ export type {
 } from './types/core.js';
 export type {
   ApiMethods,
+  BotSubscriptionUpdated,
   CallbackQuery,
   Chat,
   EditMessageReplyMarkupOptions,
   EditMessageTextOptions,
+  EphemeralMessageParameters,
   InlineKeyboardButton,
   InlineKeyboardMarkup,
+  InputRichMessage,
   KeyboardButton,
+  ManagedBotUpdated,
   Message,
+  MessageGenerationStopped,
+  RichBlock,
   SendDocumentOptions,
   SendMessageOptions,
+  SentGuestMessage,
+  StarAmount,
   Update,
   User,
 } from './types/telegram.js';

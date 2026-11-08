@@ -1,5 +1,14 @@
+import { DraftStreamSession } from '../runtime/draft-stream.js';
+import type { HtmlBubblePayload } from '../tma/bubbles.js';
 import type { JsonObject, SessionEnvelope } from '../types/core.js';
-import type { CallbackQuery, InlineKeyboardMarkup, Message, Update } from '../types/telegram.js';
+import type {
+  CallbackQuery,
+  InlineKeyboardMarkup,
+  InputRichMessage,
+  Message,
+  SentGuestMessage,
+  Update,
+} from '../types/telegram.js';
 import type { ApiClient } from './api-client.js';
 
 interface SceneController {
@@ -61,6 +70,22 @@ export class Context<TState extends string, TData extends JsonObject> {
     return undefined;
   }
 
+  public get guestMessage(): Message | undefined {
+    return this.update.guest_message;
+  }
+
+  public get stoppedDraft(): import('../types/telegram.js').MessageGenerationStopped | undefined {
+    return this.update.stopped_message_generation;
+  }
+
+  public get managedBot(): import('../types/telegram.js').ManagedBotUpdated | undefined {
+    return this.update.managed_bot;
+  }
+
+  public get subscription(): import('../types/telegram.js').BotSubscriptionUpdated | undefined {
+    return this.update.subscription;
+  }
+
   public get fromId(): number | undefined {
     const directFrom =
       this.primaryMessage?.from ??
@@ -73,7 +98,10 @@ export class Context<TState extends string, TData extends JsonObject> {
       this.update.pre_checkout_query?.from ??
       this.update.chat_join_request?.from ??
       this.update.chat_member?.from ??
-      this.update.my_chat_member?.from;
+      this.update.my_chat_member?.from ??
+      this.update.subscription?.user ??
+      this.update.managed_bot?.user ??
+      this.update.guest_message?.guest_bot_caller_user;
 
     if (directFrom) {
       return directFrom.id;
@@ -172,6 +200,124 @@ export class Context<TState extends string, TData extends JsonObject> {
     return this.apiClient.callApiUnsafe('answerPreCheckoutQuery', payload);
   }
 
+  public streamReply(options: {
+    draftId?: number;
+    minIntervalMs?: number;
+    canStop?: boolean;
+    keepOnStop?: boolean;
+    messageThreadId?: number;
+  } = {}): DraftStreamSession {
+    const chatId = this.resolveChatId();
+    if (!chatId) {
+      throw new Error('Cannot stream reply: update has no resolvable chat id.');
+    }
+
+    return new DraftStreamSession(this.apiClient, {
+      chatId,
+      ...options,
+    });
+  }
+
+  public async replyRich(richMessage: InputRichMessage, extra: JsonObject = {}): Promise<Message> {
+    const chatId = this.resolveChatId();
+    if (!chatId) {
+      throw new Error('Cannot reply: update has no resolvable chat id.');
+    }
+
+    return (await this.apiClient.callApiUnsafe<Message>('sendRichMessage', {
+      chat_id: chatId,
+      rich_message: richMessage as unknown as JsonObject,
+      ...extra,
+    })) as Message;
+  }
+
+  public async replyEphemeral(
+    text: string,
+    options: {
+      receiverUserId?: number;
+      callbackQueryId?: string;
+      replaceCallbackQueryMessage?: boolean;
+      extra?: JsonObject;
+    } = {},
+  ): Promise<Message> {
+    const chatId = this.resolveChatId();
+    if (!chatId) {
+      throw new Error('Cannot reply ephemeral: update has no resolvable chat id.');
+    }
+
+    const receiverUserId = options.receiverUserId ?? this.fromId;
+    if (!receiverUserId) {
+      throw new Error('Cannot reply ephemeral: cannot determine receiver_user_id.');
+    }
+
+    const callbackQueryId = options.callbackQueryId ?? this.update.callback_query?.id;
+    const ephemeralParams: JsonObject = {
+      receiver_user_id: receiverUserId,
+      ...(callbackQueryId ? { callback_query_id: callbackQueryId } : {}),
+      ...(options.replaceCallbackQueryMessage !== undefined
+        ? { replace_callback_query_message: options.replaceCallbackQueryMessage }
+        : {}),
+    };
+
+    return (await this.apiClient.callApiUnsafe<Message>('sendMessage', {
+      chat_id: chatId,
+      text,
+      ephemeral_message_parameters: ephemeralParams,
+      ...(options.extra ?? {}),
+    })) as Message;
+  }
+
+  public async deleteEphemeral(
+    ephemeralMessageId: number,
+    receiverUserId?: number,
+  ): Promise<boolean> {
+    const chatId = this.resolveChatId();
+    if (!chatId) {
+      throw new Error('Cannot delete ephemeral: update has no resolvable chat id.');
+    }
+
+    const targetUserId = receiverUserId ?? this.fromId;
+    if (!targetUserId) {
+      throw new Error('Cannot delete ephemeral: cannot determine receiver_user_id.');
+    }
+
+    return this.apiClient.callApiUnsafe<boolean>('deleteEphemeralMessage', {
+      chat_id: chatId,
+      receiver_user_id: targetUserId,
+      ephemeral_message_id: ephemeralMessageId,
+    });
+  }
+
+  public async answerGuestQuery(result: unknown): Promise<SentGuestMessage> {
+    const guestQueryId =
+      this.update.guest_message?.guest_query_id ??
+      (this.update.guest_message as Record<string, unknown> | undefined)?.guest_query_id;
+
+    if (!guestQueryId) {
+      throw new Error('Cannot answer guest query: update contains no guest_query_id.');
+    }
+
+    return this.apiClient.callApiUnsafe<SentGuestMessage>('answerGuestQuery', {
+      guest_query_id: String(guestQueryId),
+      result: result as unknown as import('../types/core.js').JsonValue,
+    });
+  }
+
+  public async replyHtmlBubble(bubble: HtmlBubblePayload, extra: JsonObject = {}): Promise<unknown> {
+    const chatId = this.resolveChatId();
+    if (!chatId) {
+      throw new Error('Cannot reply HTML bubble: update has no resolvable chat id.');
+    }
+
+    // Deliver bubble bundle as message text / rich payload with HTML formatting
+    return this.apiClient.callApiUnsafe('sendMessage', {
+      chat_id: chatId,
+      text: bubble.bundle,
+      parse_mode: 'HTML',
+      ...extra,
+    });
+  }
+
   private get primaryMessage(): Message | undefined {
     return (
       this.update.message ??
@@ -227,6 +373,10 @@ export class Context<TState extends string, TData extends JsonObject> {
 
     if (this.update.poll_answer?.voter_chat?.id) {
       return this.update.poll_answer.voter_chat.id;
+    }
+
+    if (this.update.stopped_message_generation?.chat?.id) {
+      return this.update.stopped_message_generation.chat.id;
     }
 
     return undefined;

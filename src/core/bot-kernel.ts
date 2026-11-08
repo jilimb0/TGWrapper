@@ -1,6 +1,7 @@
 import type { SessionManager } from '../fsm/session-manager.js';
 import type { TreeRouter } from '../router/router.js';
-import type { JsonObject } from '../types/core.js';
+import { ActiveDraftRegistry } from '../runtime/draft-stream.js';
+import type { JsonObject, SessionEnvelope } from '../types/core.js';
 import type { Update } from '../types/telegram.js';
 import type { ApiClient } from './api-client.js';
 import { Context } from './context.js';
@@ -11,6 +12,7 @@ interface BotKernelOptions<TState extends string, TData extends JsonObject> {
   router: TreeRouter<Context<TState, TData>>;
   resolveSessionKey: (update: Update) => string | null;
   transitions?: Record<TState, readonly TState[]>;
+  ephemeralGuestSessions?: boolean;
   onTransition?: (from: TState | null, to: TState, sessionKey: string) => Promise<void>;
   onUpdate?: (update: Update, sessionKey: string) => Promise<void>;
   onError?: (error: unknown, update: Update, sessionKey: string) => Promise<void>;
@@ -22,6 +24,7 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
   private readonly router: TreeRouter<Context<TState, TData>>;
   private readonly resolveSessionKey: (update: Update) => string | null;
   private readonly transitions: Record<TState, readonly TState[]>;
+  private readonly ephemeralGuestSessions: boolean;
   private readonly onTransition:
     | ((from: TState | null, to: TState, sessionKey: string) => Promise<void>)
     | undefined;
@@ -36,12 +39,18 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
     this.router = options.router;
     this.resolveSessionKey = options.resolveSessionKey;
     this.transitions = options.transitions ?? ({} as Record<TState, readonly TState[]>);
+    this.ephemeralGuestSessions = options.ephemeralGuestSessions ?? false;
     this.onTransition = options.onTransition;
     this.onUpdate = options.onUpdate;
     this.onError = options.onError;
   }
 
   public async handleUpdate(update: Update): Promise<void> {
+    // If user clicked stop button on draft streaming
+    if (update.stopped_message_generation) {
+      ActiveDraftRegistry.handleStop(update.stopped_message_generation.draft_id);
+    }
+
     const sessionKey = this.resolveSessionKey(update);
     if (!sessionKey) {
       return;
@@ -49,46 +58,22 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
 
     try {
       await this.onUpdate?.(update, sessionKey);
+
+      if (this.ephemeralGuestSessions && update.guest_message) {
+        // Run with transient in-memory session envelope without persisting
+        const guestSession: SessionEnvelope<TState, TData> = {
+          current_state: null,
+          data: {} as TData,
+          version: 1,
+          updated_at: new Date().toISOString(),
+          encrypted: false,
+        };
+        await this.dispatchContext(update, guestSession, sessionKey);
+        return;
+      }
+
       await this.sessionManager.runInSession(sessionKey, async (session) => {
-        let ctxRef: Context<TState, TData> | null = null;
-        const ctx = new Context<TState, TData>({
-          update,
-          session,
-          apiClient: this.apiClient,
-          sceneController: {
-            enter: async (nextState) => {
-              this.assertTransitionAllowed(session.current_state, nextState as TState);
-              const previous = session.current_state;
-              const previousHooks = previous ? this.router.getSceneHooks(previous) : undefined;
-              const nextHooks = this.router.getSceneHooks(nextState);
-
-              if (previousHooks?.onLeave && ctxRef) {
-                await previousHooks.onLeave(ctxRef);
-              }
-
-              session.current_state = nextState as TState;
-
-              if (nextHooks?.onEnter && ctxRef) {
-                await nextHooks.onEnter(ctxRef);
-              }
-
-              if (this.onTransition) {
-                await this.onTransition(previous, nextState as TState, sessionKey);
-              }
-            },
-            leave: async () => {
-              const previous = session.current_state;
-              const previousHooks = previous ? this.router.getSceneHooks(previous) : undefined;
-              if (previousHooks?.onLeave && ctxRef) {
-                await previousHooks.onLeave(ctxRef);
-              }
-              session.current_state = null;
-            },
-          },
-        });
-        ctxRef = ctx;
-
-        await this.router.dispatch(Object.assign(ctx, this.extractRoutingMeta(ctx)));
+        await this.dispatchContext(update, session, sessionKey);
       });
     } catch (error: unknown) {
       await this.onError?.(error, update, sessionKey);
@@ -96,20 +81,88 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
     }
   }
 
+  private async dispatchContext(
+    update: Update,
+    session: SessionEnvelope<TState, TData>,
+    sessionKey: string,
+  ): Promise<void> {
+    let ctxRef: Context<TState, TData> | null = null;
+    const ctx = new Context<TState, TData>({
+      update,
+      session,
+      apiClient: this.apiClient,
+      sceneController: {
+        enter: async (nextState) => {
+          this.assertTransitionAllowed(session.current_state, nextState as TState);
+          const previous = session.current_state;
+          const previousHooks = previous ? this.router.getSceneHooks(previous) : undefined;
+          const nextHooks = this.router.getSceneHooks(nextState);
+
+          if (previousHooks?.onLeave && ctxRef) {
+            await previousHooks.onLeave(ctxRef);
+          }
+
+          session.current_state = nextState as TState;
+
+          if (nextHooks?.onEnter && ctxRef) {
+            await nextHooks.onEnter(ctxRef);
+          }
+
+          if (this.onTransition) {
+            await this.onTransition(previous, nextState as TState, sessionKey);
+          }
+        },
+        leave: async () => {
+          const previous = session.current_state;
+          const previousHooks = previous ? this.router.getSceneHooks(previous) : undefined;
+          if (previousHooks?.onLeave && ctxRef) {
+            await previousHooks.onLeave(ctxRef);
+          }
+          session.current_state = null;
+        },
+      },
+    });
+    ctxRef = ctx;
+
+    await this.router.dispatch(Object.assign(ctx, this.extractRoutingMeta(ctx)));
+  }
+
   private extractRoutingMeta(ctx: Context<TState, TData>): {
     command?: string;
     text?: string;
     callbackData?: string;
     currentState?: string | null;
+    updateType?: string;
+    isGuestMessage?: boolean;
+    stoppedDraftId?: number;
   } {
     const meta: {
       command?: string;
       text?: string;
       callbackData?: string;
       currentState?: string | null;
+      updateType?: string;
+      isGuestMessage?: boolean;
+      stoppedDraftId?: number;
     } = {
       currentState: ctx.session.current_state,
     };
+
+    if (ctx.update.guest_message) {
+      meta.isGuestMessage = true;
+    }
+
+    if (ctx.update.stopped_message_generation) {
+      meta.stoppedDraftId = ctx.update.stopped_message_generation.draft_id;
+    }
+
+    // Detect updateType
+    for (const [key, value] of Object.entries(ctx.update)) {
+      if (key !== 'update_id' && value !== undefined) {
+        meta.updateType = key;
+        break;
+      }
+    }
 
     const text = ctx.message?.text;
     if (text !== undefined) {

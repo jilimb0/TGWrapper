@@ -5,6 +5,7 @@ import type {
   RouteCandidate,
   SceneHooks,
 } from '../types/core.js';
+import type { TelegramUpdateKey } from '../types/telegram.schema.generated.js';
 
 export interface Router<TContext> {
   command(command: string, handler: Handler<TContext>, priority?: number): void;
@@ -35,6 +36,25 @@ export interface Router<TContext> {
     handler: Handler<TContext>,
     priority?: number,
   ): void;
+  onUpdateType(type: TelegramUpdateKey, handler: Handler<TContext>, priority?: number): void;
+  onUpdateType(
+    type: TelegramUpdateKey,
+    middlewares: ReadonlyArray<Middleware<TContext>>,
+    handler: Handler<TContext>,
+    priority?: number,
+  ): void;
+  guestMessage(handler: Handler<TContext>, priority?: number): void;
+  guestMessage(
+    middlewares: ReadonlyArray<Middleware<TContext>>,
+    handler: Handler<TContext>,
+    priority?: number,
+  ): void;
+  stoppedDraft(handler: Handler<TContext>, priority?: number): void;
+  stoppedDraft(
+    middlewares: ReadonlyArray<Middleware<TContext>>,
+    handler: Handler<TContext>,
+    priority?: number,
+  ): void;
   use(handler: Handler<TContext>, priority?: number): void;
   use(
     middlewares: ReadonlyArray<Middleware<TContext>>,
@@ -57,6 +77,9 @@ export interface RouterContextMeta {
   text?: string;
   callbackData?: string;
   currentState?: string | null;
+  updateType?: TelegramUpdateKey | string;
+  isGuestMessage?: boolean;
+  stoppedDraftId?: number;
 }
 
 export class TreeRouter<TContext> implements Router<TContext> {
@@ -127,6 +150,49 @@ export class TreeRouter<TContext> implements Router<TContext> {
       200,
     );
     this.registerRoute('state', state, handlerOrMiddlewares, handler, priority);
+  }
+
+  public onUpdateType(
+    type: TelegramUpdateKey,
+    handlerOrMiddlewares: Handler<TContext> | ReadonlyArray<Middleware<TContext>>,
+    maybeHandlerOrPriority?: Handler<TContext> | number,
+    maybePriority?: number,
+  ): void {
+    const { handler, priority } = this.resolve3or4(
+      handlerOrMiddlewares,
+      maybeHandlerOrPriority,
+      maybePriority,
+      60,
+    );
+    this.registerRoute('updateType', type, handlerOrMiddlewares, handler, priority);
+  }
+
+  public guestMessage(
+    handlerOrMiddlewares: Handler<TContext> | ReadonlyArray<Middleware<TContext>>,
+    maybeHandlerOrPriority?: Handler<TContext> | number,
+    maybePriority?: number,
+  ): void {
+    const { handler, priority } = this.resolve3or4(
+      handlerOrMiddlewares,
+      maybeHandlerOrPriority,
+      maybePriority,
+      80,
+    );
+    this.registerRoute('guestMessage', undefined, handlerOrMiddlewares, handler, priority);
+  }
+
+  public stoppedDraft(
+    handlerOrMiddlewares: Handler<TContext> | ReadonlyArray<Middleware<TContext>>,
+    maybeHandlerOrPriority?: Handler<TContext> | number,
+    maybePriority?: number,
+  ): void {
+    const { handler, priority } = this.resolve3or4(
+      handlerOrMiddlewares,
+      maybeHandlerOrPriority,
+      maybePriority,
+      90,
+    );
+    this.registerRoute('stoppedDraft', undefined, handlerOrMiddlewares, handler, priority);
   }
 
   public scene(
@@ -300,7 +366,15 @@ export class TreeRouter<TContext> implements Router<TContext> {
    *   (match, [middleware], handler, priority?) — with middleware
    */
   private registerRoute(
-    type: 'command' | 'regex' | 'callbackData' | 'state' | 'use',
+    type:
+      | 'command'
+      | 'regex'
+      | 'callbackData'
+      | 'state'
+      | 'use'
+      | 'updateType'
+      | 'guestMessage'
+      | 'stoppedDraft',
     matchValue: string | RegExp | undefined,
     handlerOrMiddlewares: Handler<TContext> | ReadonlyArray<Middleware<TContext>>,
     handler: Handler<TContext>,
@@ -323,7 +397,15 @@ export class TreeRouter<TContext> implements Router<TContext> {
   }
 
   private buildMatchFn(
-    type: 'command' | 'regex' | 'callbackData' | 'state' | 'use',
+    type:
+      | 'command'
+      | 'regex'
+      | 'callbackData'
+      | 'state'
+      | 'use'
+      | 'updateType'
+      | 'guestMessage'
+      | 'stoppedDraft',
     value: string | RegExp | undefined,
   ): (ctx: TContext & RouterContextMeta) => boolean {
     switch (type) {
@@ -335,6 +417,12 @@ export class TreeRouter<TContext> implements Router<TContext> {
         return (ctx) => typeof ctx.callbackData === 'string' && (value as RegExp).test(ctx.callbackData);
       case 'state':
         return (ctx) => ctx.currentState === value;
+      case 'updateType':
+        return (ctx) => ctx.updateType === value;
+      case 'guestMessage':
+        return (ctx) => ctx.isGuestMessage === true;
+      case 'stoppedDraft':
+        return (ctx) => typeof ctx.stoppedDraftId === 'number';
       case 'use':
         return () => true;
     }

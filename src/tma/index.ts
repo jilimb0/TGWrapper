@@ -40,3 +40,17 @@ export { tmaHonoMiddleware } from './middleware/hono.js';
 
 export type { TmaSessionBridgeOptions } from './session-bridge.js';
 export { TmaSessionBridge } from './session-bridge.js';
+
+export type {
+  HtmlBubbleOptions,
+  HtmlBubblePayload,
+} from './bubbles.js';
+export {
+  HtmlBubbleSecurityError,
+  HtmlBubbleSizeLimitError,
+  MAX_HTML_BUBBLE_SIZE_BYTES,
+  createHtmlBubblePayload,
+  signBubbleState,
+  validateBubbleSandboxSafety,
+  verifyBubbleState,
+} from './bubbles.js';

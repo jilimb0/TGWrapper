@@ -24,7 +24,8 @@ export function isFreshUpdate(update: Update, nowMs = Date.now()): boolean {
     update.my_chat_member?.date ??
     update.chat_join_request?.date ??
     update.message_reaction?.date ??
-    update.chat_boost?.boost?.add_date;
+    update.chat_boost?.boost?.add_date ??
+    update.guest_message?.date;
 
   const eventDate = typeof rawEventDate === 'number' ? rawEventDate : undefined;
   if (!eventDate) {

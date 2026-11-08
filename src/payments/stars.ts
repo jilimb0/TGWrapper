@@ -1,9 +1,12 @@
 import type { ApiClient } from '../core/api-client.js';
 import type { Context } from '../core/context.js';
 import type { JsonObject } from '../types/core.js';
+import type { StarAmount } from '../types/telegram.js';
 import type {
   CreateStarsInvoiceLinkOptions,
   PaymentHandlerOptions,
+  SendSignedGiftOptions,
+  StarSubscriptionOptions,
   TelegramPreCheckoutQuery,
   TelegramSuccessfulPayment,
 } from './types.js';
@@ -76,9 +79,72 @@ export async function answerPreCheckoutQuery(
 }
 
 /**
+ * Retrieves the current Telegram Star balance of the bot.
+ */
+export async function getBotStarBalance(client: ApiClient): Promise<StarAmount> {
+  return client.callApiUnsafe<StarAmount>('getMyStarBalance', {});
+}
+
+/**
+ * Creates an invite link for a channel or supergroup chat subscription paid with Telegram Stars.
+ */
+export async function createStarSubscriptionLink(
+  client: ApiClient,
+  options: StarSubscriptionOptions,
+): Promise<string> {
+  const payload: JsonObject = {
+    chat_id: options.chatId,
+    subscription_period: options.subscriptionPeriodSeconds ?? 2_592_000, // 30 days default
+    subscription_price: options.subscriptionPriceStars,
+  };
+  if (options.name) {
+    payload.name = options.name;
+  }
+  const result = await client.callApiUnsafe<{ invite_link: string }>(
+    'createChatSubscriptionInviteLink',
+    payload,
+  );
+  return result.invite_link;
+}
+
+/**
+ * Sends a gift with personal text signature and styling options.
+ */
+export async function sendSignedGift(
+  client: ApiClient,
+  options: SendSignedGiftOptions,
+): Promise<boolean> {
+  const payload: JsonObject = {
+    gift_id: options.giftId,
+  };
+  if (options.userId !== undefined) payload.user_id = options.userId;
+  if (options.chatId !== undefined) payload.chat_id = options.chatId;
+  if (options.text) payload.text = options.text;
+  if (options.textParseMode) payload.text_parse_mode = options.textParseMode;
+  if (options.payForUpgrade) payload.pay_for_upgrade = options.payForUpgrade;
+
+  return client.callApiUnsafe<boolean>('sendGift', payload);
+}
+
+/**
+ * Converts a regular gift received by a business account to Telegram Stars.
+ */
+export async function convertBusinessGiftToStars(
+  client: ApiClient,
+  businessConnectionId: string,
+  ownedGiftId: string,
+): Promise<boolean> {
+  return client.callApiUnsafe<boolean>('convertGiftToStars', {
+    business_connection_id: businessConnectionId,
+    owned_gift_id: ownedGiftId,
+  });
+}
+
+/**
  * Creates TGWrapper middleware to handle Telegram payment flows:
  * - Automatically answers `pre_checkout_query`
  * - Intercepts `successful_payment` and triggers user callbacks
+ * - Intercepts `subscription` updates
  */
 export function createPaymentMiddleware<
   TState extends string = string,
@@ -86,7 +152,12 @@ export function createPaymentMiddleware<
 >(
   options: PaymentHandlerOptions = {},
 ): (ctx: Context<TState, TData>, next: () => Promise<void>) => Promise<void> {
-  const { autoApprovePreCheckout = true, onPreCheckout, onSuccessfulPayment } = options;
+  const {
+    autoApprovePreCheckout = true,
+    onPreCheckout,
+    onSuccessfulPayment,
+    onSubscriptionUpdate,
+  } = options;
 
   return async (ctx, next) => {
     // 1. Check for pre_checkout_query
@@ -115,6 +186,11 @@ export function createPaymentMiddleware<
     const successfulPayment = ctx.successfulPayment as TelegramSuccessfulPayment | undefined;
     if (successfulPayment && onSuccessfulPayment) {
       await onSuccessfulPayment(successfulPayment, ctx.fromId);
+    }
+
+    // 3. Check for subscription update
+    if (ctx.update.subscription && onSubscriptionUpdate) {
+      await onSubscriptionUpdate(ctx.update.subscription);
     }
 
     await next();

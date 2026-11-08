@@ -59,4 +59,23 @@ export interface PaymentHandlerOptions {
   onSuccessfulPayment?:
     | ((payment: TelegramSuccessfulPayment, fromId?: number | undefined) => Promise<void>)
     | undefined;
+  onSubscriptionUpdate?:
+    | ((subscription: import('../types/telegram.js').BotSubscriptionUpdated) => Promise<void>)
+    | undefined;
+}
+
+export interface StarSubscriptionOptions {
+  chatId: number | string;
+  subscriptionPeriodSeconds?: number;
+  subscriptionPriceStars: number;
+  name?: string;
+}
+
+export interface SendSignedGiftOptions {
+  userId?: number;
+  chatId?: number | string;
+  giftId: string;
+  text?: string;
+  textParseMode?: string;
+  payForUpgrade?: boolean;
 }

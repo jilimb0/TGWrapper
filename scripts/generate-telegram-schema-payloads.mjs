@@ -94,7 +94,7 @@ function buildStructuredPayload(method) {
 const strictPayloads = {
   approveSuggestedPost: "{ chat_id: number | string; suggested_post_id: string } & UnknownPayload",
   answerCallbackQuery: "{ callback_query_id: string; text?: string } & UnknownPayload",
-  answerGuestQuery: "{ guest_query_id: string | number; text?: string } & UnknownPayload",
+  answerGuestQuery: "{ guest_query_id: string; result: unknown } & UnknownPayload",
   answerInlineQuery: "{ inline_query_id: string; results: unknown[] } & UnknownPayload",
   createInvoiceLink:
     "{ title: string; description: string; payload: string; currency: string; prices: unknown[] } & UnknownPayload",

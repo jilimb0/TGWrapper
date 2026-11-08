@@ -35,21 +35,34 @@ async function main() {
     const tempPackageJson = await readJson(tempPackageJsonPath);
     tempPackageJson.type = 'module';
     await writeFile(tempPackageJsonPath, JSON.stringify(tempPackageJson, null, 2));
-    await run(
-      'npm',
-      [
-        'i',
-        `@tgwrapper/core@${versions.core}`,
-        `@tgwrapper/adapter-redis@${versions.adapterRedis}`,
-        `@tgwrapper/observability@${versions.observability}`,
-        `@tgwrapper/starter-migration@${versions.starterMigration}`,
-        `@tgwrapper/starter-standard-bot@${versions.starterStandardBot}`,
-        `@tgwrapper/starter-support-bot@${versions.starterSupportBot}`,
-        `@tgwrapper/create@${versions.createTgwrapper}`,
-        'typescript@5.8.2'
-      ],
-      tempDir
-    );
+    let installSuccess = false;
+    for (let attempt = 1; attempt <= 6; attempt++) {
+      try {
+        await run(
+          'npm',
+          [
+            'i',
+            `@tgwrapper/core@${versions.core}`,
+            `@tgwrapper/adapter-redis@${versions.adapterRedis}`,
+            `@tgwrapper/observability@${versions.observability}`,
+            `@tgwrapper/starter-migration@${versions.starterMigration}`,
+            `@tgwrapper/starter-standard-bot@${versions.starterStandardBot}`,
+            `@tgwrapper/starter-support-bot@${versions.starterSupportBot}`,
+            `@tgwrapper/create@${versions.createTgwrapper}`,
+            'typescript@5.8.2'
+          ],
+          tempDir
+        );
+        installSuccess = true;
+        break;
+      } catch (error) {
+        if (attempt === 6) throw error;
+        console.warn(
+          `npm install attempt ${attempt}/6 failed (likely CDN propagation delay). Retrying in 15s...`
+        );
+        await new Promise((resolve) => setTimeout(resolve, 15_000));
+      }
+    }
 
     await writeFile(
       join(tempDir, 'tsconfig.json'),

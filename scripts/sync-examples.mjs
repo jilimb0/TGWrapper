@@ -109,6 +109,29 @@ for (const example of examples) {
   }
 }
 
+// Also sync template dependency versions in create-tgwrapper/bin/create-tgwrapper.mjs
+const scaffolderBinPath = join(examplesDir, 'create-tgwrapper', 'bin', 'create-tgwrapper.mjs');
+try {
+  let scaffolderSource = readFileSync(scaffolderBinPath, 'utf8');
+  let scaffolderChanged = false;
+  for (const [name, version] of Object.entries(resolvedVersions)) {
+    if (!useLocal && version) {
+      const regex = new RegExp(`("${name}":\\s*)"[^"]+"`, 'g');
+      const targetVersion = `^${version}`;
+      if (regex.test(scaffolderSource)) {
+        scaffolderSource = scaffolderSource.replace(regex, `$1"${targetVersion}"`);
+        scaffolderChanged = true;
+      }
+    }
+  }
+  if (scaffolderChanged) {
+    writeFileSync(scaffolderBinPath, scaffolderSource, 'utf8');
+    console.log('  create-tgwrapper: synced embedded template dependencies');
+  }
+} catch {
+  // scaffolder bin not present or readable
+}
+
 if (!anyChanged) {
   console.log('All examples already in sync.');
 }

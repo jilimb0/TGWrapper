@@ -1,5 +1,12 @@
 # @tgwrapper/starter-standard-bot
 
+## 0.2.8
+
+### Patch Changes
+
+- Updated dependencies [e7a6aab]
+  - @tgwrapper/core@0.21.0
+
 ## 0.2.7
 
 ### Patch Changes

@@ -62,6 +62,7 @@ export type TelegramApiMethodResults = {
   answerPreCheckoutQuery: boolean;
   answerShippingQuery: boolean;
   answerWebAppQuery: UnknownResult;
+  answerWidgetQuery: UnknownResult;
   approveChatJoinRequest: UnknownResult;
   approveSuggestedPost: boolean;
   banChatMember: UnknownResult;
@@ -80,6 +81,7 @@ export type TelegramApiMethodResults = {
   declineChatJoinRequest: UnknownResult;
   declineSuggestedPost: boolean;
   deleteAllMessageReactions: boolean;
+  deleteBusinessAccountGift: UnknownResult;
   deleteBusinessMessages: UnknownResult;
   deleteChatPhoto: UnknownResult;
   deleteChatStickerSet: UnknownResult;
@@ -107,6 +109,8 @@ export type TelegramApiMethodResults = {
   editMessageMedia: UnknownResult;
   editMessageReplyMarkup: UnknownResult;
   editMessageText: UnknownResult;
+  editMessageWidgetData: UnknownResult;
+  editSharedWidgetData: UnknownResult;
   editStory: UnknownResult;
   editUserStarSubscription: UnknownResult;
   exportChatInviteLink: UnknownResult;
@@ -122,6 +126,7 @@ export type TelegramApiMethodResults = {
   getChatMember: UnknownResult;
   getChatMemberCount: UnknownResult;
   getChatMenuButton: UnknownResult;
+  getChatShareThemeBackdrops: UnknownResult;
   getCustomEmojiStickers: UnknownResult;
   getFile: UnknownResult;
   getForumTopicIconStickers: UnknownResult;
@@ -137,6 +142,7 @@ export type TelegramApiMethodResults = {
   getMyStarBalance: import("./telegram.js").StarAmount;
   getStarTransactions: UnknownResult;
   getStickerSet: UnknownResult;
+  getUniqueGift: UnknownResult;
   getUpdates: import("./telegram.js").Update[];
   getUserChatBoosts: UnknownResult;
   getUserGifts: UnknownResult;
@@ -186,11 +192,13 @@ export type TelegramApiMethodResults = {
   sendPoll: import("./telegram.js").Message;
   sendRichMessage: import("./telegram.js").Message;
   sendRichMessageDraft: boolean;
+  sendSharedWidget: UnknownResult;
   sendSticker: import("./telegram.js").Message;
   sendVenue: UnknownResult;
   sendVideo: UnknownResult;
   sendVideoNote: UnknownResult;
   sendVoice: UnknownResult;
+  sendWidget: UnknownResult;
   setBusinessAccountBio: UnknownResult;
   setBusinessAccountGiftSettings: UnknownResult;
   setBusinessAccountName: UnknownResult;

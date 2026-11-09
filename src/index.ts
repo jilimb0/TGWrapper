@@ -50,8 +50,11 @@ export {
   createGuestMessageUpdate,
   createManagedBotUpdate,
   createMessageUpdate,
+  createSharedWidgetQueryUpdate,
   createStoppedDraftUpdate,
   createSubscriptionUpdate,
+  createTonTransferUpdate,
+  createWidgetQueryUpdate,
 } from './testkit/update-factory.js';
 
 export type {
@@ -103,9 +106,16 @@ export type {
   SendDocumentOptions,
   SendMessageOptions,
   SentGuestMessage,
+  SharedWidgetQuery,
   StarAmount,
+  TonWalletCard,
+  TonWalletTransfer,
+  UniqueGift,
   Update,
   User,
+  Widget,
+  WidgetQuery,
+  WidgetQueryType,
 } from './types/telegram.js';
 export type { TelegramApiMethodPayloads } from './types/telegram.payloads.generated.js';
 export type { TelegramApiMethodResults } from './types/telegram.results.generated.js';

@@ -167,3 +167,109 @@ export function createManagedBotUpdate(
     },
   } as Update;
 }
+
+export function createWidgetQueryUpdate(
+  params: {
+    updateId?: number;
+    userId?: number;
+    chatId?: number;
+    messageId?: number;
+    data?: string;
+    widgetId?: string;
+    type?: import('../types/telegram.js').WidgetQueryType;
+  } = {},
+): Update {
+  const updateId = params.updateId ?? 50;
+  const userId = params.userId ?? 500;
+  const chatId = params.chatId ?? 600;
+
+  return {
+    update_id: updateId,
+    widget_query: {
+      id: `wq_${updateId}`,
+      from: {
+        id: userId,
+        is_bot: false,
+        first_name: 'WidgetUser',
+      },
+      chat: {
+        id: chatId,
+        type: 'private',
+        first_name: 'WidgetUser',
+      },
+      message_id: params.messageId ?? 1234,
+      chat_instance: `ci_${chatId}`,
+      type: params.type ?? { type: 'data' },
+      data: params.data ?? 'action=click',
+      ...(params.widgetId ? { widget_id: params.widgetId } : {}),
+    },
+  } as unknown as Update;
+}
+
+export function createSharedWidgetQueryUpdate(
+  params: {
+    updateId?: number;
+    userId?: number;
+    widgetId?: string;
+    data?: string;
+    type?: import('../types/telegram.js').WidgetQueryType;
+  } = {},
+): Update {
+  const updateId = params.updateId ?? 60;
+  const userId = params.userId ?? 500;
+
+  return {
+    update_id: updateId,
+    shared_widget_query: {
+      id: `swq_${updateId}`,
+      from: {
+        id: userId,
+        is_bot: false,
+        first_name: 'SharedUser',
+      },
+      widget_id: params.widgetId ?? 'shared_widget_1',
+      type: params.type ?? { type: 'data' },
+      data: params.data ?? 'action=refresh',
+    },
+  } as unknown as Update;
+}
+
+export function createTonTransferUpdate(
+  params: {
+    updateId?: number;
+    userId?: number;
+    chatId?: number;
+    transactionId?: string;
+    peerAddress?: string;
+    amount?: string;
+    comment?: string;
+  } = {},
+): Update {
+  const updateId = params.updateId ?? 70;
+  const userId = params.userId ?? 700;
+  const chatId = params.chatId ?? 700;
+
+  return {
+    update_id: updateId,
+    message: {
+      message_id: updateId,
+      date: Math.floor(Date.now() / 1000),
+      chat: {
+        id: chatId,
+        type: 'private',
+        first_name: 'TonUser',
+      },
+      from: {
+        id: userId,
+        is_bot: false,
+        first_name: 'TonUser',
+      },
+      ton_wallet_transfer: {
+        transaction_id: params.transactionId ?? 'tx_987654321',
+        peer_address: params.peerAddress ?? '0:1111222233334444555566667777888899990000aaaabbbbccccddddeeeeffff',
+        amount: params.amount ?? '1500000000',
+        ...(params.comment !== undefined ? { comment: params.comment } : {}),
+      },
+    },
+  } as unknown as Update;
+}

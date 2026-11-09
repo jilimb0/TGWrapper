@@ -135,6 +135,8 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
     updateType?: string;
     isGuestMessage?: boolean;
     stoppedDraftId?: number;
+    isWidgetQuery?: boolean;
+    isSharedWidgetQuery?: boolean;
   } {
     const meta: {
       command?: string;
@@ -144,6 +146,8 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
       updateType?: string;
       isGuestMessage?: boolean;
       stoppedDraftId?: number;
+      isWidgetQuery?: boolean;
+      isSharedWidgetQuery?: boolean;
     } = {
       currentState: ctx.session.current_state,
     };
@@ -154,6 +158,14 @@ export class BotKernel<TState extends string, TData extends JsonObject> {
 
     if (ctx.update.stopped_message_generation) {
       meta.stoppedDraftId = ctx.update.stopped_message_generation.draft_id;
+    }
+
+    if (ctx.update.widget_query) {
+      meta.isWidgetQuery = true;
+    }
+
+    if (ctx.update.shared_widget_query) {
+      meta.isSharedWidgetQuery = true;
     }
 
     // Detect updateType

@@ -18,3 +18,11 @@ export {
   getBotStarBalance,
   sendSignedGift,
 } from './stars.js';
+
+export {
+  formatNanotons,
+  isTonWalletTransferMessage,
+  isValidTonAddress,
+  parseTonToNanotons,
+  verifyTonWalletSignData,
+} from './ton.js';

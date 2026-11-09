@@ -43,6 +43,8 @@ export namespace Message {
     guest_bot_caller_user?: User;
     guest_bot_caller_chat?: Chat;
     guest_query_id?: string | number;
+    widget?: Widget;
+    ton_wallet_transfer?: TonWalletTransfer;
     [key: string]: unknown;
   }
 
@@ -91,9 +93,120 @@ export interface InlineKeyboardButton {
 }
 
 export interface EphemeralMessageParameters {
-  receiver_user_id: number;
+  receiver_user_id?: number;
   callback_query_id?: string;
   replace_callback_query_message?: boolean;
+  [key: string]: unknown;
+}
+
+export interface Widget {
+  id?: string;
+  width?: number;
+  height?: number;
+  html: string;
+  public_data?: string;
+  chat_data?: string;
+  [key: string]: unknown;
+}
+
+export interface AreaPosition {
+  x_percentage: number;
+  y_percentage: number;
+  width_percentage: number;
+  height_percentage: number;
+  rotation_angle?: number;
+  scale_percentage?: number;
+  [key: string]: unknown;
+}
+
+export interface TonWalletCardSticker {
+  file_id: string;
+  file_unique_id: string;
+  width: number;
+  height: number;
+  is_animated?: boolean;
+  is_video?: boolean;
+  position?: AreaPosition;
+  [key: string]: unknown;
+}
+
+export interface TonWalletCard {
+  address: string;
+  amount: string;
+  stickers: TonWalletCardSticker[];
+  background_nft_address?: string;
+  [key: string]: unknown;
+}
+
+export interface WidgetQueryWallet {
+  address: string;
+  amount: string;
+  public_key?: string;
+  state_init?: string;
+  [key: string]: unknown;
+}
+
+export interface WidgetQueryTypeData {
+  type: 'data';
+  wallet_card?: TonWalletCard;
+  [key: string]: unknown;
+}
+
+export interface WidgetQueryTypeSentTransaction {
+  type: 'sent_transaction';
+  wallet: WidgetQueryWallet;
+  msg_hash: string;
+  [key: string]: unknown;
+}
+
+export interface WidgetQueryTypeSignData {
+  type: 'sign_data';
+  wallet: WidgetQueryWallet;
+  sign_data: string;
+  [key: string]: unknown;
+}
+
+export type WidgetQueryType =
+  | WidgetQueryTypeData
+  | WidgetQueryTypeSentTransaction
+  | WidgetQueryTypeSignData
+  | { type: string; [key: string]: unknown };
+
+export interface WidgetQuery {
+  id: string;
+  from: User;
+  chat?: Chat;
+  message_id?: number;
+  inline_message_id?: string;
+  chat_instance: string;
+  chat_type?: 'sender' | 'private' | 'group' | 'supergroup' | 'channel' | string;
+  type: WidgetQueryType;
+  data: string;
+  widget_id?: string;
+  [key: string]: unknown;
+}
+
+export interface SharedWidgetQuery {
+  id: string;
+  from: User;
+  type: WidgetQueryType;
+  data: string;
+  widget_id: string;
+  [key: string]: unknown;
+}
+
+export interface TonWalletTransfer {
+  transaction_id: string;
+  peer_address: string;
+  amount: string;
+  comment?: string;
+  [key: string]: unknown;
+}
+
+export interface UniqueGift {
+  name: string;
+  owner?: User;
+  owner_address?: string;
   [key: string]: unknown;
 }
 
@@ -261,6 +374,8 @@ type TypedUpdateFields = {
   stopped_message_generation?: MessageGenerationStopped;
   subscription?: BotSubscriptionUpdated;
   managed_bot?: ManagedBotUpdated;
+  widget_query?: WidgetQuery;
+  shared_widget_query?: SharedWidgetQuery;
 };
 
 export type Update = {

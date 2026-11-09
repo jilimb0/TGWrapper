@@ -54,3 +54,24 @@ export {
   validateBubbleSandboxSafety,
   verifyBubbleState,
 } from './bubbles.js';
+
+export type {
+  NativeWidgetOptions,
+  SendWidgetPayload,
+  WidgetValidationResult,
+} from './widgets.js';
+export {
+  MAX_WIDGET_COMPRESSED_BYTES,
+  MAX_WIDGET_DATA_BYTES,
+  MAX_WIDGET_HTML_BYTES,
+  MAX_WIDGET_HEIGHT,
+  MIN_WIDGET_HEIGHT,
+  MIN_WIDGET_WIDTH,
+  WidgetSizeLimitError,
+  clampWidgetDimensions,
+  createWidgetPayload,
+  signWidgetState,
+  validateWidgetData,
+  validateWidgetHtml,
+  verifyWidgetState,
+} from './widgets.js';

@@ -55,6 +55,18 @@ export interface Router<TContext> {
     handler: Handler<TContext>,
     priority?: number,
   ): void;
+  widgetQuery(handler: Handler<TContext>, priority?: number): void;
+  widgetQuery(
+    middlewares: ReadonlyArray<Middleware<TContext>>,
+    handler: Handler<TContext>,
+    priority?: number,
+  ): void;
+  sharedWidgetQuery(handler: Handler<TContext>, priority?: number): void;
+  sharedWidgetQuery(
+    middlewares: ReadonlyArray<Middleware<TContext>>,
+    handler: Handler<TContext>,
+    priority?: number,
+  ): void;
   use(handler: Handler<TContext>, priority?: number): void;
   use(
     middlewares: ReadonlyArray<Middleware<TContext>>,
@@ -80,6 +92,8 @@ export interface RouterContextMeta {
   updateType?: TelegramUpdateKey | string;
   isGuestMessage?: boolean;
   stoppedDraftId?: number;
+  isWidgetQuery?: boolean;
+  isSharedWidgetQuery?: boolean;
 }
 
 export class TreeRouter<TContext> implements Router<TContext> {
@@ -193,6 +207,34 @@ export class TreeRouter<TContext> implements Router<TContext> {
       90,
     );
     this.registerRoute('stoppedDraft', undefined, handlerOrMiddlewares, handler, priority);
+  }
+
+  public widgetQuery(
+    handlerOrMiddlewares: Handler<TContext> | ReadonlyArray<Middleware<TContext>>,
+    maybeHandlerOrPriority?: Handler<TContext> | number,
+    maybePriority?: number,
+  ): void {
+    const { handler, priority } = this.resolve3or4(
+      handlerOrMiddlewares,
+      maybeHandlerOrPriority,
+      maybePriority,
+      80,
+    );
+    this.registerRoute('widgetQuery', undefined, handlerOrMiddlewares, handler, priority);
+  }
+
+  public sharedWidgetQuery(
+    handlerOrMiddlewares: Handler<TContext> | ReadonlyArray<Middleware<TContext>>,
+    maybeHandlerOrPriority?: Handler<TContext> | number,
+    maybePriority?: number,
+  ): void {
+    const { handler, priority } = this.resolve3or4(
+      handlerOrMiddlewares,
+      maybeHandlerOrPriority,
+      maybePriority,
+      80,
+    );
+    this.registerRoute('sharedWidgetQuery', undefined, handlerOrMiddlewares, handler, priority);
   }
 
   public scene(
@@ -374,7 +416,9 @@ export class TreeRouter<TContext> implements Router<TContext> {
       | 'use'
       | 'updateType'
       | 'guestMessage'
-      | 'stoppedDraft',
+      | 'stoppedDraft'
+      | 'widgetQuery'
+      | 'sharedWidgetQuery',
     matchValue: string | RegExp | undefined,
     handlerOrMiddlewares: Handler<TContext> | ReadonlyArray<Middleware<TContext>>,
     handler: Handler<TContext>,
@@ -405,7 +449,9 @@ export class TreeRouter<TContext> implements Router<TContext> {
       | 'use'
       | 'updateType'
       | 'guestMessage'
-      | 'stoppedDraft',
+      | 'stoppedDraft'
+      | 'widgetQuery'
+      | 'sharedWidgetQuery',
     value: string | RegExp | undefined,
   ): (ctx: TContext & RouterContextMeta) => boolean {
     switch (type) {
@@ -423,6 +469,10 @@ export class TreeRouter<TContext> implements Router<TContext> {
         return (ctx) => ctx.isGuestMessage === true;
       case 'stoppedDraft':
         return (ctx) => typeof ctx.stoppedDraftId === 'number';
+      case 'widgetQuery':
+        return (ctx) => ctx.isWidgetQuery === true || ctx.updateType === 'widget_query';
+      case 'sharedWidgetQuery':
+        return (ctx) => ctx.isSharedWidgetQuery === true || ctx.updateType === 'shared_widget_query';
       case 'use':
         return () => true;
     }

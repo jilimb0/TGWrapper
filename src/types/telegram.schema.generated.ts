@@ -1,7 +1,7 @@
 /**
  * AUTO-GENERATED FILE. DO NOT EDIT.
  * Source: docs/telegram-api-schema.snapshot.json
- * Generated at: 2026-11-08T11:20:58.000Z
+ * Generated at: 2026-11-09T15:12:29.163Z
  */
 
 export type TelegramApiMethodName =
@@ -12,6 +12,7 @@ export type TelegramApiMethodName =
   | 'answerPreCheckoutQuery'
   | 'answerShippingQuery'
   | 'answerWebAppQuery'
+  | 'answerWidgetQuery'
   | 'approveChatJoinRequest'
   | 'approveSuggestedPost'
   | 'banChatMember'
@@ -30,6 +31,7 @@ export type TelegramApiMethodName =
   | 'declineChatJoinRequest'
   | 'declineSuggestedPost'
   | 'deleteAllMessageReactions'
+  | 'deleteBusinessAccountGift'
   | 'deleteBusinessMessages'
   | 'deleteChatPhoto'
   | 'deleteChatStickerSet'
@@ -57,6 +59,8 @@ export type TelegramApiMethodName =
   | 'editMessageMedia'
   | 'editMessageReplyMarkup'
   | 'editMessageText'
+  | 'editMessageWidgetData'
+  | 'editSharedWidgetData'
   | 'editStory'
   | 'editUserStarSubscription'
   | 'exportChatInviteLink'
@@ -72,6 +76,7 @@ export type TelegramApiMethodName =
   | 'getChatMember'
   | 'getChatMemberCount'
   | 'getChatMenuButton'
+  | 'getChatShareThemeBackdrops'
   | 'getCustomEmojiStickers'
   | 'getFile'
   | 'getForumTopicIconStickers'
@@ -87,6 +92,7 @@ export type TelegramApiMethodName =
   | 'getMyStarBalance'
   | 'getStarTransactions'
   | 'getStickerSet'
+  | 'getUniqueGift'
   | 'getUpdates'
   | 'getUserChatBoosts'
   | 'getUserGifts'
@@ -136,11 +142,13 @@ export type TelegramApiMethodName =
   | 'sendPoll'
   | 'sendRichMessage'
   | 'sendRichMessageDraft'
+  | 'sendSharedWidget'
   | 'sendSticker'
   | 'sendVenue'
   | 'sendVideo'
   | 'sendVideoNote'
   | 'sendVoice'
+  | 'sendWidget'
   | 'setBusinessAccountBio'
   | 'setBusinessAccountGiftSettings'
   | 'setBusinessAccountName'
@@ -213,6 +221,8 @@ export type TelegramUpdateKey =
   | 'pre_checkout_query'
   | 'purchased_paid_media'
   | 'removed_chat_boost'
+  | 'shared_widget_query'
   | 'shipping_query'
   | 'stopped_message_generation'
-  | 'subscription';
+  | 'subscription'
+  | 'widget_query';

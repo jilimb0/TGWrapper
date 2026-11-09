@@ -1,5 +1,6 @@
 import { DraftStreamSession } from '../runtime/draft-stream.js';
 import type { HtmlBubblePayload } from '../tma/bubbles.js';
+import { createWidgetPayload, type NativeWidgetOptions } from '../tma/widgets.js';
 import type { JsonObject, SessionEnvelope } from '../types/core.js';
 import type {
   CallbackQuery,
@@ -7,7 +8,9 @@ import type {
   InputRichMessage,
   Message,
   SentGuestMessage,
+  SharedWidgetQuery,
   Update,
+  WidgetQuery,
 } from '../types/telegram.js';
 import type { ApiClient } from './api-client.js';
 
@@ -86,6 +89,18 @@ export class Context<TState extends string, TData extends JsonObject> {
     return this.update.subscription;
   }
 
+  public get widgetQuery(): WidgetQuery | undefined {
+    return this.update.widget_query;
+  }
+
+  public get sharedWidgetQuery(): SharedWidgetQuery | undefined {
+    return this.update.shared_widget_query;
+  }
+
+  public get anyWidgetQuery(): WidgetQuery | SharedWidgetQuery | undefined {
+    return this.update.widget_query ?? this.update.shared_widget_query;
+  }
+
   public get fromId(): number | undefined {
     const directFrom =
       this.primaryMessage?.from ??
@@ -101,6 +116,8 @@ export class Context<TState extends string, TData extends JsonObject> {
       this.update.my_chat_member?.from ??
       this.update.subscription?.user ??
       this.update.managed_bot?.user ??
+      this.update.widget_query?.from ??
+      this.update.shared_widget_query?.from ??
       this.update.guest_message?.guest_bot_caller_user;
 
     if (directFrom) {
@@ -246,13 +263,13 @@ export class Context<TState extends string, TData extends JsonObject> {
     }
 
     const receiverUserId = options.receiverUserId ?? this.fromId;
-    if (!receiverUserId) {
-      throw new Error('Cannot reply ephemeral: cannot determine receiver_user_id.');
+    const callbackQueryId = options.callbackQueryId ?? this.update.callback_query?.id;
+    if (!receiverUserId && !callbackQueryId) {
+      throw new Error('Cannot reply ephemeral: cannot determine receiver_user_id or callback_query_id.');
     }
 
-    const callbackQueryId = options.callbackQueryId ?? this.update.callback_query?.id;
     const ephemeralParams: JsonObject = {
-      receiver_user_id: receiverUserId,
+      ...(receiverUserId ? { receiver_user_id: receiverUserId } : {}),
       ...(callbackQueryId ? { callback_query_id: callbackQueryId } : {}),
       ...(options.replaceCallbackQueryMessage !== undefined
         ? { replace_callback_query_message: options.replaceCallbackQueryMessage }
@@ -318,6 +335,105 @@ export class Context<TState extends string, TData extends JsonObject> {
     });
   }
 
+  public async answerWidgetQuery(data?: string): Promise<boolean> {
+    const queryId = this.update.widget_query?.id ?? this.update.shared_widget_query?.id;
+    if (!queryId) {
+      throw new Error('Cannot answer widget query: update has no widget_query or shared_widget_query.');
+    }
+
+    const payload: JsonObject = { widget_query_id: queryId };
+    if (data !== undefined) {
+      payload.data = data;
+    }
+
+    return Boolean(await this.apiClient.callApiUnsafe('answerWidgetQuery', payload));
+  }
+
+  public async replyWidget(
+    options: NativeWidgetOptions & { extra?: JsonObject },
+  ): Promise<Message> {
+    const chatId = this.resolveChatId();
+    if (!chatId) {
+      throw new Error('Cannot send widget: update has no resolvable chat id.');
+    }
+
+    const payload = createWidgetPayload(options);
+    return (await this.apiClient.callApiUnsafe('sendWidget', {
+      chat_id: chatId,
+      ...payload,
+      ...(options.extra ?? {}),
+    })) as Message;
+  }
+
+  public async replySharedWidget(
+    widgetId: string,
+    options: {
+      width?: number;
+      height?: number;
+      chatData?: string;
+      caption?: string;
+      parseMode?: string;
+      disableNotification?: boolean;
+      protectContent?: boolean;
+      extra?: JsonObject;
+    } = {},
+  ): Promise<Message> {
+    const chatId = this.resolveChatId();
+    if (!chatId) {
+      throw new Error('Cannot send shared widget: update has no resolvable chat id.');
+    }
+
+    return (await this.apiClient.callApiUnsafe('sendSharedWidget', {
+      chat_id: chatId,
+      widget_id: widgetId,
+      ...(options.width !== undefined ? { width: options.width } : {}),
+      ...(options.height !== undefined ? { height: options.height } : {}),
+      ...(options.chatData !== undefined ? { chat_data: options.chatData } : {}),
+      ...(options.caption !== undefined ? { caption: options.caption } : {}),
+      ...(options.parseMode !== undefined ? { parse_mode: options.parseMode } : {}),
+      ...(options.disableNotification !== undefined
+        ? { disable_notification: options.disableNotification }
+        : {}),
+      ...(options.protectContent !== undefined ? { protect_content: options.protectContent } : {}),
+      ...(options.extra ?? {}),
+    })) as Message;
+  }
+
+  public async editWidgetData(options: { publicData?: string; chatData?: string }): Promise<boolean> {
+    const wq = this.update.widget_query;
+    const chatId = wq?.chat?.id ?? this.resolveChatId();
+    const messageId = wq?.message_id ?? this.primaryMessage?.message_id;
+    const inlineMessageId = wq?.inline_message_id;
+
+    if (!inlineMessageId && (!chatId || !messageId)) {
+      throw new Error('Cannot edit widget data: missing chat_id/message_id or inline_message_id.');
+    }
+
+    const payload: JsonObject = {
+      ...(inlineMessageId
+        ? { inline_message_id: inlineMessageId }
+        : { chat_id: chatId, message_id: messageId }),
+      ...(options.publicData !== undefined ? { public_data: options.publicData } : {}),
+      ...(options.chatData !== undefined ? { chat_data: options.chatData } : {}),
+    };
+
+    return Boolean(await this.apiClient.callApiUnsafe('editMessageWidgetData', payload));
+  }
+
+  public async editSharedWidget(
+    widgetId: string,
+    publicData: string,
+    cacheTime?: number,
+  ): Promise<boolean> {
+    const payload: JsonObject = {
+      widget_id: widgetId,
+      public_data: publicData,
+      ...(cacheTime !== undefined ? { cache_time: cacheTime } : {}),
+    };
+
+    return Boolean(await this.apiClient.callApiUnsafe('editSharedWidgetData', payload));
+  }
+
   private get primaryMessage(): Message | undefined {
     return (
       this.update.message ??
@@ -377,6 +493,10 @@ export class Context<TState extends string, TData extends JsonObject> {
 
     if (this.update.stopped_message_generation?.chat?.id) {
       return this.update.stopped_message_generation.chat.id;
+    }
+
+    if (this.update.widget_query?.chat?.id) {
+      return this.update.widget_query.chat.id;
     }
 
     return undefined;

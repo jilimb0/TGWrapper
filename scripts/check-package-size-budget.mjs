@@ -8,8 +8,8 @@ const budgets = [
   {
     dir: '.',
     name: '@tgwrapper/core',
-    maxPackageSizeBytes: 75_000,
-    maxUnpackedSizeBytes: 440_000
+    maxPackageSizeBytes: 85_000,
+    maxUnpackedSizeBytes: 500_000
   },
   {
     dir: 'packages/adapter-redis',

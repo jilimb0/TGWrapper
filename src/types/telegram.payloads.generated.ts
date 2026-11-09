@@ -58,6 +58,7 @@ export type TelegramApiMethodPayloads = {
   answerPreCheckoutQuery: { pre_checkout_query_id: string; ok: boolean; error_message?: string; } & UnknownPayload;
   answerShippingQuery: { shipping_query_id: string; ok: boolean; shipping_options?: unknown[]; error_message?: string; } & UnknownPayload;
   answerWebAppQuery: { web_app_query_id: string; result: unknown; } & UnknownPayload;
+  answerWidgetQuery: { widget_query_id: string; data?: string; } & UnknownPayload;
   approveChatJoinRequest: WithChatId & { user_id: number; } & UnknownPayload;
   approveSuggestedPost: StrictTelegramApiMethodPayloads['approveSuggestedPost'];
   banChatMember: WithChatId & { user_id: number; until_date?: number; revoke_messages?: boolean; } & UnknownPayload;
@@ -76,6 +77,7 @@ export type TelegramApiMethodPayloads = {
   declineChatJoinRequest: WithChatId & { user_id: number; } & UnknownPayload;
   declineSuggestedPost: StrictTelegramApiMethodPayloads['declineSuggestedPost'];
   deleteAllMessageReactions: StrictTelegramApiMethodPayloads['deleteAllMessageReactions'];
+  deleteBusinessAccountGift: { business_connection_id: string; owned_gift_id: string; } & UnknownPayload;
   deleteBusinessMessages: { business_connection_id: string; message_ids: number[]; } & UnknownPayload;
   deleteChatPhoto: WithChatId & {} & UnknownPayload;
   deleteChatStickerSet: WithChatId & {} & UnknownPayload;
@@ -103,6 +105,8 @@ export type TelegramApiMethodPayloads = {
   editMessageMedia: WithChatId & WithBusinessConnectionId & { message_id?: number; inline_message_id?: string; media: unknown; reply_markup?: import("./telegram.js").InlineKeyboardMarkup; } & UnknownPayload;
   editMessageReplyMarkup: WithChatId & WithBusinessConnectionId & { message_id?: number; inline_message_id?: string; reply_markup?: import("./telegram.js").InlineKeyboardMarkup; } & UnknownPayload;
   editMessageText: StrictTelegramApiMethodPayloads['editMessageText'];
+  editMessageWidgetData: WithChatId & { message_id?: number; inline_message_id?: string; public_data?: string; chat_data?: string; } & UnknownPayload;
+  editSharedWidgetData: { widget_id: string; public_data: string; cache_time?: number; } & UnknownPayload;
   editStory: { business_connection_id: string; story_id: number; content: unknown; caption?: string; parse_mode?: string; caption_entities?: unknown[]; areas?: unknown[]; } & UnknownPayload;
   editUserStarSubscription: { user_id: number; telegram_payment_charge_id: string; is_canceled: boolean; } & UnknownPayload;
   exportChatInviteLink: WithChatId & {} & UnknownPayload;
@@ -118,6 +122,7 @@ export type TelegramApiMethodPayloads = {
   getChatMember: WithChatId & { user_id: number; } & UnknownPayload;
   getChatMemberCount: WithChatId & {} & UnknownPayload;
   getChatMenuButton: { chat_id?: number; } & UnknownPayload;
+  getChatShareThemeBackdrops: UnknownPayload;
   getCustomEmojiStickers: { custom_emoji_ids: string[]; } & UnknownPayload;
   getFile: { file_id: string; } & UnknownPayload;
   getForumTopicIconStickers: UnknownPayload;
@@ -133,6 +138,7 @@ export type TelegramApiMethodPayloads = {
   getMyStarBalance: UnknownPayload;
   getStarTransactions: { offset?: number; limit?: number; } & UnknownPayload;
   getStickerSet: StrictTelegramApiMethodPayloads['getStickerSet'];
+  getUniqueGift: { name: string; } & UnknownPayload;
   getUpdates: StrictTelegramApiMethodPayloads['getUpdates'];
   getUserChatBoosts: WithChatId & { user_id: number; } & UnknownPayload;
   getUserGifts: { user_id: number; exclude_unlimited?: boolean; exclude_limited_upgradable?: boolean; exclude_limited_non_upgradable?: boolean; exclude_from_blockchain?: boolean; exclude_unique?: boolean; sort_by_price?: boolean; offset?: string; limit?: number; } & UnknownPayload;
@@ -182,11 +188,13 @@ export type TelegramApiMethodPayloads = {
   sendPoll: StrictTelegramApiMethodPayloads['sendPoll'];
   sendRichMessage: WithChatId & WithBusinessConnectionId & WithMessageThreadId & WithDirectMessagesTopicId & WithReplyMarkup & WithReplyParameters & WithSuggestedPostParameters & WithDisableNotification & WithProtectContent & WithAllowPaidBroadcast & WithMessageEffectId & { ephemeral_message_parameters?: import("./telegram.js").EphemeralMessageParameters; rich_message: import("./telegram.js").InputRichMessage; } & UnknownPayload;
   sendRichMessageDraft: WithMessageThreadId & { chat_id: number; draft_id: number; rich_message: import("./telegram.js").InputRichMessage; can_stop?: boolean; keep_on_stop?: boolean; } & UnknownPayload;
+  sendSharedWidget: WithChatId & WithMessageThreadId & WithReplyMarkup & WithReplyParameters & WithDisableNotification & WithProtectContent & WithAllowPaidBroadcast & WithMessageEffectId & { widget_id: string; chat_data?: string; caption?: string; parse_mode?: string; caption_entities?: unknown[]; show_caption_above_media?: boolean; } & UnknownPayload;
   sendSticker: StrictTelegramApiMethodPayloads['sendSticker'];
   sendVenue: WithChatId & WithBusinessConnectionId & WithMessageThreadId & WithDirectMessagesTopicId & WithReplyMarkup & WithReplyParameters & WithSuggestedPostParameters & WithDisableNotification & WithProtectContent & WithAllowPaidBroadcast & WithMessageEffectId & { ephemeral_message_parameters?: import("./telegram.js").EphemeralMessageParameters; latitude: number; longitude: number; title: string; address: string; foursquare_id?: string; foursquare_type?: string; google_place_id?: string; google_place_type?: string; } & UnknownPayload;
   sendVideo: WithChatId & WithBusinessConnectionId & WithMessageThreadId & WithDirectMessagesTopicId & WithReplyMarkup & WithReplyParameters & WithSuggestedPostParameters & WithDisableNotification & WithProtectContent & WithAllowPaidBroadcast & WithMessageEffectId & { ephemeral_message_parameters?: import("./telegram.js").EphemeralMessageParameters; video: string; duration?: number; width?: number; height?: number; thumbnail?: string; cover?: string; start_timestamp?: number; caption?: string; parse_mode?: string; caption_entities?: unknown[]; show_caption_above_media?: boolean; has_spoiler?: boolean; supports_streaming?: boolean; } & UnknownPayload;
   sendVideoNote: WithChatId & WithBusinessConnectionId & WithMessageThreadId & WithDirectMessagesTopicId & WithReplyMarkup & WithReplyParameters & WithSuggestedPostParameters & WithDisableNotification & WithProtectContent & WithAllowPaidBroadcast & WithMessageEffectId & { ephemeral_message_parameters?: import("./telegram.js").EphemeralMessageParameters; video_note: string; duration?: number; length?: number; thumbnail?: string; } & UnknownPayload;
   sendVoice: WithChatId & WithBusinessConnectionId & WithMessageThreadId & WithDirectMessagesTopicId & WithReplyMarkup & WithReplyParameters & WithSuggestedPostParameters & WithDisableNotification & WithProtectContent & WithAllowPaidBroadcast & WithMessageEffectId & { ephemeral_message_parameters?: import("./telegram.js").EphemeralMessageParameters; voice: string; caption?: string; parse_mode?: string; caption_entities?: unknown[]; duration?: number; } & UnknownPayload;
+  sendWidget: WithChatId & WithMessageThreadId & WithReplyMarkup & WithReplyParameters & WithDisableNotification & WithProtectContent & WithAllowPaidBroadcast & WithMessageEffectId & { html: string; width?: number; height?: number; public_data?: string; chat_data?: string; caption?: string; parse_mode?: string; caption_entities?: unknown[]; show_caption_above_media?: boolean; allow_queries?: boolean; is_shared?: boolean; } & UnknownPayload;
   setBusinessAccountBio: { business_connection_id: string; bio?: string; } & UnknownPayload;
   setBusinessAccountGiftSettings: { business_connection_id: string; show_gift_button: boolean; accepted_gift_types: unknown; } & UnknownPayload;
   setBusinessAccountName: { business_connection_id: string; first_name: string; last_name?: string; } & UnknownPayload;
@@ -231,6 +239,6 @@ export type TelegramApiMethodPayloads = {
   unpinAllGeneralForumTopicMessages: WithChatId & {} & UnknownPayload;
   unpinChatMessage: WithChatId & WithBusinessConnectionId & { message_id?: number; } & UnknownPayload;
   uploadStickerFile: StrictTelegramApiMethodPayloads['uploadStickerFile'];
-  verifyChat: WithChatId & { custom_description?: string; } & UnknownPayload;
-  verifyUser: { user_id: number; custom_description?: string; } & UnknownPayload;
+  verifyChat: WithChatId & { custom_description?: string; custom_description_parse_mode?: string; custom_description_entities?: unknown[]; } & UnknownPayload;
+  verifyUser: { user_id: number; custom_description?: string; custom_description_parse_mode?: string; custom_description_entities?: unknown[]; } & UnknownPayload;
 };

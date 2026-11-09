@@ -11,7 +11,6 @@ updates:
     target-branch: "main"
     labels:
       - "dependencies"
-      - "github-actions"
     commit-message:
       prefix: "chore"
       include: "scope"

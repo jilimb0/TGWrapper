@@ -19,7 +19,7 @@ const templates = {
     source: "standard-bot",
     scripts: { build: "tsc", start: "tsx src/bot.ts" },
     dependencies: {
-      "@tgwrapper/core": "^0.21.0",
+      "@tgwrapper/core": "^0.21.1",
       "@tgwrapper/adapter-redis": "^0.9.0",
       "@tgwrapper/observability": "^0.10.0",
       ioredis: "^5.4.1",
@@ -30,7 +30,7 @@ const templates = {
     source: "support-bot",
     scripts: { build: "tsc", start: "tsx src/bot.ts" },
     dependencies: {
-      "@tgwrapper/core": "^0.21.0",
+      "@tgwrapper/core": "^0.21.1",
       "@tgwrapper/adapter-redis": "^0.9.0",
       "@tgwrapper/observability": "^0.10.0",
       ioredis: "^5.4.1",
@@ -45,7 +45,7 @@ const templates = {
       "start:after": "tsx src/bot-after.ts",
     },
     dependencies: {
-      "@tgwrapper/core": "^0.21.0",
+      "@tgwrapper/core": "^0.21.1",
       "@tgwrapper/adapter-redis": "^0.9.0",
       "@tgwrapper/observability": "^0.10.0",
       ioredis: "^5.4.1",

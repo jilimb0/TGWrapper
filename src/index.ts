@@ -3,6 +3,17 @@ export { AwsLambdaHandler } from './adapters/aws-lambda-handler.js';
 export { CloudflareWorkerHandler } from './adapters/cloudflare-worker-handler.js';
 export { NodeHttpHandler } from './adapters/node-http-handler.js';
 export { WebhookHandler } from './adapters/webhook-handler.js';
+export {
+  ApprovalGateBotBridge,
+  type ApprovalGateData,
+  type DecideGateCasOptions,
+  type GateDecisionCachedResult,
+  type GateDecisionResult,
+  type GateDecisionScope,
+  type GateDecisionStatus,
+  type TmaGateDecisionInput,
+  type TmaGateDecisionResult,
+} from './orchestration/approval-gate-bridge.js';
 export type { BinaryInput } from './core/api-client.js';
 export { ApiClient } from './core/api-client.js';
 export type {

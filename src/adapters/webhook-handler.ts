@@ -1,7 +1,19 @@
+import crypto from 'node:crypto';
 import { CoreError } from '../core/errors.js';
 import type { WebhookHandlerOptions, WebhookRequest, WebhookResponse } from '../types/core.js';
 import type { Update } from '../types/telegram.js';
 import { isValidTelegramUpdate } from '../update-loop/update-validator.js';
+
+const textEncoder = new TextEncoder();
+
+function timingSafeSecretEqual(a: string, b: string): boolean {
+  const bufA = textEncoder.encode(a);
+  const bufB = textEncoder.encode(b);
+  if (bufA.byteLength !== bufB.byteLength) {
+    return false;
+  }
+  return crypto.timingSafeEqual(bufA, bufB);
+}
 
 export interface UpdateHandler {
   handleUpdate(update: Update): Promise<void>;
@@ -25,7 +37,7 @@ export class WebhookHandler {
     }
 
     const headerValue = this.readHeader(request.headers, this.options.secretHeader);
-    if (!headerValue || headerValue !== this.options.secretToken) {
+    if (!headerValue || !timingSafeSecretEqual(headerValue, this.options.secretToken)) {
       return this.response(401, { error: 'invalid_signature' });
     }
 

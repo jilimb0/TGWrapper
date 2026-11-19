@@ -1,5 +1,11 @@
 # @tgwrapper/adapter-dynamodb
 
+## 0.2.1
+
+### Patch Changes
+
+- ef0e694: fix: generate dist-cjs/package.json with type commonjs and include it in published tarballs for CommonJS require() compatibility (#214)
+
 ## 0.2.0
 
 ### Minor Changes

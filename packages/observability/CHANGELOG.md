@@ -1,5 +1,11 @@
 # @tgwrapper/observability
 
+## 0.10.1
+
+### Patch Changes
+
+- ef0e694: fix: generate dist-cjs/package.json with type commonjs and include it in published tarballs for CommonJS require() compatibility (#214)
+
 ## 0.9.3
 
 ### Patch Changes

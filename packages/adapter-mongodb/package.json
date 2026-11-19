@@ -43,7 +43,7 @@
     "test:integration": "vitest run test/mongodb.integration.test.ts",
     "prepublishOnly": "node ../../scripts/enforce-ci-publish.mjs",
     "build:esm": "tsc -p tsconfig.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json"
+    "build:cjs": "tsc -p tsconfig.cjs.json && node -e \"fs.writeFileSync('dist-cjs/package.json', JSON.stringify({ type: 'commonjs' }, null, 2))\""
   },
   "dependencies": {
     "mongodb": "^7.5.0"
@@ -55,7 +55,7 @@
   "files": [
     "dist/**/*.js",
     "dist/**/*.d.ts",
-    "dist-cjs/**/*.js",
+    "dist-cjs/**/*",
     "README.md"
   ],
   "publishConfig": {

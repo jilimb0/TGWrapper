@@ -50,14 +50,14 @@ importers:
   examples/ai-bot-starter:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: ^0.9.0
-        version: 0.9.0
+        specifier: ^0.9.1
+        version: 0.9.1
       '@tgwrapper/core':
         specifier: ^0.21.1
         version: 0.21.1
       '@tgwrapper/observability':
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.10.1
+        version: 0.10.1
       ioredis:
         specifier: ^6.0.0
         version: 6.0.0
@@ -100,14 +100,14 @@ importers:
   examples/migration-starter:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: ^0.9.0
-        version: 0.9.0
+        specifier: ^0.9.1
+        version: 0.9.1
       '@tgwrapper/core':
         specifier: ^0.21.1
         version: 0.21.1
       '@tgwrapper/observability':
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.10.1
+        version: 0.10.1
       ioredis:
         specifier: ^6.0.0
         version: 6.0.0
@@ -128,14 +128,14 @@ importers:
   examples/moderation-bot:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: ^0.9.0
-        version: 0.9.0
+        specifier: ^0.9.1
+        version: 0.9.1
       '@tgwrapper/core':
         specifier: ^0.21.1
         version: 0.21.1
       '@tgwrapper/observability':
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.10.1
+        version: 0.10.1
       ioredis:
         specifier: ^6.0.0
         version: 6.0.0
@@ -150,14 +150,14 @@ importers:
   examples/multi-instance-redis-starter:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: ^0.9.0
-        version: 0.9.0
+        specifier: ^0.9.1
+        version: 0.9.1
       '@tgwrapper/core':
         specifier: ^0.21.1
         version: 0.21.1
       '@tgwrapper/observability':
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.10.1
+        version: 0.10.1
       ioredis:
         specifier: ^6.0.0
         version: 6.0.0
@@ -208,14 +208,14 @@ importers:
   examples/standard-bot:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: ^0.9.0
-        version: 0.9.0
+        specifier: ^0.9.1
+        version: 0.9.1
       '@tgwrapper/core':
         specifier: ^0.21.1
         version: 0.21.1
       '@tgwrapper/observability':
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.10.1
+        version: 0.10.1
       ioredis:
         specifier: ^6.0.0
         version: 6.0.0
@@ -233,14 +233,14 @@ importers:
   examples/support-bot:
     dependencies:
       '@tgwrapper/adapter-redis':
-        specifier: ^0.9.0
-        version: 0.9.0
+        specifier: ^0.9.1
+        version: 0.9.1
       '@tgwrapper/core':
         specifier: ^0.21.1
         version: 0.21.1
       '@tgwrapper/observability':
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.10.1
+        version: 0.10.1
       ioredis:
         specifier: ^6.0.0
         version: 6.0.0
@@ -958,9 +958,6 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@ioredis/commands@1.10.0':
-    resolution: {integrity: sha512-UmeW7z4LfctwoQ5wkhVzgq8tXkreED2xZGpX+Bg+zA+WJFZCT6c062AfCK/Dfk81xZnnwdhJCUMkitihRaoC2Q==}
-
   '@ioredis/commands@2.0.0':
     resolution: {integrity: sha512-vrx0AE/T0h7cRZwfo1M39Cr+ZhZrkf0V8mQN75wucKCxCLD9l/VX6no3gFvrLqD1IlG/1LtzWovqEw3t0Vr9zg==}
 
@@ -1159,17 +1156,17 @@ packages:
   '@telegraf/types@7.1.0':
     resolution: {integrity: sha512-kGevOIbpMcIlCDeorKGpwZmdH7kHbqlk/Yj6dEpJMKEQw5lk0KVQY0OLXaCswy8GqlIVLd5625OB+rAntP9xVw==}
 
-  '@tgwrapper/adapter-redis@0.9.0':
-    resolution: {integrity: sha512-yKZOxpK4fA5ZM7JZWDl/gEAxPfLQnlGAWk7slU94RF29rEeMAODcHg6n5CFJWIFP/wCmGrNd9AfHOSSJLa9VgQ==}
-    engines: {node: '>=22.13'}
+  '@tgwrapper/adapter-redis@0.9.1':
+    resolution: {integrity: sha512-1HwkjVZytwrb5nRTXUL/D5hE2+ICUcVmd5UekJRGAMzg1YkQWbcj5Iog7jlgQMk8lbBPI5EXVI2OYscx9r/b3Q==}
+    engines: {node: '>=24.0'}
 
   '@tgwrapper/core@0.21.1':
     resolution: {integrity: sha512-+C4JdY7R+w3wmm72G+ex4mKX2TD7asX94oXBQfH6lalk5xoHfY4bbSNJm1XPC/yUTGyItz2geh+TW5v7H+RmTg==}
     engines: {node: '>=24.0'}
 
-  '@tgwrapper/observability@0.10.0':
-    resolution: {integrity: sha512-fGuKVIVOASnh5mxtFWDaQQxBi1hnW4giY8GGnRBLZUPisVYhTUresL9GcDGyth8D5iw4LYASjHTIaX8jAsNUpA==}
-    engines: {node: '>=22.13'}
+  '@tgwrapper/observability@0.10.1':
+    resolution: {integrity: sha512-FFJtJbkxQFWXxZHpZdQgvh6VGQaJVVR+jH5YvaTDIcaNkzp4p15aR/5T/BgexzVt6vo5m4G193hcpUo53LXxeQ==}
+    engines: {node: '>=24.0'}
 
   '@tgwrapper/starter-migration@0.2.8':
     resolution: {integrity: sha512-4QWQNW49bNGUF3uOTTGNmcigBMOLBrv8a7Hn9MzsYlpCV4fxhwOqvVEM1bICxRIYstay9HyWyJhVpxTba2xW7g==}
@@ -1492,10 +1489,6 @@ packages:
   import-meta-resolve@4.2.0:
     resolution: {integrity: sha512-Iqv2fzaTQN28s/FwZAoFq0ZSs/7hMAHJVX+w8PZl3cY19Pxk6jFFalxQoIfW2826i/fDLXv8IiEZRIT0lDuWcg==}
 
-  ioredis@5.11.1:
-    resolution: {integrity: sha512-ehuGcf94bQXhfagULNXrJdfnWO38v070jxSx/qE87Kjzmu2fU7ro5EFAb+OPituLqgfyuQaym5DlrNydW2sJ9A==}
-    engines: {node: '>=12.22.0'}
-
   ioredis@6.0.0:
     resolution: {integrity: sha512-f+Dtubxfpf6KYFq7WVXJoOLn0bk4TJrMrN9SzeE+jrWrCWj7XX3fA6vkryafhADX+GMymRxgDJDOI33COkJc0w==}
     engines: {node: '>=20.0.0'}
@@ -1716,10 +1709,6 @@ packages:
 
   redis-errors@1.2.0:
     resolution: {integrity: sha512-1qny3OExCf0UvUV/5wpYKf2YwPcOqXzkwKKSmKHiE6ZMQs5heeE/c8eXK+PNllPvmjgAbfnsbpkGZWy8cBpn9w==}
-    engines: {node: '>=4'}
-
-  redis-parser@3.0.0:
-    resolution: {integrity: sha512-DJnGAeenTdpMEH6uAJRK/uiyEIH9WVsUmoLwzudwGJUwZPp80PDBWPHXSAGNPwNvIXAbe7MSUB1zQFugFml66A==}
     engines: {node: '>=4'}
 
   rolldown@1.2.16:
@@ -2568,8 +2557,6 @@ snapshots:
   '@img/sharp-win32-x64@0.35.5':
     optional: true
 
-  '@ioredis/commands@1.10.0': {}
-
   '@ioredis/commands@2.0.0': {}
 
   '@isaacs/nonrecursive-glob-match@1.0.3': {}
@@ -2729,21 +2716,21 @@ snapshots:
 
   '@telegraf/types@7.1.0': {}
 
-  '@tgwrapper/adapter-redis@0.9.0':
+  '@tgwrapper/adapter-redis@0.9.1':
     dependencies:
-      ioredis: 5.11.1
+      ioredis: 6.0.0
     transitivePeerDependencies:
       - supports-color
 
   '@tgwrapper/core@0.21.1': {}
 
-  '@tgwrapper/observability@0.10.0': {}
+  '@tgwrapper/observability@0.10.1': {}
 
   '@tgwrapper/starter-migration@0.2.8':
     dependencies:
-      '@tgwrapper/adapter-redis': 0.9.0
+      '@tgwrapper/adapter-redis': 0.9.1
       '@tgwrapper/core': 0.21.1
-      '@tgwrapper/observability': 0.10.0
+      '@tgwrapper/observability': 0.10.1
       ioredis: 6.0.0
       telegraf: 4.16.3
     transitivePeerDependencies:
@@ -2752,18 +2739,18 @@ snapshots:
 
   '@tgwrapper/starter-standard-bot@0.2.8':
     dependencies:
-      '@tgwrapper/adapter-redis': 0.9.0
+      '@tgwrapper/adapter-redis': 0.9.1
       '@tgwrapper/core': 0.21.1
-      '@tgwrapper/observability': 0.10.0
+      '@tgwrapper/observability': 0.10.1
       ioredis: 6.0.0
     transitivePeerDependencies:
       - supports-color
 
   '@tgwrapper/starter-support-bot@0.2.8':
     dependencies:
-      '@tgwrapper/adapter-redis': 0.9.0
+      '@tgwrapper/adapter-redis': 0.9.1
       '@tgwrapper/core': 0.21.1
-      '@tgwrapper/observability': 0.10.0
+      '@tgwrapper/observability': 0.10.1
       ioredis: 6.0.0
     transitivePeerDependencies:
       - supports-color
@@ -2999,18 +2986,6 @@ snapshots:
 
   import-meta-resolve@4.2.0: {}
 
-  ioredis@5.11.1:
-    dependencies:
-      '@ioredis/commands': 1.10.0
-      cluster-key-slot: 1.1.1
-      debug: 4.4.3
-      denque: 2.1.0
-      redis-errors: 1.2.0
-      redis-parser: 3.0.0
-      standard-as-callback: 2.1.0
-    transitivePeerDependencies:
-      - supports-color
-
   ioredis@6.0.0:
     dependencies:
       '@ioredis/commands': 2.0.0
@@ -3183,10 +3158,6 @@ snapshots:
   punycode@2.3.1: {}
 
   redis-errors@1.2.0: {}
-
-  redis-parser@3.0.0:
-    dependencies:
-      redis-errors: 1.2.0
 
   rolldown@1.2.16:
     dependencies:

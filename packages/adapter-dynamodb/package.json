@@ -43,7 +43,7 @@
     "test:integration": "vitest run test/dynamodb.integration.test.ts",
     "prepublishOnly": "node ../../scripts/enforce-ci-publish.mjs",
     "build:esm": "tsc -p tsconfig.json",
-    "build:cjs": "tsc -p tsconfig.cjs.json"
+    "build:cjs": "tsc -p tsconfig.cjs.json && node -e \"fs.writeFileSync('dist-cjs/package.json', JSON.stringify({ type: 'commonjs' }, null, 2))\""
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.800.0",
@@ -56,7 +56,7 @@
   "files": [
     "dist/**/*.js",
     "dist/**/*.d.ts",
-    "dist-cjs/**/*.js",
+    "dist-cjs/**/*",
     "README.md"
   ],
   "publishConfig": {

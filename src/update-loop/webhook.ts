@@ -1,3 +1,4 @@
+import { timingSafeSecretEqual } from '../core/timing-safe.js';
 import type { UpdateSource } from '../types/core.js';
 import type { Update } from '../types/telegram.js';
 import { isValidTelegramUpdate } from './update-validator.js';
@@ -39,6 +40,9 @@ export class WebhookSource implements UpdateSource {
     options: WebhookValidationOptions,
   ): boolean {
     const current = headers[options.headerName.toLowerCase()] ?? headers[options.headerName];
-    return current === options.secretToken;
+    if (typeof current !== 'string') {
+      return false;
+    }
+    return timingSafeSecretEqual(current, options.secretToken);
   }
 }

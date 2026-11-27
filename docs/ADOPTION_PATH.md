@@ -20,7 +20,7 @@ This guide outlines the progressive integration model for TGWrapper — from a m
         │  + RedisSessionAdapter (single instance)
         ▼
   [Stage 5: Distributed]
-        │  + Multi-instance + RedisRateLimiter + webhook mode
+        │  + Multi-instance + webhook mode (distributed Redis sliding-window rate limiting planned for v1.1)
         ▼
   [Stage 6: Production-Grade]
               Full telemetry stack, Prometheus, OTLP, hardening
@@ -104,18 +104,25 @@ const bot = createBotClient({
 
 ## 4. Distributed Scale (Multiple Instances)
 
-Add distributed rate limiting and switch to webhook mode:
+> **Rate limiting availability:** In-process `TokenBucket` rate limiting (`TokenBucketRateLimiter` in `@tgwrapper/core`) is available today for single-instance setups. Distributed Redis sliding-window rate limiting via `@tgwrapper/adapter-redis` (`createRateLimiter` / `RedisRateLimiter`) is planned for `v1.1` (see [`ROADMAP.md`](../ROADMAP.md)).
+
+Switch to webhook mode for multi-instance deployments, and pair with `TokenBucketRateLimiter` (in-process today) or the `v1.1` Redis sliding-window rate limiter once released:
 
 ```typescript
-import { RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
+import { TokenBucketRateLimiter, createBotClient } from '@tgwrapper/core';
 
-const kv = new RedisKvStore({ redisUrl: process.env.REDIS_URL! });
-const limiter = createRateLimiter(kv, {
-  namespace: 'bot-limit', windowMs: 10_000, limit: 5, blockDurationMs: 30_000
-});
+// Available today in @tgwrapper/core (in-process per-instance guard):
+const limiter = new TokenBucketRateLimiter({ capacity: 5, refillPerSecond: 1 });
 
-// Switch transport
+// Switch transport for horizontal scaling
 const bot = createBotClient({ token: process.env.BOT_TOKEN!, mode: 'webhook' });
+
+// Planned for v1.1 in @tgwrapper/adapter-redis (distributed sliding-window across instances):
+// import { RedisKvStore, createRateLimiter } from '@tgwrapper/adapter-redis';
+// const kv = new RedisKvStore({ redisUrl: process.env.REDIS_URL! });
+// const distributedLimiter = createRateLimiter(kv, {
+//   namespace: 'bot-limit', windowMs: 10_000, limit: 5, blockDurationMs: 30_000
+// });
 ```
 
 See [`examples/multi-instance-redis-starter`](../examples/multi-instance-redis-starter) for a complete runnable reference.

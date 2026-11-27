@@ -1,6 +1,7 @@
 # Launch Sequence — TGWrapper GTM
 
 > Internal reference doc for the launch phase.
+> **Current Version:** v0.21.1
 
 ---
 
@@ -20,15 +21,15 @@ Week 0–1: Messaging prep  →  Week 2: Soft launch  →  Week 3–4: Public la
 
 ### Checklist
 
-- [ ] `ICP.md` reviewed and finalized by all maintainers.
-- [ ] README quick start verified: clone → install → run < 5 minutes on a clean machine.
-- [ ] Three migration guides validated end-to-end:
-  - [ ] [`MIGRATION_FROM_TELEGRAF.md`](./MIGRATION_FROM_TELEGRAF.md)
-  - [ ] [`MIGRATION_FROM_GRMMY.md`](./MIGRATION_FROM_GRMMY.md)
-  - [ ] [`MIGRATION_FROM_NODE_TELEGRAM_BOT_API.md`](./MIGRATION_FROM_NODE_TELEGRAM_BOT_API.md)
-- [ ] `COMPARISON.md` reviewed for accuracy and tone (respectful, evidence-backed).
-- [ ] Example apps (`polling-starter`, `multi-instance-redis-starter`, `serverless-webhook-starter`) boot cleanly on latest published npm version.
-- [ ] Proof layer passes: `pnpm test && pnpm benchmark && pnpm telegram:baseline:check`.
+- [x] `ICP.md` reviewed and finalized by all maintainers.
+- [x] README quick start verified: clone → install → run < 5 minutes on a clean machine.
+- [x] Three migration guides validated end-to-end:
+  - [x] [`MIGRATION_FROM_TELEGRAF.md`](./MIGRATION_FROM_TELEGRAF.md)
+  - [x] [`MIGRATION_FROM_GRMMY.md`](./MIGRATION_FROM_GRMMY.md)
+  - [x] [`MIGRATION_FROM_NODE_TELEGRAM_BOT_API.md`](./MIGRATION_FROM_NODE_TELEGRAM_BOT_API.md)
+- [x] `COMPARISON.md` reviewed for accuracy and tone (respectful, evidence-backed).
+- [x] Example apps (`polling-starter`, `multi-instance-redis-starter`, `serverless-webhook-starter`) boot cleanly on latest published npm version.
+- [x] Proof layer passes: `pnpm test && pnpm benchmark && pnpm telegram:baseline:check`.
 
 ### Validation Gate
 
@@ -91,7 +92,7 @@ No pressure either way. Here's the repo: [link]
 
 ### Assets to publish before launch
 
-- [ ] **Blog post / dev.to article:** "Why We Built TGWrapper" — problem-first narrative, not feature list.
+- [x] **Blog post / dev.to article:** "Why We Built TGWrapper" — problem-first narrative, not feature list (core technical articles shipped per `docs/CONTENT_ROADMAP.md`).
 - [ ] **Hacker News / Reddit post:** Short, honest, technical. Link to repo + comparison matrix.
 - [ ] **Twitter/X thread:** 5–7 tweets. Hook = pain point. Body = code snippet. CTA = repo link.
 - [ ] **GitHub README** updated with any design-partner feedback incorporated.
@@ -115,7 +116,7 @@ No pressure either way. Here's the repo: [link]
 Example closing:
 
 ```
-TGWrapper is at v0.20.2 (targeting v1.0.0) — the core API and storage adapters are stable,
+TGWrapper is at v0.21.1 (targeting v1.0.0) — the core API and storage adapters are stable,
 and observability includes OpenTelemetry SDK support. We're looking for teams running
 production Telegram bots who want structured telemetry and are willing to give feedback on
 the trace schema. If that's you, open an issue or reach out.

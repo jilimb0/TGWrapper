@@ -1,10 +1,17 @@
 # TGWrapper Platform Roadmap
 
-Current Version: **v0.20.2** · Node.js: **>=24.0** · Status: **Production Ready**
+Current Version: **v0.21.1** · Node.js: **>=24.0** · Status: **Production Ready**
 
 ---
 
 ## 🚀 Shipped Milestones
+
+### v0.21.x — Bot API 10.x/10.4, HTMLBubbles & Orchestration Security
+- ✅ **Telegram Bot API 10.x & 10.4 Parity:** Streaming draft engine (`sendMessageDraft`, `sendRichMessageDraft`, `ActiveDraftRegistry`), `RichMessageBuilder` (tables, expandable block quotes up to 32 KB), `guest_message` / `stopped_message_generation` / `managed_bot` routing, and ephemeral button replies (`EphemeralMessageParameters`, `quote_rich_texts`).
+- ✅ **HTMLBubbles (`./tma`):** Sub-package micro-app runtime with bundle minification, 32 KB sandbox byte limit, security scanner, and HMAC state verification.
+- ✅ **Native HTML Widgets & Shared Widgets:** `sendWidget`, `sendSharedWidget`, `answerWidgetQuery`, `editMessageWidgetData`, `editSharedWidgetData`, `router.widgetQuery()`, `router.sharedWidgetQuery()`, and 1–32 KB / `<= 4 KB` zlib enforcement.
+- ✅ **Telegram Stars, Gifts & TON Wallet:** `getMyStarBalance`, `createChatSubscriptionInviteLink`, `sendGift`, `convertGiftToStars`, plus `TonWalletCard`, `TonWalletTransfer`, `WidgetQueryWallet` transaction events and data signing.
+- ✅ **CAS Approval Gates & Zero-Leakage Webhooks (`ADR-0005`):** `ApprovalGateBotBridge` wired to `SessionManager.compareAndSet` (`ag:<action>:<gateId>:<version>`), constant-time webhook secret verification (`crypto.timingSafeEqual`), and deep recursive PII + `bot[REDACTED]` token redaction in `@tgwrapper/observability`.
 
 ### v0.20.x — API Parity & Multi-Package Architecture
 - ✅ **Telegram Bot API 8.x Sync:** Automated drift detection, ephemeral message methods, and updated payloads.
@@ -30,7 +37,7 @@ Current Version: **v0.20.2** · Node.js: **>=24.0** · Status: **Production Read
 
 ---
 
-## 🎯 Active Milestone: v0.21.x / v1.0 — Performance Profiling & Launch Readiness (Current Focus)
+## 🎯 Active Milestone: v0.22.x / v1.0 — Performance Profiling & Launch Readiness (Current Focus)
 
 - [ ] **Memory Profiling Hooks:** Standardized hooks for capturing heap snapshots and detecting memory leaks under sustained webhook loads.
 - [ ] **Flamegraph Profiling Tooling:** Scripts and recipes to record CPU profiles and generate interactive flamegraphs during load tests.

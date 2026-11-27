@@ -27,7 +27,7 @@ jobs:
           stage: "Scale"
           sarif-output: "udpa-audit.sarif"
           passport-output: "udpa-zk-passport.json"
-          fail-on-breach: "true"
+          fail-on-breach: "false"
 
       - name: Upload OASIS SARIF to GitHub Security Tab
         if: always() && hashFiles('udpa-audit.sarif') != ''

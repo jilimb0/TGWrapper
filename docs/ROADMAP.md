@@ -10,16 +10,17 @@ This document outlines the architectural phases, delivery milestones, and develo
 flowchart LR
     P1["Phase 1: Core Stabilize<br/>(v0.15 - v0.18)<br/><b>[DONE]</b>"] --> P2["Phase 2: Distributed Storage<br/>(v0.19)<br/><b>[DONE]</b>"]
     P2 --> P3["Phase 3: DX & API Parity<br/>(v0.20)<br/><b>[DONE]</b>"]
-    P3 --> P4["Phase 4: Profiling & v1.0<br/>(v0.21 - v1.0)<br/><b>[IN PROGRESS]</b>"]
-    P4 --> P5["Phase 5: Ecosystem Scale<br/>(v1.1+)<br/><b>[PLANNED]</b>"]
+    P3 --> P4["Phase 4: Bot API 10.x & Security<br/>(v0.21.1)<br/><b>[DONE]</b>"]
+    P4 --> P5["Phase 5: Profiling & v1.0<br/>(v0.22 - v1.0)<br/><b>[IN PROGRESS]</b>"]
+    P5 --> P6["Phase 6: Ecosystem Scale<br/>(v1.1+)<br/><b>[PLANNED]</b>"]
 
     classDef done fill:#22c55e,stroke:#15803d,color:#ffffff;
     classDef active fill:#3b82f6,stroke:#1d4ed8,color:#ffffff;
     classDef planned fill:#64748b,stroke:#334155,color:#ffffff;
 
-    class P1,P2,P3 done;
-    class P4 active;
-    class P5 planned;
+    class P1,P2,P3,P4 done;
+    class P5 active;
+    class P6 planned;
 ```
 
 ---
@@ -31,8 +32,9 @@ flowchart LR
 | **Phase 1** | v0.15 – v0.18 | Core Stabilize & Reliability | Zero-dependency bot kernel, FSM, dual ESM/CJS, Redis CAS, failsafe memory fallback | ✅ **Completed** |
 | **Phase 2** | v0.19 | Multi-Engine Distributed State | DynamoDB adapter, MongoDB adapter, middleware pipeline (`useMiddleware`), webhook debugger UI | ✅ **Completed** |
 | **Phase 3** | v0.20 | Telegram API Parity & Observability | Telegram Bot API 8.x schema sync, TMA cryptographic validation (`crypto.timingSafeEqual`), Stars/Payments, OpenTelemetry SDK integration | ✅ **Completed** |
-| **Phase 4** | v0.21 – v1.0 | Profiling, Benchmarks & Hardening | Memory leak profiling hooks, CPU flamegraphs, benchmark dashboard, local webhook simulator, API freeze | 🔄 **Active** |
-| **Phase 5** | v1.1+ | Extended Ecosystem & Edge Scale | PostgreSQL/SQLite CAS adapters, sliding-window rate limiters, Deno Deploy/Bun edge presets, visual FSM builder | 📋 **Planned** |
+| **Phase 4** | v0.21.1 | Bot API 10.x/10.4 & CAS Security | `sendMessageDraft`, `HTMLBubbles`, Native HTML Widgets, Stars/Gifts, TON Wallet, `ADR-0005` `ApprovalGateBotBridge`, timing-safe webhooks, recursive PII redaction | ✅ **Completed** |
+| **Phase 5** | v0.22 – v1.0 | Profiling, Benchmarks & Hardening | Memory leak profiling hooks, CPU flamegraphs, benchmark dashboard, local webhook simulator, API freeze | 🔄 **Active** |
+| **Phase 6** | v1.1+ | Extended Ecosystem & Edge Scale | PostgreSQL/SQLite CAS adapters, sliding-window rate limiters, Deno Deploy/Bun edge presets, visual FSM builder | 📋 **Planned** |
 
 ---
 
@@ -56,14 +58,19 @@ flowchart LR
 - **Digital Goods & Telegram Stars (`./payments`):** Full invoice creation, pre-checkout query handling, and successful payment processing.
 - **First-Party OpenTelemetry Integration (`@tgwrapper/observability`):** Semantic conventions for Telegram update handling, distributed context propagation via `AsyncLocalStorage`, and Prometheus metrics exports.
 
-### Phase 4: Profiling, Benchmarks & v1.0 Readiness (Current Focus)
+### Phase 4: Bot API 10.x/10.4, HTMLBubbles & Orchestration Security (v0.21.1 — Shipped)
+- **Bot API 10.x & 10.4 Parity:** Streaming drafts (`sendMessageDraft`, `sendRichMessageDraft`), `RichMessageBuilder`, Native HTML & Shared Widgets (`sendWidget`, `sendSharedWidget`, `answerWidgetQuery`), Stars & Gifts (`getMyStarBalance`, `sendGift`, `convertGiftToStars`), and TON Wallet (`TonWalletCard`, `TonWalletTransfer`, `WidgetQueryWallet`).
+- **HTMLBubbles (`./tma`):** Sandboxed 32 KB HTML micro-app runtime with bundle minification, security scanning, and HMAC state verification.
+- **Orchestration & Webhook Security (`ADR-0005`):** `ApprovalGateBotBridge` with atomic CAS `expectedVersion` checks, constant-time webhook secret verification (`crypto.timingSafeEqual`), and recursive PII / `bot[REDACTED]` token redaction.
+
+### Phase 5: Profiling, Benchmarks & v1.0 Readiness (Current Focus)
 - **Memory Profiling Hooks:** Non-invasive heap snapshot capture and memory growth telemetry for high-throughput webhook workers.
 - **Flamegraph Profiling Tooling:** Integrated profiling scripts to generate CPU flamegraphs during peak load testing.
 - **Automated Benchmark Dashboard:** GitHub Pages regression tracking for updates-per-second (UPS) across releases.
 - **Local Webhook Simulator:** Offline development CLI to simulate incoming Telegram updates without third-party reverse proxies.
 - **Final v1.0 API Stability Lock:** API freeze across core exports in preparation for long-term support (LTS).
 
-### Phase 5: Extended Ecosystem & Edge Scale (Planned)
+### Phase 6: Extended Ecosystem & Edge Scale (Planned)
 - **Relational Storage Adapters:** `@tgwrapper/adapter-postgres` and `@tgwrapper/adapter-sqlite`.
 - **Edge Runtime Presets:** Native configuration templates for Deno Deploy, Fastly Compute, and Bun.
 - **Visual State Machine Designer:** Web UI to design and export validated FSM definitions.
